@@ -26,4 +26,5 @@ pnpm-debug.log*
 /public/assets/dune2.rc
 /src/core/dune2-rc.js
 
-
+# Test example
+/tests/unit/example.spec.js
