@@ -4,8 +4,7 @@
  * @param {*} palette 
  * @param {CanvasRenderingContext2D} context 
  */
-export function tileToImageData(tile, palette, context, scale=1) {
-    const colors = palette.getColorsList()
+export function tileToImageData(tile, colors, context, scale=1) {
     const tile_pixels = tile.getPixels()
     const tile_remap_table = tile.getRemaptable()
     const tile_width = tile.getWidth()
@@ -58,9 +57,11 @@ export function tileToDataURI(tile, palette, scale=4) {
     const canvas = document.createElement("canvas")
     const context = canvas.getContext("2d")
 
+    const colors = palette.getColorsList()
+
     canvas.width = tile.getWidth()*scale
     canvas.height = tile.getHeight()*scale
-    context.putImageData(tileToImageData(tile, palette, context, scale), 0, 0)
+    context.putImageData(tileToImageData(tile, colors, context, scale), 0, 0)
 
     return canvas.toDataURL()
 }

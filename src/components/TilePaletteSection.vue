@@ -3,7 +3,7 @@
         <header>{{name}}</header>
         {{count}}
         <ol>
-            <li v-for="index in count" :key="index">
+            <li class="item" v-for="index in count" :key="index">
                 <img :src="tileDataURI(index)">
             </li>
         </ol>
@@ -11,11 +11,22 @@
 </template>
 
 <style scoped>
+header {
+    font-family: sans-serif;
+    font-weight: bold;
+}
+ol {
+    line-height: 0;
+    /* padding: 0; */
+}
+.item {
+    /* display: inline-block; */
+    overflow: visible;
+}
 </style>
 
 <script>
 import {tileToDataURI} from "../core/tile"
-// import {setImmediate} from "../core/async"
 
 export default {
     props: ["name", "tiles", "palette"],
