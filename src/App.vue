@@ -4,7 +4,9 @@
             v-if="!gameData"
             :current="gameDataProgress"
             :label="gameDataProgressLabel" />
-        <tile-palette :tilesets="tilesets" :palette="palette"/>
+        <tile-palette 
+            v-if="gameData"
+            :tilesets="tilesets" :palette="palette"/>
         <screen ref="screen"/>
     </div>
 </template>
@@ -31,7 +33,7 @@ export default {
         const bytes = await fetch_data(
             "/assets/dune2.rc",
             (receivedLength, totalLength) => {
-                this.gameDataProgress = 100*Math.min(receivedLength/totalLength, 1)
+                this.gameDataProgress = Math.min(receivedLength/totalLength, 1)
             }
         )
         this.gameDataProgressLabel = "Deserializing the data ... "
