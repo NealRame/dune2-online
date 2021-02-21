@@ -12,6 +12,9 @@ canvas {
 
 <script>
 import debounce from "lodash/debounce"
+
+import Rect from "../maths/rect"
+import Painter from "../graphics/painter"
 export default {
     computed: {
         context() {
@@ -22,7 +25,16 @@ export default {
         },
         height() {
             return this.$refs.canvas.height
-        }
+        },
+        size() {
+            return {
+                width: this.width,
+                height: this.height
+            }
+        },
+        rect() {
+            return Rect({ x: 0, y: 0, }, this.size)
+        },
     },
     mounted() {
         const update_screen_size = () => {
@@ -30,16 +42,14 @@ export default {
             this.$refs.canvas.width = window.innerWidth - left_pos
             this.$refs.canvas.height = window.innerHeight
         }
+
         update_screen_size()
         window.addEventListener("resize", debounce(update_screen_size, 200))
 
+        const painter = Painter(this)
+
         const loop = () => {
-            const context = this.context
-
-            context.lineWidth = 1
-            context.fillStyle = "#dead33"
-            context.fillRect(64, 64, 128, 128)
-
+            painter.clear()
             requestAnimationFrame(loop)
         }
         loop()
