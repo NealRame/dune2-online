@@ -26,7 +26,7 @@ ol {
 </style>
 
 <script>
-import {tileToDataURI} from "../core/tile"
+import {tileToImageData} from "../core/tile"
 
 export default {
     props: ["name", "tiles", "palette"],
@@ -37,7 +37,8 @@ export default {
     },
     methods: {
         tileDataURI(index) {
-            return tileToDataURI(this.tiles[index - 1], this.palette)
+            const surface = tileToImageData(this.tiles[index - 1], this.palette, 4)
+            return surface.dataUri
         }
     }
 }
