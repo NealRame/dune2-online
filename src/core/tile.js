@@ -7,8 +7,6 @@ import Surface from "../graphics/surface"
  * @param {CanvasRenderingContext2D} context 
  */
 export function tileToImageData(tile, palette, scale=1) {
-    const colors = palette.getColorsList()
-
     const tile_pixels = tile.getPixels()
     const tile_remap_table = tile.getRemaptable()
     const tile_width = tile.getWidth()
@@ -24,19 +22,14 @@ export function tileToImageData(tile, palette, scale=1) {
 
         for (let col = 0; col < tile_width; ++col) {
             const tile_pixel_index = row*tile_width + col
-            const tile_pixel_color = colors[
+            const tile_pixel_color = palette[
                 tile_remap_table.length > 0
                     ? tile_remap_table[tile_pixels[tile_pixel_index]]
                     : tile_pixels[tile_pixel_index]
             ]
 
             const image_pixel_index = image_row_offset + 4*scale*col
-            const image_pixel = [
-                Math.trunc(255*tile_pixel_color.getRed()),
-                Math.trunc(255*tile_pixel_color.getGreen()),
-                Math.trunc(255*tile_pixel_color.getBlue()),
-                255,
-            ]
+            const image_pixel = tile_pixel_color.rgba255
 
             for (let i = 0; i < scale; ++i) {
                 surface.pixels.set(image_pixel, image_pixel_index + 4*i)

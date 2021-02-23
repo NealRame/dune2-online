@@ -6,14 +6,19 @@
             :label="gameDataProgressLabel" />
         <tile-palette 
             v-if="gameData"
-            :tilesets="tilesets" :palette="palette"/>
+            :tilesets="tilesets" :palette="gamePalette"/>
         <screen ref="screen"/>
     </div>
 </template>
 
+<style scoped>
+</style>
+
 <script>
 import {fetch_data} from "./core/functional"
 import * as DuneRC from "./core/dune2-rc"
+
+import Palette from "./core/palette"
 
 import ProgressBar from "./components/ProgressBar.vue"
 import Screen from "./components/Screen.vue"
@@ -26,6 +31,7 @@ export default {
             gameDataProgressLabel: "",
             gameDataProgress: 0,
             gameData: null,
+            gamePalette: null,
         }
     },
     async mounted() {
@@ -38,17 +44,13 @@ export default {
         )
         this.gameDataProgressLabel = "Deserializing the data ... "
         this.gameData = DuneRC.Data.deserializeBinary(bytes)
+        this.gamePalette = Palette(this.gameData)
     },
     computed: {
         tilesets() {
             return this.gameData != null
                 ? this.gameData.getTilesetsMap()
                 : new Map()
-        },
-        palette() {
-            return this.gameData != null
-                ? this.gameData.getPalettesMap().get("Bene")
-                : null
         }
     }
 }
