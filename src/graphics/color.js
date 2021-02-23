@@ -1,7 +1,6 @@
 import clamp from "lodash/clamp"
 import pad_start from "lodash/padStart"
 
-
 function rgb2hsl(r, g, b) {
     const max = Math.max(r, g, b)
     const min = Math.min(r, g, b)
@@ -58,7 +57,7 @@ function toHex(v) {
     return pad_start(toByte(v).toString(16), 2, "0")
 }
 
-export function Color(r, g, b, a = 1) {
+export default function Color(r, g, b, a = 1) {
     return {
         get red()   { return r },
         get red255()   { return toByte(r) },
@@ -68,22 +67,24 @@ export function Color(r, g, b, a = 1) {
         get blue255()  { return toByte(b) },
         get alpha() { return a },
         get alpha255() { return toByte(a) },
-        get array() { return [r, g, b, a] },
-        get array255() { return [r, b, g, a].map(toByte) },
+        get rgb() { return [r, g, b] },
+        get rgba() { return [r, g, b, a] },
+        get rgb255() { return [r, g, b].map(toByte) },
+        get rgba255() { return [r, g, b, a].map(toByte) },
         get hex() {
             return `#${[r, g, b].map(toHex).join("")}`
         },
-        get rgb() {
+        get cssrgb() {
             return `rgb(${[r, g, b].map(toByte).join(",")})`
         },
-        get hsl() {
+        get csshsl() {
             const [h, s, l] = rgb2hsl(r, g, b)
             return `hsl(${h},${s}%,${l}%,${a})`
         },
-        get rgba() {
+        get cssrgba() {
             return `rgb(${[r, g, b].map(toByte).join(",")},${a})`
         },
-        get hsla() {
+        get csshsla() {
             const [h, s, l] = rgb2hsl(r, g, b)
             return `hsla(${h},${s}%,${l}%,${a})`
         },
@@ -116,18 +117,18 @@ Color.hsla = function hsla(h, s, l, a) {
 
 Color.rgb = function rgb(r, g, b) {
     return Color(
-        Math.round(clamp(r, 0, 255))/255,
-        Math.round(clamp(g, 0, 255))/255,
-        Math.round(clamp(b, 0, 255))/255,
+        clamp(r, 0, 1),
+        clamp(g, 0, 1),
+        clamp(b, 0, 1),
         1
     )
 }
 
 Color.rgba = function rgba(r, g, b, a) {
     return Color(
-        Math.round(clamp(r, 0, 255))/255,
-        Math.round(clamp(g, 0, 255))/255,
-        Math.round(clamp(b, 0, 255))/255,
-        clamp(a, 0, 1)
+        clamp(r, 0, 1),
+        clamp(g, 0, 1),
+        clamp(b, 0, 1),
+        clamp(a, 0, 1),
     )
 }
