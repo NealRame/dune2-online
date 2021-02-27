@@ -2,7 +2,7 @@
     <div>
         <label>
             {{label}}
-            <progress id="" :value="current" max=1></progress>
+            <progress id="" :value="current" :max="total"></progress>
         </label>
     </div>
 </template>

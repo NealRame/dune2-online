@@ -1,24 +1,28 @@
 <template>
     <div>
         <progress-bar
-            v-if="!gameData"
+            v-if="gameDataLoading"
             :current="gameDataProgress"
             :label="gameDataProgressLabel" />
-        <tile-palette 
-            v-if="gameData"
-            :tilesets="tilesets" :palette="gamePalette"/>
-        <screen ref="screen"/>
+        <tile-palette
+            v-if="!gameDataLoading"
+            :tilesets="gameTilesets" />
+        <screen
+            v-if="!gameDataLoading"
+            ref="screen" />
     </div>
 </template>
 
 <style scoped>
+
 </style>
 
 <script>
 import {fetch_data} from "./core/functional"
 import * as DuneRC from "./core/dune2-rc"
 
-import Palette from "./core/palette"
+import {loadPalette} from "./core/palette"
+import {loadTilesets} from "./core/tile"
 
 import ProgressBar from "./components/ProgressBar.vue"
 import Screen from "./components/Screen.vue"
@@ -28,10 +32,11 @@ export default {
     components: {ProgressBar, Screen, TilePalette},
     data() {
         return {
+            gameDataLoading: true,
             gameDataProgressLabel: "",
             gameDataProgress: 0,
-            gameData: null,
             gamePalette: null,
+            gameTilesets: null,
         }
     },
     async mounted() {
@@ -43,15 +48,15 @@ export default {
             }
         )
         this.gameDataProgressLabel = "Deserializing the data ... "
-        this.gameData = DuneRC.Data.deserializeBinary(bytes)
-        this.gamePalette = Palette(this.gameData)
+        const game_data = DuneRC.Data.deserializeBinary(bytes)
+
+        this.gameDataProgressLabel = "Loading palette ... "
+        this.gamePalette = await loadPalette(game_data)
+
+        this.gameDataProgressLabel = "Loading tilesets ... "
+        this.gameTilesets = await loadTilesets(game_data, this.gamePalette)
+
+        this.gameDataLoading = false
     },
-    computed: {
-        tilesets() {
-            return this.gameData != null
-                ? this.gameData.getTilesetsMap()
-                : new Map()
-        }
-    }
 }
 </script>

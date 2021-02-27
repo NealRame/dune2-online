@@ -1,4 +1,5 @@
 import Surface from "../graphics/surface"
+// import {setImmediate} from "./async"
 
 /**
  * 
@@ -46,4 +47,26 @@ export function tileToImageData(tile, palette, scale=1) {
     }
 
     return surface
+}
+
+export function* loadTiles(pb_tiles, palette, scales) {
+    for (const pb_tile of pb_tiles) {
+        yield Object.assign({}, ...scales.map(scale => ({
+            [scale]: tileToImageData(pb_tile, palette, scale)
+        })))
+    }
+}
+
+export async function loadTilesets(game_data, palette) {
+    const pb_tilesets = game_data.getTilesetsMap()
+    const tilesets = {}
+    for (const name of pb_tilesets.keys()) {
+        const tiles = pb_tilesets.get(name).getTilesList()
+        const surfaces = []
+        for await (const tile of loadTiles(tiles, palette, [1, 2, 3, 4])) {
+            surfaces.push(tile)
+        }
+        tilesets[name] = surfaces
+    }
+    return tilesets
 }

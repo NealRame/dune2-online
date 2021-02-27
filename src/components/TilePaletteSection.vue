@@ -1,10 +1,9 @@
 <template>
     <section>
         <header>{{name}}</header>
-        {{count}}
         <ol>
-            <li class="item" v-for="index in count" :key="index">
-                <img :src="tileDataURI(index)">
+            <li class="item" v-for="(tile, index) in tiles" :key="index">
+                <img :src="tile.dataURI">
             </li>
         </ol>
     </section>
@@ -26,19 +25,11 @@ ol {
 </style>
 
 <script>
-import {tileToImageData} from "../core/tile"
-
 export default {
-    props: ["name", "tiles", "palette"],
-    computed: {
-        count() {
-            return this.tiles.length
-        },
-    },
+    props: ["name", "tiles"],
     methods: {
-        tileDataURI(index) {
-            const surface = tileToImageData(this.tiles[index - 1], this.palette, 4)
-            return surface.dataUri
+        dataURI(tile) {
+            return tile.dataUri
         }
     }
 }

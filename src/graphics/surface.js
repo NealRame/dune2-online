@@ -24,7 +24,7 @@ export default function Surface({width, height}, pixels = null) {
         get imageData() {
             return image_data
         },
-        get dataUri() {
+        get dataURI() {
             const canvas = document.createElement("canvas")
             const context = canvas.getContext("2d")
 

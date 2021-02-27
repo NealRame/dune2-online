@@ -1,11 +1,10 @@
 <template>
     <div class="tile-palette">
         <ul>
-            <li v-for="section in sections" :key="section">
-                <tile-palette-section
-                    :palette="palette"
-                    :name="section"
-                    :tiles="tiles(section)" />
+            <li v-for="name in sections" :key="name">
+                <tile-palette-section 
+                    :name="name"
+                    :tiles="tiles(name)" />
             </li>
         </ul>
     </div>
@@ -34,19 +33,16 @@ ul {
 import TilePaletteSection from "./TilePaletteSection.vue"
 export default {
     components: {TilePaletteSection},
-    props: ["tilesets", "palette"],
+    props: ["tilesets"],
     computed: {
         sections() {
-            return this.tilesets.keys()
-        }
+            return Object.keys(this.tilesets)
+        },
     },
     methods: {
-        tiles(name) {
-            const tileset = this.tilesets.get(name)
-            return tileset != null
-                ? tileset.getTilesList()
-                : []
-        }
+        tiles(section) {
+            return this.tilesets[section].map(tile => tile[3])
+        },
     }
 }
 </script>
