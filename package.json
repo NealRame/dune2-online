@@ -25,6 +25,7 @@
     "lodash": "^4.17.20",
     "sass": "^1.30.0",
     "sass-loader": "^10.1.0",
+    "style-resources-loader": "^1.4.1",
     "vue": "^3.0.4"
   }
 }

@@ -2,11 +2,11 @@
     <canvas ref="canvas"></canvas>
 </template>
 
-<style scoped>
+<style lang="scss" scoped>
 canvas {
     position: absolute;
     top: 0;
-    left: 256px;
+    left: $palette-width;
 }
 </style>
 

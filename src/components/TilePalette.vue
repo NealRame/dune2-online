@@ -2,7 +2,7 @@
     <div class="tile-palette">
         <ul>
             <li v-for="name in sections" :key="name">
-                <tile-palette-section 
+                <tile-palette-section
                     :name="name"
                     :tiles="tiles(name)" />
             </li>
@@ -10,22 +10,22 @@
     </div>
 </template>
 
-<style scoped>
+<style lang="scss" scoped>
 .tile-palette {
-    border-right: 1px solid black;
-    background-color: rgb(24, 24, 24);
-    color: rgb(128, 128, 128);
+    background-color: $palette-bg-color;
+    color: $palette-color;
 
     position: absolute;
     left: 0;
     top: 0;
-    width: 256px;
+    width: $palette-width;
     height: 100vh;
 
     overflow: scroll;
-}
-ul {
-    padding: 0;
+
+    ul {
+        padding: 0;
+    }
 }
 </style>
 

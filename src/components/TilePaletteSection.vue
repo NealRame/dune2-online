@@ -16,10 +16,8 @@ header {
 }
 ol {
     line-height: 0;
-    /* padding: 0; */
 }
 .item {
-    /* display: inline-block; */
     overflow: visible;
 }
 </style>
