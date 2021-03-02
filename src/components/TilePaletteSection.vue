@@ -31,6 +31,6 @@ export default {
         dataURI(tile) {
             return tile.dataUri
         }
-    }
+    },
 }
 </script>

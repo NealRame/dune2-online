@@ -12,6 +12,6 @@
 
 <script>
 export default {
-    props: ["current", "label", "total"],
+    props: ["current", "label"],
 }
 </script>

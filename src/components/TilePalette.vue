@@ -31,9 +31,14 @@ ul {
 
 <script>
 import TilePaletteSection from "./TilePaletteSection.vue"
+
 export default {
     components: {TilePaletteSection},
-    props: ["tilesets"],
+    data() {
+        return {
+            tilesets: {}
+        }
+    },
     computed: {
         sections() {
             return Object.keys(this.tilesets)
@@ -41,8 +46,13 @@ export default {
     },
     methods: {
         tiles(section) {
-            return this.tilesets[section].map(tile => tile[3])
+            return this.tilesets[section]
         },
+        setTilesets(tilesets) {
+            for (const [name, tiles] of Object.entries(tilesets)) {
+                this.tilesets[name] = tiles.map(tile => tile[3])
+            }
+        }
     }
 }
 </script>
