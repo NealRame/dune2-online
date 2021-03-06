@@ -13,8 +13,10 @@ canvas {
 <script>
 import debounce from "lodash/debounce"
 
-import Rect from "../maths/rect"
-import Painter from "../graphics/painter"
+import Rect from "@/maths/rect"
+import Painter from "@/graphics/painter"
+import Scene from "@/graphics/scene"
+
 export default {
     computed: {
         context() {

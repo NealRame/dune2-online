@@ -30,7 +30,7 @@
 </style>
 
 <script>
-import TilePaletteSection from "./TilePaletteSection.vue"
+import TilePaletteSection from "@/components/TilePaletteSection.vue"
 
 export default {
     components: {TilePaletteSection},

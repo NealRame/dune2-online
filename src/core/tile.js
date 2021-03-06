@@ -1,4 +1,4 @@
-import Surface from "../graphics/surface"
+import Surface from "@/graphics/surface"
 
 /**
  * 

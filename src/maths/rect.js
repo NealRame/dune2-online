@@ -1,4 +1,4 @@
-import Vector from "./vector"
+import Vector from "@/maths/vector"
 
 import is_number from "lodash/isNumber"
 import clamp from "lodash/clamp"

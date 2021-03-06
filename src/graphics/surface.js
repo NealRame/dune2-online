@@ -1,5 +1,5 @@
 import is_nil from "lodash/isNil"
-import Rect from "../maths/rect"
+import Rect from "@/maths/rect"
 
 export default function Surface({width, height}, pixels = null) {
     pixels = is_nil(pixels) ? new Uint8ClampedArray(4*width*height) : pixels
