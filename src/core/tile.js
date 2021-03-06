@@ -1,5 +1,4 @@
 import Surface from "../graphics/surface"
-// import {setImmediate} from "./async"
 
 /**
  * 
