@@ -50,7 +50,7 @@ export default {
         },
         setTilesets(tilesets) {
             for (const [name, tiles] of Object.entries(tilesets)) {
-                this.tilesets[name] = tiles.map(tile => tile[3])
+                this.tilesets[name] = Object.freeze(tiles.map(tile => tile[3]))
             }
         }
     }

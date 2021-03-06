@@ -3,7 +3,7 @@
         <header>{{name}}</header>
         <ol>
             <li class="item" v-for="(tile, index) in tiles" :key="index">
-                <img :src="tile.dataURI">
+                <img :src="tile.dataURI()">
             </li>
         </ol>
     </section>
@@ -25,10 +25,5 @@ ol {
 <script>
 export default {
     props: ["name", "tiles"],
-    methods: {
-        dataURI(tile) {
-            return tile.dataUri
-        }
-    },
 }
 </script>

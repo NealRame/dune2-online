@@ -1,18 +1,19 @@
-import Surface from "@/graphics/surface"
+import Surface from "../graphics/surface"
 
 /**
  * 
  * @param {*} tile 
  * @param {*} palette 
  * @param {CanvasRenderingContext2D} context 
+ * @returns {Surface}
  */
-export function tileToImageData(tile, palette, scale=1) {
+export function tileToSurface(tile, palette, scale=1) {
     const tile_pixels = tile.getPixels()
     const tile_remap_table = tile.getRemaptable()
     const tile_width = tile.getWidth()
     const tile_height = tile.getHeight()
 
-    const surface = Surface({
+    const surface = new Surface({
         width: tile_width*scale,
         height: tile_height*scale,
     })
@@ -51,7 +52,7 @@ export function tileToImageData(tile, palette, scale=1) {
 export function* loadTiles(pb_tiles, palette, scales) {
     for (const pb_tile of pb_tiles) {
         yield Object.assign({}, ...scales.map(scale => ({
-            [scale]: tileToImageData(pb_tile, palette, scale)
+            [scale]: tileToSurface(pb_tile, palette, scale)
         })))
     }
 }
