@@ -1,67 +1,75 @@
 import is_number from "lodash/isNumber"
 import is_string from "lodash/isString"
 
-export default function Painter(paint_device) {
-    const context = paint_device.context
-    return {
-        // Pen and brush
-        getPen() {
-            return {
-                lineWidth: context.lineWidth,
-                strokeStyle: context.strokeStyle,
-            }
-        },
-        setPen(pen) {
-            if (is_number(pen)) {
-                context.lineWidth = pen
-            } else if (is_string(pen)) {
-                context.strokeStyle = pen
-            } else {
-                const {lineWidth, strokeStyle} = pen
-                context.lineWidth = lineWidth
-                context.strokeStyle = strokeStyle
-            }
-        },
-        getBrush() {
-            return context.fillStyle
-        },
-        setBrush(brush) {
-            context.fillStyle = brush
-        },
-        // Drawing routines
-        clear(brush) {
-            context.save()
-            context.fillStyle = brush
-            context.fillRect(0, 0, paint_device.width, paint_device.height)
-            context.restore()
-            return this
-        },
-        drawLine({x: x1, y: y1}, {x: x2, y: y2}) {
-            context.beginPath()
-            context.moveTo({x: x1, y: y1})
-            context.lineTo({x: x2, y: y2})
-            context.stroke()
-            return this
-        },
-        drawRect({topLeft, topRight, bottomLeft, bottomRight}) {
-            context.beginPath()
-            context.moveTo(topLeft)
-            context.lineTo(topRight)
-            context.lineTo(bottomRight)
-            context.lineTo(bottomLeft)
-            context.closePath()
-            context.stroke()
-            return this
-        },
-        fillRect({topLeft, topRight, bottomLeft, bottomRight}) {
-            context.beginPath()
-            context.moveTo(topLeft)
-            context.lineTo(topRight)
-            context.lineTo(bottomRight)
-            context.lineTo(bottomLeft)
-            context.closePath()
-            context.fill()
-            return this
-        },
+export default class Painter {
+    #context
+
+    /**
+     * 
+     * @param {CanvasRenderingContext2D} context 
+     */
+    constructor(context) {
+        this.#context = context
+    }
+
+    get pen() {
+        return {
+            lineWidth: this.#context.lineWidth,
+            strokeStyle: this.#context.strokeStyle,
+        }
+    }
+    set pen(pen) {
+        if (is_number(pen)) {
+            this.#context.lineWidth = pen
+        } else if (is_string(pen)) {
+            this.#context.strokeStyle = pen
+        } else {
+            const {lineWidth, strokeStyle} = pen
+            this.#context.lineWidth = lineWidth
+            this.#context.strokeStyle = strokeStyle
+        }
+    }
+
+    get brush() {
+        return this.#context.fillStyle
+    }
+    set brush(brush) {
+        this.#context.fillStyle = brush
+    }
+
+    // Drawing routines
+    clear(brush) {
+        this.#context.save()
+        this.#context.fillStyle = brush
+        this.#context.fillRect(0, 0, this.#context.canvas.width, this.#context.canvas.height)
+        this.#context.restore()
+        return this
+    }
+    drawLine({x: x1, y: y1}, {x: x2, y: y2}) {
+        this.#context.beginPath()
+        this.#context.moveTo({x: x1, y: y1})
+        this.#context.lineTo({x: x2, y: y2})
+        this.#context.stroke()
+        return this
+    }
+    drawRect({topLeft, topRight, bottomLeft, bottomRight}) {
+        this.#context.beginPath()
+        this.#context.moveTo(topLeft)
+        this.#context.lineTo(topRight)
+        this.#context.lineTo(bottomRight)
+        this.#context.lineTo(bottomLeft)
+        this.#context.closePath()
+        this.#context.stroke()
+        return this
+    }
+    fillRect({topLeft, topRight, bottomLeft, bottomRight}) {
+        this.#context.beginPath()
+        this.#context.moveTo(topLeft)
+        this.#context.lineTo(topRight)
+        this.#context.lineTo(bottomRight)
+        this.#context.lineTo(bottomLeft)
+        this.#context.closePath()
+        this.#context.fill()
+        return this
     }
 }
