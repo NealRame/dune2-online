@@ -1,10 +1,9 @@
+import Rect from "../maths/rect"
+
 import isNil from "lodash/isNil"
-import Rect from "@/maths/rect"
 
 /**
- * @typedef Size
- * @property {number} height
- * @property {number} width
+ * @typedef {{width: number, height: number}} Size
  */
 
 /**
@@ -60,8 +59,8 @@ export default class Surface {
     /**
      * 
      * @param {Surface} surface 
-     * @param {*} src_rect 
-     * @param {*} dst_rect 
+     * @param {Rect} src_rect 
+     * @param {Rect} dst_rect 
      * @returns {Surface} this surface
      */
     blit(surface, src_rect, dst_rect) {
