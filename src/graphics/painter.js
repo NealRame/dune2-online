@@ -1,5 +1,5 @@
-import is_number from "lodash/isNumber"
-import is_string from "lodash/isString"
+import isNumber from "lodash/isNumber"
+import isString from "lodash/isString"
 
 export default class Painter {
     #context
@@ -19,9 +19,9 @@ export default class Painter {
         }
     }
     set pen(pen) {
-        if (is_number(pen)) {
+        if (isNumber(pen)) {
             this.#context.lineWidth = pen
-        } else if (is_string(pen)) {
+        } else if (isString(pen)) {
             this.#context.strokeStyle = pen
         } else {
             const {lineWidth, strokeStyle} = pen
