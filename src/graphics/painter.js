@@ -1,6 +1,11 @@
 import isNumber from "lodash/isNumber"
 import isString from "lodash/isString"
 
+/**
+ * @typedef {import("../graphics/surface").default} Surface
+ * @typedef {import("../maths/rect").default} Rect
+ */
+
 export default class Painter {
     #context
 
