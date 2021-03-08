@@ -5,12 +5,12 @@ import clamp from "lodash/clamp"
 
 /**
  * @typedef {{x: number, y: number}} Point
- */
-
-/**
  * @typedef {{width: number, height: number}} Size
  */
 
+/**
+ * @class Rect
+ */
 export default class Rect {
     #width
     #height
