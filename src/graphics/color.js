@@ -1,3 +1,7 @@
+/**
+ * @module graphics/color
+ */
+
 import clamp from "lodash/clamp"
 import pad_start from "lodash/padStart"
 
@@ -57,7 +61,42 @@ function toHex(v) {
     return pad_start(toByte(v).toString(16), 2, "0")
 }
 
-export default function Color(r, g, b, a = 1) {
+/**
+ * @callback DarkenMethod
+ * @param {number} amount value between 0% and 100%
+ * @returns {Color}
+ */
+
+/**
+ * @callback LightenMethod
+ * @param {number} amount value between 0% and 100%
+ * @returns {Color}
+ */
+
+/**
+ * @typedef Color
+ * @property {number} alpha alpha value in the interval [0,1]
+ * @property {number} red red value in the interval [0,1]
+ * @property {number} green green value in the interval [0,1]
+ * @property {number} blue blue value in the interval [0,1]
+ * @property {number} alpha255 integer alpha value in the interval [0,255]
+ * @property {number} red255 integer red value in the interval [0,255]
+ * @property {number} green255 integer green value in the interval [0,255]
+ * @property {number} blue255 integer blue value in the interval [0,255]
+ * @property {Array<number>} rgb an array containing the red, green, and blue float values
+ * @property {Array<number>} rgba an array containing the red, green, blue and alpha float values
+ * @property {Array<number>} rgb255 an array containing the red, green, and blue integer values
+ * @property {Array<number>} rgba255 an array containing the red, green, blue and alpha integer values
+ * @property {string} hex css #rrggbb string representation
+ * @property {string} cssrgb css rgb(r, g, b) string representation
+ * @property {string} csshsl css hsl(h, s, l) string representation
+ * @property {string} cssrgba css rgba(r, g, b, a) string representation
+ * @property {string} csshsla css hsla(h, s, l, a) string representation
+ * @property {DarkenMethod} darken Makes a darker color
+ * @property {LightenMethod} lighten Makes a lighter color
+*/
+
+function createColor(r, g, b, a = 1) {
     return {
         get red()   { return r },
         get red255()   { return toByte(r) },
@@ -90,33 +129,55 @@ export default function Color(r, g, b, a = 1) {
         },
         darken(amount) {
             const [h, s, l] = rgb2hsl(r, g, b)
-            return Color(...hsl2rgb(h, s, clamp(l - amount/100, 0, 1)), a)
+            return createColor(...hsl2rgb(h, s, clamp(l - amount/100, 0, 1)), a)
         },
         lighten(amount) {
             const [h, s, l] = rgb2hsl(r, g, b)
-            return Color(...hsl2rgb(h, s, clamp(l + amount/100, 0, 1)), a)
+            return createColor(...hsl2rgb(h, s, clamp(l + amount/100, 0, 1)), a)
         }
     }
 }
 
-Color.hsl = function hsl(h, s, l) {
-    return Color(...hsl2rgb(
+/**
+ * Create a HSL color
+ * @param {number} h hue
+ * @param {number} s saturation
+ * @param {number} l lightness
+ * @returns {Color}
+ */
+export function hsl(h, s, l) {
+    return createColor(...hsl2rgb(
         (h%360)/360,
         clamp(s, 0, 100)/100,
         clamp(l, 0, 100)/100
     ), 1)
 }
 
-Color.hsla = function hsla(h, s, l, a) {
-    return Color(...hsl2rgb(
+/**
+ * Create a HSLa color
+ * @param {number} h hue
+ * @param {number} s saturation
+ * @param {number} l lightness
+ * @param {number} a alpha
+ * @returns {Color}
+ */
+export function hsla(h, s, l, a) {
+    return createColor(...hsl2rgb(
         (h%360)/360,
         clamp(s, 0, 100)/100,
         clamp(l, 0, 100)/100
     ), a)
 }
 
-Color.rgb = function rgb(r, g, b) {
-    return Color(
+/**
+ * Create a RGB color
+ * @param {number} r red
+ * @param {number} g green
+ * @param {number} b blue
+ * @returns {Color}
+ */
+export function rgb(r, g, b) {
+    return createColor(
         clamp(r, 0, 1),
         clamp(g, 0, 1),
         clamp(b, 0, 1),
@@ -124,8 +185,16 @@ Color.rgb = function rgb(r, g, b) {
     )
 }
 
-Color.rgba = function rgba(r, g, b, a) {
-    return Color(
+/**
+ * Create a RGBa color
+ * @param {number} r red
+ * @param {number} g green
+ * @param {number} b blue
+ * @param {number} a alpha
+ * @returns {Color}
+ */
+export function rgba(r, g, b, a) {
+    return createColor(
         clamp(r, 0, 1),
         clamp(g, 0, 1),
         clamp(b, 0, 1),
