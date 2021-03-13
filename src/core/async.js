@@ -1,3 +1,5 @@
 export function setImmediate(fn, ...args) {
-    return Promise.resolve().then(() => fn(...args))
+    return new Promise(resolve => {
+        setTimeout(() => resolve(fn(...args)), 0)
+    })
 }
