@@ -18,10 +18,10 @@
 
 <script>
 import {fetch_data} from "./core/functional"
-import * as DuneRC from "./core/dune2-rc"
-
 import {loadPalette} from "./core/palette"
 import {loadTilesets} from "./core/tile"
+
+import * as DuneRC from "./core/dune2-rc"
 
 import ProgressBar from "./components/ProgressBar.vue"
 import Screen from "./components/Screen.vue"
@@ -38,9 +38,9 @@ export default {
         }
     },
     async mounted() {
-        this.gameDataProgressLabel = "Fetching data ... "
         this.gameDataLoading = true
 
+        this.gameDataProgressLabel = "Fetching data ... "
         const bytes = await fetch_data(
             "/assets/dune2.rc",
             (receivedLength, totalLength) => {
