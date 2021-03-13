@@ -143,6 +143,20 @@ export default class Rect {
 
     /**
      * 
+     * @returns {Rect}
+     */
+    copy() {
+        return new Rect({
+            x: this.#x,
+            y: this.#y,
+        }, {
+            width: this.#width,
+            height: this.#height
+        })
+    }
+
+    /**
+     * 
      * @param {Rect} rect
      * @returns {boolean}
      */
