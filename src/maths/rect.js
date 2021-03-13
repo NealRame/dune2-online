@@ -166,7 +166,6 @@ export default class Rect {
             || this.contains(rect.bottomLeft())
             || this.contains(rect.topLeft())
     }
-
     /**
      * 
      * @param {Rect} rect 
@@ -187,14 +186,18 @@ export default class Rect {
      * @param {Size} size
      * @returns {Rect}
      */
+    crop({width, height}) {
+        this.#width = width
+        this.#height = height
+        return this
+    }
+    /**
+     * 
+     * @param {Size} size
+     * @returns {Rect}
+     */
     cropped({width, height}) {
-        return Rect({
-            x: this.leftX,
-            y: this.topY,
-        }, {
-            width: clamp(this.width, 0, width),
-            height: clamp(this.height, 0, height),
-        })
+        return this.copy().crop({width, height})
     }
 
     /**
@@ -202,11 +205,18 @@ export default class Rect {
      * @param {Point} vector
      * @returns {Rect}
      */
+    translate({x, y}) {
+        this.#x += x
+        this.#y += y
+        return this
+    }
+    /**
+     * 
+     * @param {Point} vector
+     * @returns {Rect}
+     */
     translated({x, y}) {
-        return Rect(
-            {x: this.x + x, y: this.y + y},
-            this.size
-        )
+        return this.copy().translate({x, y})
     }
 
     /**
@@ -214,11 +224,18 @@ export default class Rect {
      * @param {(number | {x: number, y: number})} f scale factor
      * @returns {Rect}
      */
-    scaled(f) {
+    scale(f) {
         const {x, y} = is_number(f) ? {x: f, y: f} : f
-        return Rect(
-            this.topLeft,
-            {width: this.width*x, height: this.height*y}
-        )
+        this.#width *= x
+        this.#height *= y
+        return this
+    }
+    /**
+     * 
+     * @param {(number | {x: number, y: number})} f scale factor
+     * @returns {Rect}
+     */
+    scaled(f) {
+        return this.copy().scale(f)
     }
 }
