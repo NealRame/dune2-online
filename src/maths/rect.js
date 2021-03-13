@@ -12,50 +12,25 @@ import clamp from "lodash/clamp"
  * @class Rect
  */
 export default class Rect {
-    #x
-    #y
-    #width
-    #height
-
     /**
      * Constructs Rect based on the top left point and a size
      * @param {Point} point
      * @param {Size} size
      */
     constructor({x, y}, {width, height}) {
-        this.#x = x
-        this.#y = y
-        this.#width = width
-        this.#height = height
+        this.x = x
+        this.y = y
+        this.width = width
+        this.height = height
     }
-
-    /**
-     * @returns {number} the left x coordinate of this Rect
-     */
-    get x() { return this.#x }
-
-    /**
-     * @returns {number} the top y coordinate of this Rect
-     */
-    get y() { return this.#y }
-
-    /**
-     * @returns {number} the width of this Rect
-     */
-    get width() { return this.#width }
-
-    /**
-     * @returns {number} the height of this Rect
-     */
-    get height() { return this.#height }
 
     /**
      * @returns {Size} the size to this Rect
      */
     get size() {
         return {
-            width: this.#width,
-            height: this.#height,
+            width: this.width,
+            height: this.height,
         }
     }
 
@@ -63,31 +38,31 @@ export default class Rect {
      * Alias Rect#x
      * @returns {number}
      */
-    get leftX() { return this.#x }
+    get leftX() { return this.x }
 
     /**
      * @returns {number} the right x coordinate of this Rect
      */
-    get rightX() { return this.#x + this.#width }
+    get rightX() { return this.x + this.width }
 
     /**
      * Alias Rect#y
      * @returns {number}
      */
-    get topY() { return this.#y }
+    get topY() { return this.y }
 
     /**
      * @returns {number} the bottom y coordinate of this Rect
      */
-    get bottomY() { return this.#y + this.#height }
+    get bottomY() { return this.y + this.height }
 
     /**
      * @returns {Vector} the top left point of this Rect
      */
     topLeft() {
         return new Vector({
-            x: this.#x,
-            y: this.#y
+            x: this.x,
+            y: this.y
         })
     }
 
@@ -97,7 +72,7 @@ export default class Rect {
     topRight() {
         return new Vector({
             x: this.rightX,
-            y: this.#y
+            y: this.y
         })
     }
 
@@ -106,8 +81,8 @@ export default class Rect {
      */
     bottomLeft() {
         return new Vector({
-            x: this.#x,
-            y: this.#y + this.#height
+            x: this.x,
+            y: this.y + this.height
         })
     }
 
@@ -126,8 +101,8 @@ export default class Rect {
      */
     center() {
         return new Vector({
-            x: this.#x + this.#width/2,
-            y: this.#y + this.#height/2
+            x: this.x + this.width/2,
+            y: this.y + this.height/2
         })
     }
 
@@ -147,11 +122,11 @@ export default class Rect {
      */
     copy() {
         return new Rect({
-            x: this.#x,
-            y: this.#y,
+            x: this.x,
+            y: this.y,
         }, {
-            width: this.#width,
-            height: this.#height
+            width: this.width,
+            height: this.height
         })
     }
 
@@ -187,8 +162,8 @@ export default class Rect {
      * @returns {Rect}
      */
     crop({width, height}) {
-        this.#width = width
-        this.#height = height
+        this.width = width
+        this.height = height
         return this
     }
     /**
@@ -206,8 +181,8 @@ export default class Rect {
      * @returns {Rect}
      */
     translate({x, y}) {
-        this.#x += x
-        this.#y += y
+        this.x += x
+        this.y += y
         return this
     }
     /**
@@ -226,8 +201,8 @@ export default class Rect {
      */
     scale(f) {
         const {x, y} = is_number(f) ? {x: f, y: f} : f
-        this.#width *= x
-        this.#height *= y
+        this.width *= x
+        this.height *= y
         return this
     }
     /**
