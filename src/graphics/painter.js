@@ -77,4 +77,21 @@ export default class Painter {
         this.#context.fill()
         return this
     }
+    /**
+     * 
+     * @param {Surface} surface 
+     * @param {Rect} src_rect
+     * @param {Rect} dst_rect
+     * @returns {Painter} this Painter
+     */
+    drawSurface(surface, src_rect, dst_rect) {
+        const image = surface.imageData()
+        this.#context.putImageData(
+            image,
+            dst_rect.leftX, dst_rect.topY,
+            src_rect.leftX, src_rect.topY,
+            src_rect.width, src_rect.height
+        )
+        return this
+    }
 }

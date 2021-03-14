@@ -30,7 +30,8 @@
 </style>
 
 <script>
-import TilePaletteSection from "@/components/TilePaletteSection.vue"
+import TilePaletteSection from "../components/TilePaletteSection.vue"
+import Surface from "../graphics/surface"
 
 export default {
     components: {TilePaletteSection},
@@ -50,7 +51,7 @@ export default {
         },
         setTilesets(tilesets) {
             for (const [name, tiles] of Object.entries(tilesets)) {
-                this.tilesets[name] = Object.freeze(tiles.map(tile => tile[3]))
+                this.tilesets[name] = Object.freeze(tiles.map(tile => new Surface(tile[3])))
             }
         }
     }

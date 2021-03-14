@@ -18,14 +18,13 @@
 
 <script>
 import {fetch_data} from "./core/functional"
-import {loadPalette} from "./core/palette"
-import {loadTilesets} from "./core/tile"
-
-import * as DuneRC from "./core/dune2-rc"
 
 import ProgressBar from "./components/ProgressBar.vue"
 import Screen from "./components/Screen.vue"
 import TilePalette from "./components/TilePalette.vue"
+
+
+import * as Dune2RCWorker from "./worker"
 
 export default {
     components: {ProgressBar, Screen, TilePalette},
@@ -48,14 +47,7 @@ export default {
             }
         )
 
-        this.gameDataProgressLabel = "Deserializing the data ... "
-        const game_data = DuneRC.Data.deserializeBinary(bytes)
-
-        this.gameDataProgressLabel = "Loading palette ... "
-        const palette = await loadPalette(game_data)
-
-        this.gameDataProgressLabel = "Loading tilesets ... "
-        const tilesets = await loadTilesets(game_data, palette)
+        const tilesets = await Dune2RCWorker.deserialize(bytes)
 
         this.gameDataLoading = false
         this.gameDataLoaded = true

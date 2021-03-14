@@ -1,5 +1,3 @@
-import {setImmediate} from "../core/async"
-
 import Surface from "../graphics/surface"
 
 /**
@@ -48,14 +46,18 @@ export function tileToSurface(tile, palette, scale=1) {
         }
     }
 
-    return surface
+    return {
+        width: surface.width,
+        height: surface.height,
+        pixels: surface.pixels,
+    }
 }
 
 export function* loadTiles(pb_tiles, palette, scales) {
     for (const pb_tile of pb_tiles) {
-        yield setImmediate(() => Object.assign({}, ...scales.map(scale => ({
+        yield Object.assign({}, ...scales.map(scale => ({
             [scale]: tileToSurface(pb_tile, palette, scale)
-        }))))
+        })))
     }
 }
 
