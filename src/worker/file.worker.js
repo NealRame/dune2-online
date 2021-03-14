@@ -6,8 +6,8 @@ import registerPromiseWorker from "promise-worker/register"
 
 registerPromiseWorker(async bytes => {
     const data = DuneRC.Data.deserializeBinary(bytes)
-    const palette = await loadPalette(data)
-    const tilesets = await loadTilesets(data, palette)
+    const palette = loadPalette(data)
+    const tilesets = loadTilesets(data, palette)
 
     return tilesets
 })

@@ -91,4 +91,17 @@ export default class Surface {
 
         return this
     }
+
+    /**
+     * 
+     * @param {ImageData} image 
+     * @returns {Surface}
+     */
+    static fromImageData(image) {
+        return new Surface({
+            width: image.width,
+            height: image.height,
+            pixels: image.data
+        })
+    }
 }
