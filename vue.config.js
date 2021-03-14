@@ -3,7 +3,8 @@ const path = require("path")
 
 module.exports = {
     chainWebpack: config => {
-        config.entry("style")
+        config
+            .entry("style")
             .add(path.resolve(__dirname, "./src/style.scss"))
             .end()
 
