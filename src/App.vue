@@ -1,16 +1,11 @@
 <template>
-    <div id="game">
-        <progress-bar
-            v-if="gameDataLoading"
-            :current="gameDataProgress"
-            :label="gameDataProgressLabel" />
-        <tile-palette
-            ref="tilePalette"
-            v-show="gameDataLoaded" />
-        <screen
-            ref="screen"
-            v-show="gameDataLoaded" />
-    </div>
+    <progress-bar
+        v-if="gameDataLoading"
+        :current="gameDataProgress"
+        :label="gameDataProgressLabel"
+    />
+    <tile-palette ref="tilePalette" />
+    <screen ref="screen" />
 </template>
 
 <style lang="scss" scoped>
@@ -49,9 +44,9 @@ export default {
 
         const tilesets = await Dune2RCWorker.deserialize(bytes)
 
+        this.$refs.tilePalette.setTilesets(tilesets)
         this.gameDataLoading = false
         this.gameDataLoaded = true
-        this.$refs.tilePalette.setTilesets(tilesets)
     },
 }
 </script>
