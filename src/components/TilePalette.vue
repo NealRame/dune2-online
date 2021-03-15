@@ -1,12 +1,14 @@
 <template>
     <div class="tile-palette">
-        <ul>
-            <li v-for="name in sections" :key="name">
-                <tile-palette-section
-                    :name="name"
-                    :tiles="tiles(name)" />
-            </li>
-        </ul>
+        <form>
+            <ul>
+                <li v-for="name in sections" :key="name">
+                    <tile-palette-section
+                        :name="name"
+                        :tiles="tiles(name)" />
+                </li>
+            </ul>
+        </form>
     </div>
 </template>
 
