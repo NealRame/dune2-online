@@ -9,13 +9,21 @@
 
 <style lang="scss" scoped>
 .progress-bar {
+    background-color: rgba(0, 0, 0, 1);
+    position: absolute;
     display: block;
-    margin: 0 auto;
-    width: 25%;
+    width: 100%;
+    height: 100%;
+    z-index: 10;
     label {
+        position: absolute;
+        left: 10%;
+        right: 10%;
+        top: 50%;
         color: $progress-bar-label-color;
         font-family: $progress-bar-label-font-family;
         font-size: $progress-bar-label-font-size;
+        text-align: center;
     }
     progress {
         display: block;
