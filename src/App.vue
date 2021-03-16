@@ -18,7 +18,6 @@ import ProgressBar from "./components/ProgressBar.vue"
 import Screen from "./components/Screen.vue"
 import TilePalette from "./components/TilePalette.vue"
 
-
 import * as Dune2RCWorker from "./worker"
 
 export default {
