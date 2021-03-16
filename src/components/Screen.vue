@@ -14,6 +14,7 @@ canvas {
 import debounce from "lodash/debounce"
 
 import Painter from "../graphics/painter"
+import Scene from "../graphics/scene"
 
 import Rect from "../maths/rect"
 
@@ -50,10 +51,11 @@ export default {
         update_screen_size()
         window.addEventListener("resize", debounce(update_screen_size, 200))
 
-        const painter = Painter(this)
+        const painter = new Painter(this.context)
+        const scene = Scene(painter)
 
         const loop = () => {
-            painter.clear()
+            scene.render()
             requestAnimationFrame(loop)
         }
         loop()
