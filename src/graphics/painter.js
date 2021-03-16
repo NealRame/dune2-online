@@ -57,22 +57,22 @@ export default class Painter {
         this.#context.stroke()
         return this
     }
-    drawRect({topLeft, topRight, bottomLeft, bottomRight}) {
+    drawRect({x, y, width, height}) {
         this.#context.beginPath()
-        this.#context.moveTo(topLeft)
-        this.#context.lineTo(topRight)
-        this.#context.lineTo(bottomRight)
-        this.#context.lineTo(bottomLeft)
+        this.#context.moveTo(x, y)
+        this.#context.lineTo(x + width, y)
+        this.#context.lineTo(x + width, y + height)
+        this.#context.lineTo(x, y + height)
         this.#context.closePath()
         this.#context.stroke()
         return this
     }
-    fillRect({topLeft, topRight, bottomLeft, bottomRight}) {
+    fillRect({x, y, width, height}) {
         this.#context.beginPath()
-        this.#context.moveTo(topLeft)
-        this.#context.lineTo(topRight)
-        this.#context.lineTo(bottomRight)
-        this.#context.lineTo(bottomLeft)
+        this.#context.moveTo(x, y)
+        this.#context.lineTo(x + width, y)
+        this.#context.lineTo(x + width, y + height)
+        this.#context.lineTo(x, y + height)
         this.#context.closePath()
         this.#context.fill()
         return this
