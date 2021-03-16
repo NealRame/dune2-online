@@ -13,15 +13,17 @@ canvas {
 <script>
 import debounce from "lodash/debounce"
 
-import Rect from "@/maths/rect"
-import Painter from "@/graphics/painter"
-import Scene from "@/graphics/scene"
+import Painter from "../graphics/painter"
+
+import Rect from "../maths/rect"
 
 export default {
     computed: {
         context() {
             return this.$refs.canvas.getContext("2d")
-        },
+        }
+    },
+    methods: {
         width() {
             return this.$refs.canvas.width
         },
@@ -30,12 +32,12 @@ export default {
         },
         size() {
             return {
-                width: this.width,
-                height: this.height
+                width: this.width(),
+                height: this.height()
             }
         },
         rect() {
-            return Rect({ x: 0, y: 0, }, this.size)
+            return Rect({ x: 0, y: 0, }, this.size())
         },
     },
     mounted() {
