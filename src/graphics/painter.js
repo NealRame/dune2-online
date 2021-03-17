@@ -60,8 +60,8 @@ export default class Painter {
     }
     drawLine({x: x1, y: y1}, {x: x2, y: y2}) {
         this.#context.beginPath()
-        this.#context.moveTo({x: x1, y: y1})
-        this.#context.lineTo({x: x2, y: y2})
+        this.#context.moveTo(x1, y1)
+        this.#context.lineTo(x2, y2)
         this.#context.stroke()
         return this
     }
