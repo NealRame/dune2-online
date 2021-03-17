@@ -17,6 +17,14 @@ export default class Painter {
         this.#context = context
     }
 
+    get size() {
+        const {width, height} = this.#context.canvas
+        return {
+            width,
+            height
+        }
+    }
+
     get pen() {
         return {
             lineWidth: this.#context.lineWidth,
