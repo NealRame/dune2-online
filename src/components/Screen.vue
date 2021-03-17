@@ -1,5 +1,5 @@
 <template>
-    <canvas ref="canvas"></canvas>
+    <canvas ref="canvas" :width="width" :height="height"></canvas>
 </template>
 
 <style lang="scss" scoped>
@@ -16,49 +16,32 @@ import debounce from "lodash/debounce"
 import Painter from "../graphics/painter"
 import Scene from "../graphics/scene"
 
-import Rect from "../maths/rect"
-
 export default {
-    computed: {
-        context() {
-            return this.$refs.canvas.getContext("2d")
+    data() {
+        return {
+            width: 0,
+            height: 0,
         }
     },
-    methods: {
-        width() {
-            return this.$refs.canvas.width
+    computed: {
+        canvas() {
+            return this.$refs.canvas
         },
-        height() {
-            return this.$refs.canvas.height
-        },
-        size() {
-            return {
-                width: this.width(),
-                height: this.height()
-            }
-        },
-        rect() {
-            return Rect({ x: 0, y: 0, }, this.size())
+        context() {
+            return this.canvas.getContext("2d")
         },
     },
     mounted() {
         const update_screen_size = () => {
-            const {x: left_pos} = this.$refs.canvas.getBoundingClientRect()
-            this.$refs.canvas.width = window.innerWidth - left_pos
-            this.$refs.canvas.height = window.innerHeight
+            const {x: left_pos} = this.canvas.getBoundingClientRect()
+            this.width = window.innerWidth - left_pos
+            this.height = window.innerHeight
         }
-
+        window.addEventListener("resize", debounce(update_screen_size, 100))
         update_screen_size()
-        window.addEventListener("resize", debounce(update_screen_size, 200))
 
-        const painter = new Painter(this.context)
-        const scene = Scene(painter)
-
-        const loop = () => {
-            scene.render()
-            requestAnimationFrame(loop)
-        }
-        loop()
+        const scene = Scene(new Painter(this.context))
+        scene.run()
     },
 }
 </script>
