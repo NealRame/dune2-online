@@ -5,8 +5,8 @@
 <style lang="scss" scoped>
 canvas {
     position: absolute;
-    top: 0;
     left: $palette-width;
+    top: 0;
 }
 </style>
 
@@ -31,14 +31,18 @@ export default {
             return this.canvas.getContext("2d")
         },
     },
-    mounted() {
-        const update_screen_size = () => {
+    methods: {
+        resize() {
             const {x: left_pos} = this.canvas.getBoundingClientRect()
             this.width = window.innerWidth - left_pos
             this.height = window.innerHeight
         }
-        window.addEventListener("resize", debounce(update_screen_size, 100))
-        update_screen_size()
+    },
+    created() {
+        window.addEventListener("resize", debounce(this.resize, 40))
+    },
+    mounted() {
+        this.resize()
 
         const scene = Scene(new Painter(this.context))
         scene.run()
