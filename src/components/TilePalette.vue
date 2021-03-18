@@ -5,7 +5,9 @@
                 <li v-for="name in sections" :key="name">
                     <tile-palette-section
                         :name="name"
-                        :tiles="tiles(name)" />
+                        :tiles="tiles(name)"
+                        @tile-changed="$emit('tileChanged', $event)"
+                    />
                 </li>
             </ul>
         </form>
@@ -37,6 +39,7 @@ import Surface from "../graphics/surface"
 
 export default {
     components: {TilePaletteSection},
+    emits: ["tileChanged"],
     data() {
         return {
             tilesets: {}

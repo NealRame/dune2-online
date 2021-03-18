@@ -4,7 +4,7 @@
         <ol>
             <li class="item" v-for="(tile, index) in tiles" :key="index">
                 <label>
-                    <input type="radio" name="tile" :value="index"/>
+                    <input type="radio" name="tile" :value="index" @change="onChange"/>
                     <img :src="tile.dataURI()" :title="index">
                 </label>
             </li>
@@ -50,6 +50,19 @@ ol {
 
 <script>
 export default {
+    emits: ["tileChanged"],
     props: ["name", "tiles"],
+    methods: {
+        /**
+         * @param {InputEvent} ev
+         */
+        onChange(ev) {
+            const tile_index = ev.target.value
+            this.$emit("tileChanged", {
+                tileset: this.name,
+                tile: tile_index
+            })
+        }
+    }
 }
 </script>
