@@ -3,7 +3,7 @@
  * @param {*} tile 
  * @param {*} palette 
  * @param {CanvasRenderingContext2D} context 
- * @returns {Surface}
+ * @returns {ImageData}
  */
 function tileToImageData(tile, palette, scale=1) {
     const tile_pixels = tile.getPixels()
@@ -11,12 +11,10 @@ function tileToImageData(tile, palette, scale=1) {
     const tile_width = tile.getWidth()
     const tile_height = tile.getHeight()
 
-    const image_width = tile_width*scale
-    const image_height = tile_height*scale
-    const image = new ImageData(image_width, image_height)
+    const image = new ImageData(tile_width*scale, tile_height*scale)
 
     for (let row = 0; row < tile_height; ++row) {
-        const image_row_offset = 4*scale*row*image_width
+        const image_row_offset = 4*scale*row*image.width
 
         for (let col = 0; col < tile_width; ++col) {
             const tile_pixel_index = row*tile_width + col
@@ -34,9 +32,9 @@ function tileToImageData(tile, palette, scale=1) {
         
         for (let i = 1; i < scale; ++i) {
             image.data.copyWithin(
-                image_row_offset + 4*i*image_width,
+                image_row_offset + 4*i*image.width,
                 image_row_offset,
-                image_row_offset + 4*image_width
+                image_row_offset + 4*image.width
             )
         }
     }
@@ -44,10 +42,14 @@ function tileToImageData(tile, palette, scale=1) {
     return image
 }
 
-function loadTiles(pb_tiles, palette, scales) {
-    return pb_tiles.map(pb_tile => Object.assign({}, ...scales.map(scale => ({
+function TileLoader(palette, scales) {
+    return pb_tile => Object.assign({}, ...scales.map(scale => ({
         [scale]: tileToImageData(pb_tile, palette, scale)
-    }))))
+    })))
+}
+
+function loadTiles(pb_tiles, palette, scales) {
+    return pb_tiles.map(TileLoader(palette, scales))
 }
 
 export function loadTilesets(game_data, palette) {
@@ -55,11 +57,7 @@ export function loadTilesets(game_data, palette) {
     const tilesets = {}
     for (const name of pb_tilesets.keys()) {
         const tiles = pb_tilesets.get(name).getTilesList()
-        const surfaces = []
-        for (const tile of loadTiles(tiles, palette, [1, 2, 3, 4])) {
-            surfaces.push(tile)
-        }
-        tilesets[name] = surfaces
+        tilesets[name] = loadTiles(tiles, palette, [1, 2, 3, 4])
     }
     return tilesets
 }
