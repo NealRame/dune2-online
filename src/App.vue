@@ -4,7 +4,10 @@
         :current="gameDataProgress"
         :label="gameDataProgressLabel"
     />
-    <tile-palette ref="tilePalette" />
+    <tile-palette 
+        ref="tilePalette"
+        @tile-changed="onTileChanged"
+    />
     <screen ref="screen" />
 </template>
 
@@ -30,6 +33,11 @@ export default {
             gameDataProgress: 0,
         }
     },
+    methods: {
+        onTileChanged({tileset, tile}) {
+            console.log(tileset, tile)
+        }
+    },
     async mounted() {
         this.gameDataLoading = true
 
@@ -41,11 +49,12 @@ export default {
             }
         )
 
+        this.gameDataProgressLabel = "Loading data ... "
         const tilesets = await Dune2RCWorker.deserialize(bytes)
 
         this.$refs.tilePalette.setTilesets(tilesets)
         this.gameDataLoading = false
         this.gameDataLoaded = true
-    },
+    }
 }
 </script>
