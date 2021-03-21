@@ -15,7 +15,7 @@
 </style>
 
 <script>
-import {fetch_data} from "./core/functional"
+import fetch_data from "./utils/fetch"
 
 import ProgressBar from "./components/ProgressBar.vue"
 import Screen from "./components/Screen.vue"

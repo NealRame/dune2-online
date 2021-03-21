@@ -1,6 +1,6 @@
-export function noop() {}
+import noop from "./noop"
 
-export async function fetch_data(url, progress_cb = noop) {
+export default async function fetch_data(url, progress_cb = noop) {
     const response = await fetch(url)
     const reader = response.body.getReader()
     const content_length = Number(response.headers.get("Content-Length"))
