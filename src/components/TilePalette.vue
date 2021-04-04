@@ -5,14 +5,14 @@
                 <li v-for="name in sections" :key="name">
                     <tile-palette-section
                         :name="name"
-                        :tiles="tiles(name)"
+                        :tiles="tilesets[name]"
                         @tile-changed="$emit('tileChanged', $event)"
                     />
                 </li>
             </ul>
         </form>
     </div>
-</template>
+</template>>
 
 <style lang="scss" scoped>
 .tile-palette {
@@ -33,32 +33,53 @@
 }
 </style>
 
-<script>
+<script lang="ts">
 import TilePaletteSection from "../components/TilePaletteSection.vue"
-import Surface from "../graphics/surface"
 
-export default {
-    components: {TilePaletteSection},
+import { computed, defineComponent } from "vue"
+
+export default defineComponent({
+    components: { TilePaletteSection },
+    props: ["tilesets"],
     emits: ["tileChanged"],
-    data() {
+    setup(props) {
+        const sections = computed(() => {
+            return props.tilesets == null
+                ? []
+                : Object.keys(props.tilesets)
+        })
+        const tiles = (section: string) => {
+            return props.tilesets[section]
+        }
         return {
-            tilesets: {}
+            sections,
+            tiles,
         }
     },
-    computed: {
-        sections() {
-            return Object.keys(this.tilesets)
-        },
-    },
-    methods: {
-        tiles(section) {
-            return this.tilesets[section]
-        },
-        setTilesets(tilesets) {
-            for (const [name, tiles] of Object.entries(tilesets)) {
-                this.tilesets[name] = Object.freeze(tiles.map(tile => Surface.fromImageData(tile[3])))
-            }
-        }
-    }
-}
+})
+
+// export default defineComponent({
+//     components: { TilePaletteSection },
+//     emits: ["tileChanged"],
+//     data() {
+//         return {
+//             tilesets: {}
+//         }
+//     },
+//     computed: {
+//         sections() {
+//             return Object.keys(this.tilesets)
+//         },
+//     },
+//     methods: {
+//         tiles(section) {
+//             return this.tilesets[section]
+//         },
+//         setTilesets(tilesets) {
+//             for (const [name, tiles] of Object.entries(tilesets)) {
+//                 this.tilesets[name] = Object.freeze(tiles.map(tile => Surface.fromImageData(tile[3])))
+//             }
+//         }
+//     }
+// })
 </script>

@@ -10,51 +10,59 @@ canvas {
 }
 </style>
 
-<script>
-import debounce from "lodash/debounce"
-import clamp from "lodash/clamp"
+<script lang="ts">
+import { defineComponent, onMounted, ref } from "vue"
+import { clamp, debounce } from "lodash"
 
-import Painter from "../graphics/painter"
-import Scene from "../graphics/scene"
+import { Painter, Scene } from "@/graphics"
 
-export default {
-    emits: ["mouseMotion"],
-    data() {
+export default defineComponent({
+    setup(props, { emit }) {
+        const width = ref(0)
+        const height = ref(0)
+        const canvas = ref<HTMLCanvasElement | null>(null)
+
+        // handle window resize event
+        const resize = debounce(() => {
+            if (canvas.value != null) {
+                const { x: leftPos } = canvas.value.getBoundingClientRect()
+                width.value = window.innerWidth - leftPos
+                height.value = window.innerHeight
+            }
+        }, 60)
+
+        // handle mouse move event
+        const mouseMove = (e: MouseEvent) => {
+            if (canvas.value != null) {
+                const { left, top } = canvas.value.getBoundingClientRect()
+                const x = clamp(e.clientX - left, 0, width.value)
+                const y = clamp(e.clientY - top, 0, height.value)
+                emit("mouseMotion", { x, y })
+            }
+        }
+
+        onMounted(() => {
+            if (canvas.value == null) {
+                throw new Error("")
+            }
+
+            canvas.value.addEventListener("mousemove", mouseMove)
+            window.addEventListener("resize", resize)
+
+            resize()
+
+            const scene = new Scene(new Painter({
+                canvas: canvas.value as HTMLCanvasElement,
+                context: canvas.value.getContext("2d") as CanvasRenderingContext2D,
+            }))
+            scene.run()
+        })
+
         return {
-            width: 0,
-            height: 0,
+            width,
+            height,
+            canvas,
         }
-    },
-    computed: {
-        canvas() {
-            return this.$refs.canvas
-        },
-        context() {
-            return this.canvas.getContext("2d")
-        },
-    },
-    methods: {
-        resize() {
-            const {x: left_pos} = this.canvas.getBoundingClientRect()
-            this.width = window.innerWidth - left_pos
-            this.height = window.innerHeight
-        },
-        mouseMove(e) {
-            const {left, top} = this.canvas.getBoundingClientRect()
-            const x = clamp(e.clientX - left, 0, this.width)
-            const y = clamp(e.clientY - top, 0, this.height)
-            this.$emit("mouseMotion", {x, y})
-        }
-    },
-    created() {
-        window.addEventListener("resize", debounce(this.resize, 40))
-    },
-    mounted() {
-        this.canvas.addEventListener("mousemove", this.mouseMove)
-        this.resize()
-
-        const scene = Scene(new Painter(this.context))
-        scene.run()
-    },
-}
+    }
+})
 </script>

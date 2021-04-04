@@ -23,8 +23,7 @@ pnpm-debug.log*
 *.sw?
 
 # Generated core dune2 rc files
-/public/assets/dune2.rc
-/src/core/dune2-rc.js
+/public/assets/*.json.gz
 
 # Test example
 /tests/unit/example.spec.js

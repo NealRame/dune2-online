@@ -4,57 +4,114 @@
         :current="gameDataProgress"
         :label="gameDataProgressLabel"
     />
-    <tile-palette 
+    <screen ref="screen" />
+    <tile-palette
         ref="tilePalette"
+        :tilesets="tilesets"
         @tile-changed="onTileChanged"
     />
-    <screen ref="screen" />
 </template>
 
-<style lang="scss" scoped>
-</style>
+<script lang="ts">
+import ProgressBar from "@/components/ProgressBar.vue"
+import Screen from "@/components/Screen.vue"
+import TilePalette from "@/components/TilePalette.vue"
 
-<script>
-import fetch_data from "./utils/fetch"
+import { GameData, GameDataItems, Palette, Tile, TilesetMap, Tilesets, TilsetsData, Workers } from "@/core"
+import { fetchData } from "@/utils"
+import { TileChangedEvent } from "@/components/types"
 
-import ProgressBar from "./components/ProgressBar.vue"
-import Screen from "./components/Screen.vue"
-import TilePalette from "./components/TilePalette.vue"
+import { defineComponent, onMounted, ref, Ref } from "vue"
+import { isNil } from "lodash"
 
-import * as Dune2RCWorker from "./worker"
+async function fetchGameData(
+    gameDataProgress: Ref<number>,
+    gameDataProgressLabel: Ref<string>,
+) {
+    const gameData: Partial<GameData> = {}
 
-export default {
-    components: {ProgressBar, Screen, TilePalette},
-    data() {
-        return {
-            gameDataLoading: false,
-            gameDataLoaded: false,
-            gameDataProgressLabel: "",
-            gameDataProgress: 0,
-        }
-    },
-    methods: {
-        onTileChanged({tileset, tile}) {
-            console.log(tileset, tile)
-        }
-    },
-    async mounted() {
-        this.gameDataLoading = true
-
-        this.gameDataProgressLabel = "Fetching data ... "
-        const bytes = await fetch_data(
-            "/assets/dune2.rc",
-            (receivedLength, totalLength) => {
-                this.gameDataProgress = Math.min(receivedLength/totalLength, 1)
+    for (const item of GameDataItems) {
+        gameDataProgressLabel.value = `Fetching ${item} ...`
+        const data = await fetchData(
+            `/assets/${item}.json.gz`,
+            (current: number, total: number) => {
+                gameDataProgress.value = Math.min(current/total, 1)
             }
         )
 
-        this.gameDataProgressLabel = "Loading data ... "
-        const tilesets = await Dune2RCWorker.deserialize(bytes)
-
-        this.$refs.tilePalette.setTilesets(tilesets)
-        this.gameDataLoading = false
-        this.gameDataLoaded = true
+        gameDataProgressLabel.value = `Decoding ${item} ...`
+        gameData[item] = await Workers.decode({ data, item })
     }
+
+    return gameData as GameData
 }
+
+async function createTilesets(
+    gameDataProgress: Ref<number>,
+    gameDataProgressLabel: Ref<string>,
+    gameData: GameData,
+) {
+    const gameTilesets: TilesetMap = {}
+
+    if (!isNil(gameData.tilesets)) {
+        for (const tileset of Tilesets) {
+            gameDataProgressLabel.value = `Initializing ${tileset} tiles ...`
+            gameDataProgress.value = 1
+            gameTilesets[tileset] = Object.freeze(await Workers.createTileset({
+                tilesData: (gameData.tilesets as TilsetsData)[tileset],
+                palette: gameData.palette as Palette,
+            }) as Tile[])
+        }
+    }
+
+    return gameTilesets
+}
+
+export default defineComponent({
+    components: {
+        ProgressBar,
+        Screen,
+        TilePalette,
+    },
+    setup() {
+        const gameDataLoading = ref(false)
+        const gameDataLoaded = ref(false)
+        const gameDataProgressLabel = ref("")
+        const gameDataProgress = ref(0)
+        const tilesets = ref<TilesetMap | null>(null)
+
+        const onTileChanged = (ev: TileChangedEvent) => {
+            console.log(ev)
+        }
+
+        onMounted(async () => {
+            gameDataLoading.value = true
+
+            const gameData = await fetchGameData(gameDataProgress, gameDataProgressLabel)
+
+            tilesets.value = await createTilesets(gameDataProgress, gameDataProgressLabel, gameData)
+            gameDataLoading.value = false
+            gameDataLoaded.value = true
+        })
+
+        return {
+            gameDataLoading,
+            gameDataLoaded,
+            gameDataProgressLabel,
+            gameDataProgress,
+            tilesets,
+            onTileChanged,
+        }
+    }
+})
 </script>
+
+<style lang="scss">
+#app {
+    color: whitesmoke;
+    font-family: Avenir, Helvetica, Arial, sans-serif;
+    text-align: center;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+</style>

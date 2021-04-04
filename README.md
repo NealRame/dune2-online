@@ -1,4 +1,4 @@
-# dune2
+# dune2-online-ts
 
 ## Project setup
 ```

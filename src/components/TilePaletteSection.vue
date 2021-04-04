@@ -5,7 +5,7 @@
             <li class="item" v-for="(tile, index) in tiles" :key="index">
                 <label>
                     <input type="radio" name="tile" :value="index" @change="onChange"/>
-                    <img :src="tile.dataURI()" :title="index">
+                    <img :src="dataURI(tile[3])" :title="index">
                 </label>
             </li>
         </ol>
@@ -48,21 +48,24 @@ ol {
 }
 </style>
 
-<script>
-export default {
+<script lang="ts">
+import { Surface } from "@/graphics"
+import { defineComponent } from "@vue/runtime-core"
+
+export default defineComponent({
     emits: ["tileChanged"],
     props: ["name", "tiles"],
     methods: {
-        /**
-         * @param {InputEvent} ev
-         */
-        onChange(ev) {
-            const tile_index = ev.target.value
+        onChange(ev: InputEvent): void {
+            const tileIndex = Number((ev.target as HTMLInputElement).value)
             this.$emit("tileChanged", {
                 tileset: this.name,
-                tile: tile_index
+                tile: tileIndex
             })
+        },
+        dataURI(tile: ImageData) {
+            return new Surface(tile).dataURI()
         }
     }
-}
+})
 </script>
