@@ -57,29 +57,4 @@ export default defineComponent({
         }
     },
 })
-
-// export default defineComponent({
-//     components: { TilePaletteSection },
-//     emits: ["tileChanged"],
-//     data() {
-//         return {
-//             tilesets: {}
-//         }
-//     },
-//     computed: {
-//         sections() {
-//             return Object.keys(this.tilesets)
-//         },
-//     },
-//     methods: {
-//         tiles(section) {
-//             return this.tilesets[section]
-//         },
-//         setTilesets(tilesets) {
-//             for (const [name, tiles] of Object.entries(tilesets)) {
-//                 this.tilesets[name] = Object.freeze(tiles.map(tile => Surface.fromImageData(tile[3])))
-//             }
-//         }
-//     }
-// })
 </script>
