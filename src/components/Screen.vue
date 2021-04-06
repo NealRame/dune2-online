@@ -14,8 +14,6 @@ canvas {
 import { defineComponent, onMounted, ref } from "vue"
 import { clamp, debounce } from "lodash"
 
-import { Painter, Scene } from "@/graphics"
-
 export default defineComponent({
     setup(props, { emit }) {
         const width = ref(0)
@@ -50,9 +48,6 @@ export default defineComponent({
             window.addEventListener("resize", resize)
 
             resize()
-
-            const scene = new Scene(new Painter(canvas.value as HTMLCanvasElement))
-            scene.run()
         })
 
         return {

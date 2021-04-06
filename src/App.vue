@@ -18,8 +18,9 @@ import Screen from "@/components/Screen.vue"
 import TilePalette from "@/components/TilePalette.vue"
 
 import { GameData, GameDataItems, Palette, Tile, TilesetMap, Tilesets, TilsetsData, Workers } from "@/core"
-import { fetchData } from "@/utils"
 import { TileChangedEvent } from "@/components/types"
+import { PaintDevice, Painter, Scene } from "@/graphics"
+import { fetchData } from "@/utils"
 
 import { defineComponent, onMounted, ref, Ref } from "vue"
 import { isNil } from "lodash"
@@ -79,6 +80,7 @@ export default defineComponent({
         const gameDataProgressLabel = ref("")
         const gameDataProgress = ref(0)
         const tilesets = ref<TilesetMap | null>(null)
+        const screen = ref<PaintDevice | null>(null)
 
         const onTileChanged = (ev: TileChangedEvent) => {
             console.log(ev)
@@ -92,6 +94,11 @@ export default defineComponent({
             tilesets.value = await createTilesets(gameDataProgress, gameDataProgressLabel, gameData)
             gameDataLoading.value = false
             gameDataLoaded.value = true
+
+            const canvas = screen.value?.canvas as HTMLCanvasElement
+            const painter = new Painter(canvas)
+            const scene = new Scene(painter)
+            scene.run()
         })
 
         return {
@@ -101,6 +108,7 @@ export default defineComponent({
             gameDataProgress,
             tilesets,
             onTileChanged,
+            screen,
         }
     }
 })
