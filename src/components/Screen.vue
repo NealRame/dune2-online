@@ -51,10 +51,7 @@ export default defineComponent({
 
             resize()
 
-            const scene = new Scene(new Painter({
-                canvas: canvas.value as HTMLCanvasElement,
-                context: canvas.value.getContext("2d") as CanvasRenderingContext2D,
-            }))
+            const scene = new Scene(new Painter(canvas.value as HTMLCanvasElement))
             scene.run()
         })
 

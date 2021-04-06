@@ -1,4 +1,3 @@
-import { PaintDevice } from "./types"
 import { Surface } from "./surface"
 
 import { Rect, RectangularCoordinates, Size } from "@/maths"
@@ -13,17 +12,19 @@ export interface Pen {
 export type Brush = string | CanvasGradient | CanvasPattern
 
 export class Painter {
-    private paintDevice_: PaintDevice
+    private canvas_: HTMLCanvasElement
+    private context_: CanvasRenderingContext2D
 
     /**
      * @param paintDevice
      */
-    constructor(paintDevice: PaintDevice) {
-        this.paintDevice_ = paintDevice
+    constructor(canvas: HTMLCanvasElement) {
+        this.canvas_ = canvas
+        this.context_ = canvas.getContext("2d") as CanvasRenderingContext2D
     }
 
     get size(): Size {
-        const { width, height } = this.paintDevice_.canvas
+        const { width, height } = this.canvas_
         return {
             width,
             height,
@@ -31,39 +32,34 @@ export class Painter {
     }
 
     get pen(): Pen {
-        const context = this.paintDevice_.context
         return {
-            lineWidth: context.lineWidth,
-            strokeStyle: context.strokeStyle,
+            lineWidth: this.context_.lineWidth,
+            strokeStyle: this.context_.strokeStyle,
         }
     }
 
     set pen(pen: Pen) {
         const { lineWidth, strokeStyle } = pen
-        const context = this.paintDevice_.context
-        context.lineWidth = lineWidth
-        context.strokeStyle = strokeStyle
+        this.context_.lineWidth = lineWidth
+        this.context_.strokeStyle = strokeStyle
     }
 
     get brush(): Brush {
-        const context = this.paintDevice_.context
-        return context.fillStyle
+        return this.context_.fillStyle
     }
 
     set brush(brush: Brush) {
-        const context = this.paintDevice_.context
-        context.fillStyle = brush
+        this.context_.fillStyle = brush
     }
 
     // Drawing routines
 
     clear(brush: Brush): Painter {
         const { width, height } = this.size
-        const context = this.paintDevice_.context
-        context.save()
-        context.fillStyle = brush
-        context.fillRect(0, 0, width, height)
-        context.restore()
+        this.context_.save()
+        this.context_.fillStyle = brush
+        this.context_.fillRect(0, 0, width, height)
+        this.context_.restore()
         return this
     }
 
@@ -71,11 +67,10 @@ export class Painter {
         { x: x1, y: y1 }: RectangularCoordinates,
         { x: x2, y: y2 }: RectangularCoordinates,
     ): Painter {
-        const context = this.paintDevice_.context
-        context.beginPath()
-        context.moveTo(x1, y1)
-        context.lineTo(x2, y2)
-        context.stroke()
+        this.context_.beginPath()
+        this.context_.moveTo(x1, y1)
+        this.context_.lineTo(x2, y2)
+        this.context_.stroke()
         return this
     }
 
@@ -83,14 +78,13 @@ export class Painter {
         { x, y }: RectangularCoordinates,
         { width, height }: Size,
     ): Painter {
-        const context = this.paintDevice_.context
-        context.beginPath()
-        context.moveTo(x, y)
-        context.lineTo(x + width, y)
-        context.lineTo(x + width, y + height)
-        context.lineTo(x, y + height)
-        context.closePath()
-        context.stroke()
+        this.context_.beginPath()
+        this.context_.moveTo(x, y)
+        this.context_.lineTo(x + width, y)
+        this.context_.lineTo(x + width, y + height)
+        this.context_.lineTo(x, y + height)
+        this.context_.closePath()
+        this.context_.stroke()
         return this
     }
 
@@ -98,14 +92,13 @@ export class Painter {
         { x, y }: RectangularCoordinates,
         { width, height }: Size,
     ): Painter {
-        const context = this.paintDevice_.context
-        context.beginPath()
-        context.moveTo(x, y)
-        context.lineTo(x + width, y)
-        context.lineTo(x + width, y + height)
-        context.lineTo(x, y + height)
-        context.closePath()
-        context.fill()
+        this.context_.beginPath()
+        this.context_.moveTo(x, y)
+        this.context_.lineTo(x + width, y)
+        this.context_.lineTo(x + width, y + height)
+        this.context_.lineTo(x, y + height)
+        this.context_.closePath()
+        this.context_.fill()
         return this
     }
 
@@ -114,10 +107,9 @@ export class Painter {
         { x, y }: RectangularCoordinates,
         srcRect?: Rect
     ): Painter {
-        const context = this.paintDevice_.context
         const image = surface.imageData()
         srcRect = isNil(srcRect) ? surface.rect : srcRect
-        context.putImageData(
+        this.context_.putImageData(
             image,
             x, y,
             srcRect.leftX, srcRect.topY,
