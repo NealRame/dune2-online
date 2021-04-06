@@ -3,7 +3,7 @@ import { Color } from "@/graphics"
 // Palette
 export type RGBColor = Color.RGB
 export type RGBAColor = Color.RGBA
-export type Palette = Array<RGBColor | RGBAColor>
+export type Palette = Array<RGBAColor>
 
 // Tileset
 export const Tilesets = ["Terrain", "Units"] as const
