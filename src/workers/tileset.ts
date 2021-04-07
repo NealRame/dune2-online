@@ -1,5 +1,4 @@
-import { CreateTileMessage } from "../types"
-import { createTile } from "../tile"
+import { CreateTileMessage, createTile } from "@/core"
 
 import registerPromiseWorker from "promise-worker/register"
 

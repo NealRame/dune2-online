@@ -1,4 +1,4 @@
-import { DecodeMessage, RGBColor } from "../types"
+import { DecodeMessage, RGBColor } from "@/core"
 
 import { ungzip } from "pako"
 

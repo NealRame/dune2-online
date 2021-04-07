@@ -3,7 +3,7 @@
 import DecodeWorker from "worker-loader!./decode"
 import TilesetWorker from "worker-loader!./tileset"
 
-import { CreateTileMessage, DecodeMessage, Tile } from "../types"
+import { CreateTileMessage, DecodeMessage, Tile } from "@/core"
 
 import PromiseWorker from "promise-worker"
 
