@@ -7,8 +7,8 @@
     <screen ref="screen" />
     <tile-palette
         ref="tilePalette"
+        v-model="currentTile"
         :tilesets="tilesets"
-        @tile-changed="onTileChanged"
     />
 </template>
 
@@ -18,7 +18,6 @@ import Screen from "@/components/Screen.vue"
 import TilePalette from "@/components/TilePalette.vue"
 
 import { GameData, GameDataItems, Palette, Tile, TilesetMap, Tilesets, TilsetsData } from "@/core"
-import { TileChangedEvent } from "@/components/types"
 import { PaintDevice, Painter, Scene } from "@/graphics"
 import { fetchData } from "@/utils"
 import * as Workers from "@/workers"
@@ -82,10 +81,7 @@ export default defineComponent({
         const gameDataProgress = ref(0)
         const tilesets = ref<TilesetMap | null>(null)
         const screen = ref<PaintDevice | null>(null)
-
-        const onTileChanged = (ev: TileChangedEvent) => {
-            console.log(ev)
-        }
+        const currentTile = ref<Tile | null>(null)
 
         onMounted(async () => {
             gameDataLoading.value = true
@@ -106,8 +102,8 @@ export default defineComponent({
             gameDataLoaded,
             gameDataProgressLabel,
             gameDataProgress,
+            currentTile,
             tilesets,
-            onTileChanged,
             screen,
         }
     }

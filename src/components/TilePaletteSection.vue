@@ -58,10 +58,8 @@ export default defineComponent({
     methods: {
         onChange(ev: InputEvent): void {
             const tileIndex = Number((ev.target as HTMLInputElement).value)
-            this.$emit("tileChanged", {
-                tileset: this.name,
-                tile: tileIndex
-            })
+            const tile = this.tiles[tileIndex]
+            this.$emit("tileChanged", tile)
         },
         dataURI(tile: ImageData) {
             return new Surface(tile).dataURI()

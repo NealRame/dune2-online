@@ -6,7 +6,7 @@
                     <tile-palette-section
                         :name="name"
                         :tiles="tilesets[name]"
-                        @tile-changed="$emit('tileChanged', $event)"
+                        @tile-changed="currentTile = $event"
                     />
                 </li>
             </ul>
@@ -40,20 +40,21 @@ import { computed, defineComponent } from "vue"
 
 export default defineComponent({
     components: { TilePaletteSection },
-    props: ["tilesets"],
-    emits: ["tileChanged"],
-    setup(props) {
+    props: ["tilesets", "modelValue"],
+    emits: ["update:modelValue"],
+    setup(props, { emit }) {
         const sections = computed(() => {
             return props.tilesets == null
                 ? []
                 : Object.keys(props.tilesets)
         })
-        const tiles = (section: string) => {
-            return props.tilesets[section]
-        }
+        const currentTile = computed({
+            get: () => props.modelValue,
+            set: value => emit("update:modelValue", value)
+        })
         return {
             sections,
-            tiles,
+            currentTile,
         }
     },
 })
