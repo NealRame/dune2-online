@@ -15,6 +15,7 @@ import { defineComponent, onMounted, ref } from "vue"
 import { clamp, debounce } from "lodash"
 
 export default defineComponent({
+    emits: ["mouseMotion", "mouseClick"],
     setup(props, { emit }) {
         const width = ref(0)
         const height = ref(0)
@@ -33,9 +34,18 @@ export default defineComponent({
         const mouseMove = (e: MouseEvent) => {
             if (canvas.value != null) {
                 const { left, top } = canvas.value.getBoundingClientRect()
-                const x = clamp(e.clientX - left, 0, width.value)
-                const y = clamp(e.clientY - top, 0, height.value)
+                const x = Math.round(clamp(e.clientX - left, 0, width.value))
+                const y = Math.round(clamp(e.clientY - top, 0, height.value))
                 emit("mouseMotion", { x, y })
+            }
+        }
+
+        const mouseClick = (e: MouseEvent) => {
+            if (canvas.value != null) {
+                const { left, top } = canvas.value.getBoundingClientRect()
+                const x = Math.round(clamp(e.clientX - left, 0, width.value))
+                const y = Math.round(clamp(e.clientY - top, 0, height.value))
+                emit("mouseClick", { x, y })
             }
         }
 
@@ -45,6 +55,7 @@ export default defineComponent({
             }
 
             canvas.value.addEventListener("mousemove", mouseMove)
+            canvas.value.addEventListener("click", mouseClick)
             window.addEventListener("resize", resize)
 
             resize()
