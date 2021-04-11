@@ -83,6 +83,8 @@ export default defineComponent({
         const screen = ref<PaintDevice | null>(null)
         const currentTile = ref<Tile | null>(null)
 
+        const scene = new Scene()
+
         onMounted(async () => {
             gameDataLoading.value = true
 
@@ -92,8 +94,9 @@ export default defineComponent({
             gameDataLoading.value = false
             gameDataLoaded.value = true
 
-            const scene = new Scene((unref(screen) as PaintDevice).painter())
-            scene.run()
+            scene
+                .setPainter((unref(screen) as PaintDevice).painter())
+                .run()
         })
 
         return {

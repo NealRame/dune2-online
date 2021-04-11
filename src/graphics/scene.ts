@@ -1,6 +1,8 @@
 import { cssHex } from "./color"
 import { Brush, Painter } from "./painter"
 
+import { isNil } from "lodash"
+
 type GridConfig = {
     enabled?: boolean,
     space?: number,
@@ -35,11 +37,11 @@ function drawGrid(
 }
 
 export class Scene {
-    private painter_: Painter
+    private painter_: Painter | null
     private backgroundColor_: Brush
     private gridConfig_: GridConfig
 
-    constructor(painter: Painter) {
+    constructor(painter: Painter | null = null) {
         this.painter_ = painter
         this.backgroundColor_ = cssHex([0, 0, 0])
         this.gridConfig_ = {
@@ -48,11 +50,18 @@ export class Scene {
         }
     }
 
+    setPainter(painter: Painter | null = null): Scene {
+        this.painter_ = painter
+        return this
+    }
+
     render(): Scene {
-        this.painter_.clear(this.backgroundColor_)
-        // draw grid
-        if (this.gridConfig_.enabled) {
-            drawGrid(this.painter_, this.gridConfig_)
+        if (!isNil(this.painter_)) {
+            this.painter_.clear(this.backgroundColor_)
+            // draw grid
+            if (this.gridConfig_.enabled) {
+                drawGrid(this.painter_, this.gridConfig_)
+            }
         }
         return this
     }
