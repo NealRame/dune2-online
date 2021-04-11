@@ -11,60 +11,54 @@ canvas {
 </style>
 
 <script lang="ts">
-import { defineComponent, onMounted, ref } from "vue"
+import { defineComponent, onMounted, ref, unref } from "vue"
 import { clamp, debounce } from "lodash"
 
 export default defineComponent({
     emits: ["mouseMotion", "mouseClick"],
     setup(props, { emit }) {
-        const width = ref(0)
-        const height = ref(0)
-        const canvas = ref<HTMLCanvasElement | null>(null)
+        const widthRef = ref(0)
+        const heightRef = ref(0)
+        const canvasRef = ref<HTMLCanvasElement | null>(null)
 
         // handle window resize event
         const resize = debounce(() => {
-            if (canvas.value != null) {
-                const { x: leftPos } = canvas.value.getBoundingClientRect()
-                width.value = window.innerWidth - leftPos
-                height.value = window.innerHeight
-            }
+            const canvas = unref(canvasRef) as HTMLCanvasElement
+            const { x: leftPos } = canvas.getBoundingClientRect()
+            widthRef.value = window.innerWidth - leftPos
+            heightRef.value = window.innerHeight
         }, 60)
-
         // handle mouse move event
         const mouseMove = (e: MouseEvent) => {
-            if (canvas.value != null) {
-                const { left, top } = canvas.value.getBoundingClientRect()
-                const x = Math.round(clamp(e.clientX - left, 0, width.value))
-                const y = Math.round(clamp(e.clientY - top, 0, height.value))
-                emit("mouseMotion", { x, y })
-            }
+            const canvas = unref(canvasRef) as HTMLCanvasElement
+            const { left, top } = canvas.getBoundingClientRect()
+            const x = Math.round(clamp(e.clientX - left, 0, unref(widthRef)))
+            const y = Math.round(clamp(e.clientY - top, 0, unref(heightRef)))
+            emit("mouseMotion", { x, y })
         }
-
+        // handle mouse click event
         const mouseClick = (e: MouseEvent) => {
-            if (canvas.value != null) {
-                const { left, top } = canvas.value.getBoundingClientRect()
-                const x = Math.round(clamp(e.clientX - left, 0, width.value))
-                const y = Math.round(clamp(e.clientY - top, 0, height.value))
-                emit("mouseClick", { x, y })
-            }
+            const canvas = unref(canvasRef) as HTMLCanvasElement
+            const { left, top } = canvas.getBoundingClientRect()
+            const x = Math.round(clamp(e.clientX - left, 0, unref(widthRef)))
+            const y = Math.round(clamp(e.clientY - top, 0, unref(heightRef)))
+            emit("mouseClick", { x, y })
         }
 
         onMounted(() => {
-            if (canvas.value == null) {
-                throw new Error("")
-            }
-
-            canvas.value.addEventListener("mousemove", mouseMove)
-            canvas.value.addEventListener("click", mouseClick)
+            const canvas = unref(canvasRef) as HTMLCanvasElement
+            // listen to canvas and window events
+            canvas.addEventListener("mousemove", mouseMove)
+            canvas.addEventListener("click", mouseClick)
             window.addEventListener("resize", resize)
-
+            // resize canvas
             resize()
         })
 
         return {
-            width,
-            height,
-            canvas,
+            width: widthRef,
+            height: heightRef,
+            canvas: canvasRef,
         }
     }
 })
