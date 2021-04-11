@@ -11,8 +11,10 @@ canvas {
 </style>
 
 <script lang="ts">
+import { Painter } from "@/graphics"
+
 import { defineComponent, onMounted, ref, unref } from "vue"
-import { clamp, debounce } from "lodash"
+import { clamp, debounce, isNil } from "lodash"
 
 export default defineComponent({
     emits: ["mouseMotion", "mouseClick"],
@@ -20,6 +22,7 @@ export default defineComponent({
         const widthRef = ref(0)
         const heightRef = ref(0)
         const canvasRef = ref<HTMLCanvasElement | null>(null)
+        let painter: Painter | null
 
         // handle window resize event
         const resize = debounce(() => {
@@ -53,12 +56,20 @@ export default defineComponent({
             window.addEventListener("resize", resize)
             // resize canvas
             resize()
+            // initialize painter
+            painter = new Painter(canvas)
         })
 
         return {
             width: widthRef,
             height: heightRef,
             canvas: canvasRef,
+            painter() {
+                if (isNil(painter)) {
+                    throw new Error("No painter available yet")
+                }
+                return painter
+            },
         }
     }
 })

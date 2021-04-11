@@ -18,11 +18,11 @@ import Screen from "@/components/Screen.vue"
 import TilePalette from "@/components/TilePalette.vue"
 
 import { GameData, GameDataItems, Palette, Tile, TilesetMap, Tilesets, TilsetsData } from "@/core"
-import { PaintDevice, Painter, Scene } from "@/graphics"
+import { PaintDevice, Scene } from "@/graphics"
 import { fetchData } from "@/utils"
 import * as Workers from "@/workers"
 
-import { defineComponent, onMounted, ref, Ref } from "vue"
+import { defineComponent, onMounted, ref, Ref, unref } from "vue"
 import { isNil } from "lodash"
 
 async function fetchGameData(
@@ -92,8 +92,7 @@ export default defineComponent({
             gameDataLoading.value = false
             gameDataLoaded.value = true
 
-            const canvas = screen.value?.canvas as HTMLCanvasElement
-            const scene = new Scene(new Painter(canvas))
+            const scene = new Scene((unref(screen) as PaintDevice).painter())
             scene.run()
         })
 

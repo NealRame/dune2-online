@@ -1,3 +1,5 @@
+import { Painter } from "./painter"
+
 export interface PaintDevice {
-    canvas: HTMLCanvasElement
+    painter(): Painter
 }
