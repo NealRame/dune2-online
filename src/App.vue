@@ -13,6 +13,8 @@
 </template>
 
 <script lang="ts">
+import "@/styles/global.scss"
+
 import ProgressBar from "@/components/ProgressBar.vue"
 import Screen from "@/components/Screen.vue"
 import TilePalette from "@/components/TilePalette.vue"

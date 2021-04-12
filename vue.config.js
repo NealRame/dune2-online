@@ -4,11 +4,7 @@ const path = require("path")
 
 module.exports = {
     chainWebpack: config => {
-        config
-            .entry("style")
-            .add(path.resolve(__dirname, "./src/style.scss"))
-            .end()
-
+        // automaticaly import variables.scss file for scss styles
         const types = ["vue-modules", "vue", "normal-modules", "normal"]
         types.forEach(type => {
             addStyleResource(config.module.rule("scss").oneOf(type))
