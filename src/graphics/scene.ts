@@ -1,5 +1,6 @@
 import { cssHex } from "./color"
 import { Brush, Painter } from "./painter"
+import { SceneItem } from "./types"
 
 import { isNil } from "lodash"
 
@@ -40,9 +41,11 @@ export class Scene {
     private painter_: Painter | null
     private backgroundColor_: Brush
     private gridConfig_: GridConfig
+    private items_: Array<SceneItem>
 
     constructor(painter: Painter | null = null) {
         this.painter_ = painter
+        this.items_ = []
         this.backgroundColor_ = cssHex([0, 0, 0])
         this.gridConfig_ = {
             enabled: true,
@@ -55,12 +58,21 @@ export class Scene {
         return this
     }
 
+    addItem(item: SceneItem): Scene {
+        this.items_.push(item)
+        return this
+    }
+
     render(): Scene {
         if (!isNil(this.painter_)) {
             this.painter_.clear(this.backgroundColor_)
             // draw grid
             if (this.gridConfig_.enabled) {
                 drawGrid(this.painter_, this.gridConfig_)
+            }
+            // draw items
+            for (const item of this.items_) {
+                item.draw(this.painter_)
             }
         }
         return this
