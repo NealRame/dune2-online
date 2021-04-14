@@ -19,55 +19,58 @@ import ProgressBar from "@/components/ProgressBar.vue"
 import Screen from "@/components/Screen.vue"
 import TilePalette from "@/components/TilePalette.vue"
 
-import { GameData, GameDataItems, Palette, Tile, TilesetMap, Tilesets, TilsetsData } from "@/core"
+import { GameData, Palette, SoundsetMap, Tile, TilesetMap } from "@/core"
 import { PaintDevice, Scene } from "@/graphics"
 import { fetchData } from "@/utils"
 import * as Workers from "@/workers"
 
 import { defineComponent, onMounted, ref, Ref, unref } from "vue"
-import { isNil } from "lodash"
 
 async function fetchGameData(
     gameDataProgress: Ref<number>,
     gameDataProgressLabel: Ref<string>,
 ) {
-    const gameData: Partial<GameData> = {}
+    type FetchedData = Record<keyof GameData, Uint8Array>
 
-    for (const item of GameDataItems) {
+    const fetchedData: Partial<FetchedData> = {}
+    for (const item of ["palette", "tilesets", "soundsets"] as const) {
         gameDataProgressLabel.value = `Fetching ${item} ...`
-        const data = await fetchData(
+        fetchedData[item] = await fetchData(
             `/assets/${item}.json.gz`,
             (current: number, total: number) => {
                 gameDataProgress.value = Math.min(current/total, 1)
             }
         )
-
-        gameDataProgressLabel.value = `Decoding ${item} ...`
-        gameData[item] = await Workers.decode({ data, item })
     }
-
-    return gameData as GameData
+    return fetchedData as FetchedData
 }
 
-async function createTilesets(
+async function decodeGameData(
     gameDataProgress: Ref<number>,
     gameDataProgressLabel: Ref<string>,
-    gameData: GameData,
 ) {
-    const gameTilesets: TilesetMap = {}
+    const fetchedData = await fetchGameData(gameDataProgress, gameDataProgressLabel)
+    const gameData: Partial<GameData> = {}
 
-    if (!isNil(gameData.tilesets)) {
-        for (const tileset of Tilesets) {
-            gameDataProgressLabel.value = `Initializing ${tileset} tiles ...`
-            gameDataProgress.value = 1
-            gameTilesets[tileset] = Object.freeze(await Workers.createTileset({
-                tilesData: (gameData.tilesets as TilsetsData)[tileset],
-                palette: gameData.palette as Palette,
-            }) as Tile[])
-        }
-    }
+    gameDataProgressLabel.value = "Decoding palette ..."
+    gameData.palette = await Workers.decodePalette(
+        fetchedData.palette
+    ) as Palette
+    gameDataProgress.value = 1/3
 
-    return gameTilesets
+    gameDataProgressLabel.value = "Decoding tilesets ..."
+    gameData.tilesets = await Workers.decodeTilesets(
+        fetchedData.tilesets, gameData.palette
+    ) as TilesetMap
+    gameDataProgress.value = 2/3
+
+    gameDataProgressLabel.value = "Decoding soundsets ..."
+    gameData.soundsets = await Workers.decodeSoundsets(
+        fetchedData.soundsets
+    ) as SoundsetMap
+    gameDataProgress.value = 3/3
+
+    return gameData as GameData
 }
 
 export default defineComponent({
@@ -78,7 +81,6 @@ export default defineComponent({
     },
     setup() {
         const gameDataLoading = ref(false)
-        const gameDataLoaded = ref(false)
         const gameDataProgressLabel = ref("")
         const gameDataProgress = ref(0)
         const tilesets = ref<TilesetMap | null>(null)
@@ -90,11 +92,10 @@ export default defineComponent({
         onMounted(async () => {
             gameDataLoading.value = true
 
-            const gameData = await fetchGameData(gameDataProgress, gameDataProgressLabel)
+            const gameData = await decodeGameData(gameDataProgress, gameDataProgressLabel)
 
-            tilesets.value = await createTilesets(gameDataProgress, gameDataProgressLabel, gameData)
+            tilesets.value = gameData.tilesets
             gameDataLoading.value = false
-            gameDataLoaded.value = true
 
             scene
                 .setPainter((unref(screen) as PaintDevice).painter())
@@ -103,7 +104,6 @@ export default defineComponent({
 
         return {
             gameDataLoading,
-            gameDataLoaded,
             gameDataProgressLabel,
             gameDataProgress,
             currentTile,

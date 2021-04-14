@@ -1,19 +1,25 @@
 /* eslint-disable import/no-webpack-loader-syntax */
 
-import DecodeWorker from "worker-loader!./decode"
-import TilesetWorker from "worker-loader!./tileset"
+import DecodePaletteWorker from "worker-loader!./decode-palette"
+import DecodeSoundsetsWorker from "worker-loader!./decode-soundsets"
+import DecodeTilesetsWorker from "worker-loader!./decode-tilesets"
 
-import { CreateTileMessage, DecodeMessage, Tile } from "@/core"
+import { Palette } from "@/core"
 
 import PromiseWorker from "promise-worker"
 
-const promiseDecodeWorker = new PromiseWorker(new DecodeWorker())
-const promiseTileWorder = new PromiseWorker(new TilesetWorker())
+const promiseDecodePaletteWorker = new PromiseWorker(new DecodePaletteWorker())
+const promiseDecodeSoundsetsWorker = new PromiseWorker(new DecodeSoundsetsWorker())
+const promiseDecodeTilesetsWorker = new PromiseWorker(new DecodeTilesetsWorker())
 
-export function decode(message: DecodeMessage) : unknown {
-    return promiseDecodeWorker.postMessage(message)
+export function decodePalette(data: Uint8Array) : unknown {
+    return promiseDecodePaletteWorker.postMessage(data)
 }
 
-export function createTileset(message: CreateTileMessage) : unknown {
-    return promiseTileWorder.postMessage(message) as Promise<Tile[]>
+export function decodeSoundsets(data: Uint8Array) : unknown {
+    return promiseDecodeSoundsetsWorker.postMessage(data)
+}
+
+export function decodeTilesets(data: Uint8Array, palette: Palette) : unknown {
+    return promiseDecodeTilesetsWorker.postMessage({ data, palette })
 }
