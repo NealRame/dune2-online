@@ -61,7 +61,7 @@ export default defineComponent({
             const tile = this.tiles[tileIndex]
             this.$emit("tileChanged", tile)
         },
-        dataURI(tile: ImageData) {
+        dataURI(tile: ImageBitmap) {
             return new Surface(tile).dataURI()
         }
     }

@@ -1,15 +1,10 @@
-import { Color } from "@/graphics"
+import { Color, ScaleFactor } from "@/graphics"
 
 // Palette
 export type Palette = readonly Color.RGBA[]
 
 // Tileset
-export type Tile = {
-    1: ImageData,
-    2: ImageData,
-    3: ImageData,
-    4: ImageData,
-}
+export type Tile = Record<ScaleFactor, ImageBitmap>
 export type Tileset = readonly Tile[]
 export type TilesetGroup = "Terrain" | "Units"
 export type TilesetMap = Record<TilesetGroup, Tileset>

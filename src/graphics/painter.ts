@@ -107,12 +107,13 @@ export class Painter {
         { x, y }: RectangularCoordinates,
         srcRect?: Rect
     ): Painter {
-        const image = surface.imageData()
+        const image = surface.imageBitmap()
         srcRect = isNil(srcRect) ? surface.rect : srcRect
-        this.context_.putImageData(
+        this.context_.drawImage(
             image,
-            x, y,
             srcRect.leftX, srcRect.topY,
+            srcRect.width, srcRect.height,
+            x, y,
             srcRect.width, srcRect.height
         )
         return this

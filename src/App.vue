@@ -4,7 +4,9 @@
         :current="gameDataProgress"
         :label="gameDataProgressLabel"
     />
-    <screen ref="screen" />
+    <screen ref="screen"
+        @mouseClick="onMouseClick"
+    />
     <tile-palette
         ref="tilePalette"
         v-model="currentTile"
@@ -19,12 +21,14 @@ import ProgressBar from "@/components/ProgressBar.vue"
 import Screen from "@/components/Screen.vue"
 import TilePalette from "@/components/TilePalette.vue"
 
-import { GameData, Palette, SoundsetMap, Tile, TilesetMap } from "@/core"
+import { LandItem, GameData, Palette, SoundsetMap, Tile, TilesetMap } from "@/core"
 import { PaintDevice, Scene } from "@/graphics"
 import { fetchData } from "@/utils"
 import * as Workers from "@/workers"
 
 import { defineComponent, onMounted, ref, Ref, unref } from "vue"
+import { RectangularCoordinates } from "./maths"
+import { isNil } from "lodash"
 
 async function fetchGameData(
     gameDataProgress: Ref<number>,
@@ -102,6 +106,17 @@ export default defineComponent({
                 .run()
         })
 
+        const onMouseClick = ({ x, y }: RectangularCoordinates) => {
+            const tile = unref(currentTile)
+            if (!isNil(tile)) {
+                const item = LandItem(tile)
+                item.x = Math.floor(x/32)*32
+                item.y = Math.floor(y/32)*32
+                item.scale = 2
+                scene.addItem(item)
+            }
+        }
+
         return {
             gameDataLoading,
             gameDataProgressLabel,
@@ -109,6 +124,7 @@ export default defineComponent({
             currentTile,
             tilesets,
             screen,
+            onMouseClick,
         }
     }
 })

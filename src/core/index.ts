@@ -1,2 +1,2 @@
-export * from "./tile"
 export * from "./types"
+export * from "./land-item"

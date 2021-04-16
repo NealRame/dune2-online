@@ -1,5 +1,5 @@
-import { Palette, Tile } from "@/core"
 import { base64ToByteArray } from "@/utils"
+import { Palette, Tile, TilesetMap } from "@/core"
 
 import { isNil } from "lodash"
 import { ungzip } from "pako"
@@ -12,7 +12,6 @@ type TileData = {
     data: Uint8Array,
     remap?: Uint8Array,
 }
-type TilesetData = [string, Array<TileData>]
 
 function tileToImageData(tile: TileData, palette: Palette, scale=1) {
     const image = new ImageData(tile.w*scale, tile.h*scale)
@@ -46,15 +45,16 @@ function tileToImageData(tile: TileData, palette: Palette, scale=1) {
     return image
 }
 
-function createTile(tileData: TileData, palette: Palette): Tile {
+async function createTile(tileData: TileData, palette: Palette): Promise<Tile> {
     const tile: Partial<Tile> = {}
     for (const scale of [1, 2, 3, 4] as const) {
-        tile[scale] = tileToImageData(tileData, palette, scale)
+        tile[scale] = await createImageBitmap(tileToImageData(tileData, palette, scale))
     }
     return tile as Tile
 }
 
-function decodeTilesets(inflatedData: string, palette: Palette): unknown {
+async function decodeTilesets(inflatedData: string, palette: Palette): Promise<TilesetMap> {
+    const tilesets: Partial<TilesetMap> = {}
     const tilesetsData = JSON.parse(
         inflatedData,
         function (key: string, value: unknown) {
@@ -64,13 +64,14 @@ function decodeTilesets(inflatedData: string, palette: Palette): unknown {
             return value
         }
     )
-    const tilesets = Object.entries(tilesetsData).map(t => {
-        const [tileset, tilesData] = t as TilesetData
-        return {
-            [tileset]: tilesData.map(tileData => createTile(tileData, palette))
-        }
-    })
-    return Object.assign({}, ...tilesets)
+
+    for (const group of ["Terrain", "Units"] as const) {
+        tilesets[group] = await Promise.all(tilesetsData[group].map(
+            (tileData: TileData) => createTile(tileData, palette)
+        ))
+    }
+
+    return tilesets as TilesetMap
 }
 
 registerPromiseWorker(async ({ data, palette }) => {

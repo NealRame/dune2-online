@@ -1,25 +1,17 @@
-import { Rect, RectangularCoordinates, Size } from "@/maths"
-
-import isNil from "lodash/isNil"
-import clamp from "lodash/clamp"
+import { Rect, Size } from "@/maths"
 
 /**
  * @class Surface
  */
 export class Surface {
-    private image_: ImageData
+    private image_: ImageBitmap
 
     /**
      * @param size
      * @param pixels
      */
-    constructor(sizeOrImage: Size|ImageData) {
-        if (sizeOrImage instanceof ImageData) {
-            this.image_ = sizeOrImage
-        } else {
-            const { width, height } = sizeOrImage
-            this.image_ = new ImageData(width, height)
-        }
+    constructor(image: ImageBitmap) {
+        this.image_ = image
     }
 
     get width(): number { return this.image_.width }
@@ -42,14 +34,10 @@ export class Surface {
         )
     }
 
-    get pixels(): Uint8ClampedArray {
-        return this.image_.data
-    }
-
     /**
-     * @returns {ImageData}
+     * @returns {ImageBitmap}
      */
-    imageData(): ImageData {
+    imageBitmap(): ImageBitmap {
         return this.image_
     }
 
@@ -63,45 +51,9 @@ export class Surface {
         canvas.width = this.width
         canvas.height = this.height
         if (context != null) {
-            context.putImageData(this.imageData(), 0, 0)
+            context.drawImage(this.image_, 0, 0)
         }
 
         return canvas.toDataURL()
-    }
-
-    /**
-     *
-     * @param surface
-     * @param position
-     * @param srcRect
-     * @returns this
-     */
-    blit(
-        surface: Surface,
-        { x, y }: RectangularCoordinates,
-        srcRect?: Rect
-    ): Surface {
-        srcRect = isNil(srcRect)
-            ? surface.rect
-            : surface.rect.intersected(srcRect)
-        srcRect.x = clamp(0, srcRect.x - x, srcRect.width)
-        srcRect.y = clamp(0, srcRect.y - y, srcRect.height)
-        srcRect.crop({
-            width: Math.min(this.width - x, srcRect.width),
-            height: Math.min(this.height - y, srcRect.height),
-        })
-
-        for (let y = 0; y < srcRect.height; ++y) {
-            const srcOffset = 4*(y*surface.width + srcRect.x)
-            const srcPixels = new Uint8ClampedArray(
-                surface.pixels.buffer,
-                srcOffset,
-                4*srcRect.width,
-            )
-            const dstOffset = 4*(y*this.width + x)
-            this.pixels.set(srcPixels, dstOffset)
-        }
-
-        return this
     }
 }
