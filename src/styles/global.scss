@@ -1,5 +1,17 @@
 body {
-    background-color: $bg-color;
-    margin: 0;
-    padding: 0;
+  background-color: $bg-color;
+  color: $fg-color;
+
+  font-family: $font-family;
+  text-align: center;
+
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+
+  padding: 0;
+  margin: 0;
+}
+
+a {
+  color: $link-color;
 }

@@ -1,10 +1,6 @@
+import App from "@/app.vue"
+import router from "@/router"
+
 import { createApp } from "vue"
-import App from "./App.vue"
 
-declare global {
-    interface Window {
-        appVM: any // eslint-disable-line @typescript-eslint/no-explicit-any
-    }
-}
-
-window.appVM = createApp(App).mount("#app")
+createApp(App).use(router).mount("#app")
