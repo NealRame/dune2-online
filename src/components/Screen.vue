@@ -2,19 +2,11 @@
     <canvas ref="canvas" :width="width" :height="height"></canvas>
 </template>
 
-<style lang="scss" scoped>
-canvas {
-    position: absolute;
-    left: $palette-width;
-    top: 0;
-}
-</style>
-
 <script lang="ts">
 import { Painter } from "@/graphics"
 
 import { defineComponent, onMounted, ref, unref } from "vue"
-import { clamp, debounce, isNil } from "lodash"
+import { clamp, isNil } from "lodash"
 
 export default defineComponent({
     emits: ["mouseMotion", "mouseClick"],
@@ -24,13 +16,6 @@ export default defineComponent({
         const canvasRef = ref<HTMLCanvasElement | null>(null)
         let painter: Painter | null
 
-        // handle window resize event
-        const resize = debounce(() => {
-            const canvas = unref(canvasRef) as HTMLCanvasElement
-            const { x: leftPos } = canvas.getBoundingClientRect()
-            widthRef.value = window.innerWidth - leftPos
-            heightRef.value = window.innerHeight
-        }, 60)
         // handle mouse move event
         const mouseMove = (e: MouseEvent) => {
             const canvas = unref(canvasRef) as HTMLCanvasElement
@@ -53,9 +38,6 @@ export default defineComponent({
             // listen to canvas and window events
             canvas.addEventListener("mousemove", mouseMove)
             canvas.addEventListener("click", mouseClick)
-            window.addEventListener("resize", resize)
-            // resize canvas
-            resize()
             // initialize painter
             painter = new Painter(canvas)
         })
@@ -70,6 +52,12 @@ export default defineComponent({
                 }
                 return painter
             },
+            rect() {
+                const canvas = unref(canvasRef)
+                if (!isNil(canvas)) {
+                    return canvas.getBoundingClientRect()
+                }
+            }
         }
     }
 })

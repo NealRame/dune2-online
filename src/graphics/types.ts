@@ -1,7 +1,8 @@
 import { Painter } from "./painter"
-import { RectangularCoordinates, Size } from "@/maths"
+import { Rect, RectangularCoordinates, Size } from "@/maths"
 export interface PaintDevice {
-    painter(): Painter
+    painter(): Painter,
+    rect(): Rect,
 }
 
 export type ScaleFactor = 1 | 2 | 3 | 4

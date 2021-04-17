@@ -5,6 +5,8 @@
         :label="gameDataProgressLabel"
     />
     <screen ref="screen"
+        :width="gameScreenWidth"
+        :height="gameScreenHeight"
         @mouseClick="onMouseClick"
     />
     <tile-palette
@@ -13,6 +15,14 @@
         :tilesets="tilesets"
     />
 </template>
+
+<style lang="scss" scoped>
+canvas {
+    position: absolute;
+    left: $palette-width;
+    top: 0;
+}
+</style>
 
 <script lang="ts">
 import ProgressBar from "@/components/ProgressBar.vue"
@@ -26,7 +36,7 @@ import * as Workers from "@/workers"
 
 import { defineComponent, onMounted, ref, Ref, unref } from "vue"
 import { RectangularCoordinates } from "../maths"
-import { isNil } from "lodash"
+import { debounce, isNil } from "lodash"
 
 async function fetchGameData(
     gameDataProgress: Ref<number>,
@@ -85,11 +95,20 @@ export default defineComponent({
         const gameDataLoading = ref(false)
         const gameDataProgressLabel = ref("")
         const gameDataProgress = ref(0)
+        const gameScreenWidth = ref(0)
+        const gameScreenHeight = ref(0)
         const tilesets = ref<TilesetMap | null>(null)
         const screen = ref<PaintDevice | null>(null)
         const currentTile = ref<Tile | null>(null)
 
         const scene = new Scene()
+
+        // handle window resize event
+        const resize = debounce(() => {
+            const { x: leftPos } = (unref(screen) as PaintDevice).rect()
+            gameScreenWidth.value = window.innerWidth - leftPos
+            gameScreenHeight.value = window.innerHeight
+        }, 60)
 
         onMounted(async () => {
             gameDataLoading.value = true
@@ -99,9 +118,12 @@ export default defineComponent({
             tilesets.value = gameData.tilesets
             gameDataLoading.value = false
 
+            resize()
+
             scene
                 .setPainter((unref(screen) as PaintDevice).painter())
                 .run()
+            window.addEventListener("resize", resize)
         })
 
         const onMouseClick = ({ x, y }: RectangularCoordinates) => {
@@ -119,6 +141,8 @@ export default defineComponent({
             gameDataLoading,
             gameDataProgressLabel,
             gameDataProgress,
+            gameScreenWidth,
+            gameScreenHeight,
             currentTile,
             tilesets,
             screen,
