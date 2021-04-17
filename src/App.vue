@@ -1,10 +1,13 @@
 <template>
-    <h1>Dune2</h1>
-    <p>
-        <router-link to="/tiles">Tiles configurator</router-link>
-    </p>
     <router-view></router-view>
 </template>
+
+<style lang="scss" scoped>
+ul {
+    padding: 0;
+    list-style-type: none;
+}
+</style>
 
 <script lang="ts">
 import "@/styles/global.scss"
