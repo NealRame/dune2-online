@@ -27,9 +27,9 @@ export default defineComponent({
         // handle mouse click event
         const mouseClick = (e: MouseEvent) => {
             const canvas = unref(canvasRef) as HTMLCanvasElement
-            const { left, top } = canvas.getBoundingClientRect()
-            const x = Math.round(clamp(e.clientX - left, 0, unref(widthRef)))
-            const y = Math.round(clamp(e.clientY - top, 0, unref(heightRef)))
+            const { left, top, width, height } = canvas.getBoundingClientRect()
+            const x = Math.round(clamp(e.clientX - left, 0, width))
+            const y = Math.round(clamp(e.clientY - top, 0, height))
             emit("mouseClick", { x, y })
         }
 
