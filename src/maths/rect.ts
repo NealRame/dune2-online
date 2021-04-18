@@ -69,50 +69,35 @@ export class Rect implements RectangularCoordinates, Size {
      * @returns the top left point of this Rect
      */
     topLeft(): Vector {
-        return new Vector({
-            x: this.x,
-            y: this.y,
-        })
+        return new Vector(this.x, this.y)
     }
 
     /**
      * @returns the top right point
      */
     topRight(): Vector {
-        return new Vector({
-            x: this.rightX,
-            y: this.y,
-        })
+        return new Vector(this.rightX, this.y)
     }
 
     /**
      * @returns the bottom left point
      */
     bottomLeft(): Vector {
-        return new Vector({
-            x: this.x,
-            y: this.y + this.height
-        })
+        return new Vector(this.x, this.y + this.height)
     }
 
     /**
      * @returns the bottom right point
      */
     bottomRight(): Vector {
-        return new Vector({
-            x: this.rightX,
-            y: this.bottomY
-        })
+        return new Vector(this.rightX, this.bottomY)
     }
 
     /**
      * @returns the center point
      */
     center(): Vector {
-        return new Vector({
-            x: this.x + this.width/2,
-            y: this.y + this.height/2
-        })
+        return new Vector(this.x + this.width/2, this.y + this.height/2)
     }
 
     /**

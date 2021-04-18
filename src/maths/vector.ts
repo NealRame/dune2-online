@@ -4,7 +4,7 @@ export class Vector implements RectangularCoordinates {
     x: number
     y: number
 
-    constructor({ x, y }: RectangularCoordinates) {
+    constructor(x: number, y: number) {
         this.x = x
         this.y = y
     }
@@ -20,10 +20,7 @@ export class Vector implements RectangularCoordinates {
      * The opposite of this Vector
      */
     get opposite(): Vector {
-        return new Vector({
-            x: -this.x,
-            y: -this.y
-        })
+        return new Vector(-this.x, -this.y)
     }
 
     /**
@@ -68,10 +65,10 @@ export class Vector implements RectangularCoordinates {
     }
 
     /**
-     * Scalar product with the Vector like object
+     * Dot product with the Vector like object
      * @returns this
      */
-    scalar({ x, y }: RectangularCoordinates): number {
+    dot({ x, y }: RectangularCoordinates): number {
         return this.x*x + this.y*y
     }
 
@@ -104,19 +101,16 @@ export class Vector implements RectangularCoordinates {
      */
     toUnit(): Vector {
         const n = this.norm
-        return new Vector({
-            x: this.x/n,
-            y: this.y/n,
-        })
+        return new Vector(this.x/n, this.y/n)
     }
 
     toString(): string {
         return `(${this.x}, ${this.y})`
     }
 
-    static Null  = new Vector({ x:  0, y:  0 })
-    static Up    = new Vector({ x:  0, y: -1 })
-    static Right = new Vector({ x:  1, y:  0 })
-    static Down  = new Vector({ x:  0, y:  1 })
-    static Left  = new Vector({ x: -1, y:  0 })
+    static Null  = new Vector( 0,  0)
+    static Up    = new Vector( 0, -1)
+    static Right = new Vector( 1,  0)
+    static Down  = new Vector( 0,  1)
+    static Left  = new Vector(-1,  0)
 }
