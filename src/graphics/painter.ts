@@ -102,20 +102,48 @@ export class Painter {
         return this
     }
 
+    drawImageData(
+        imageData: ImageData,
+        { x, y }: RectangularCoordinates,
+        srcRect?: Rect
+    ): Painter {
+        if (isNil(srcRect)) {
+            this.context_.putImageData(imageData, x, y)
+        } else {
+            this.context_.putImageData(
+                imageData,
+                x, y,
+                srcRect.x, srcRect.y,
+                srcRect.width, srcRect.height
+            )
+        }
+        return this
+    }
+
+    drawImageBitmap(
+        imageBitmap: ImageBitmap,
+        { x, y }: RectangularCoordinates,
+        srcRect?: Rect
+    ): Painter {
+        if (isNil(srcRect)) {
+            this.context_.drawImage(imageBitmap, x, y)
+        } else {
+            this.context_.drawImage(
+                imageBitmap,
+                srcRect.leftX, srcRect.topY,
+                srcRect.width, srcRect.height,
+                x, y,
+                srcRect.width, srcRect.height
+            )
+        }
+        return this
+    }
+
     drawSurface(
         surface: Surface,
         { x, y }: RectangularCoordinates,
         srcRect?: Rect
     ): Painter {
-        const image = surface.imageBitmap()
-        srcRect = isNil(srcRect) ? surface.rect : srcRect
-        this.context_.drawImage(
-            image,
-            srcRect.leftX, srcRect.topY,
-            srcRect.width, srcRect.height,
-            x, y,
-            srcRect.width, srcRect.height
-        )
-        return this
+        return this.drawImageBitmap(surface.imageBitmap(), { x, y }, srcRect)
     }
 }
