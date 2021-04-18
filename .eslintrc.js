@@ -20,6 +20,7 @@ module.exports = {
             "asyncArrow": "always",
             "named": "never",
         }],
+        "space-in-parens": "off",
         "key-spacing": ["error", { "mode": "minimum" }],
         "space-infix-ops": ["off"],
         "operator-linebreak": ["off"],
