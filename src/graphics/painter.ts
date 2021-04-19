@@ -18,9 +18,7 @@ export class Painter {
      */
     constructor(canvas: HTMLCanvasElement) {
         this.canvas_ = canvas
-        this.context_ = canvas.getContext("2d", {
-            alpha: false,
-        }) as CanvasRenderingContext2D
+        this.context_ = canvas.getContext("2d") as CanvasRenderingContext2D
     }
 
     get size(): Size {
