@@ -1,5 +1,3 @@
-import { Surface } from "./surface"
-
 import { Rect, RectangularCoordinates, Size } from "@/maths"
 
 import { isNil } from "lodash"
@@ -139,13 +137,5 @@ export class Painter {
             )
         }
         return this
-    }
-
-    drawSurface(
-        surface: Surface,
-        { x, y }: RectangularCoordinates,
-        srcRect?: Rect
-    ): Painter {
-        return this.drawImageBitmap(surface.imageBitmap(), { x, y }, srcRect)
     }
 }

@@ -49,8 +49,24 @@ ol {
 </style>
 
 <script lang="ts">
-import { Surface } from "@/graphics"
 import { defineComponent } from "@vue/runtime-core"
+
+function dataURI(image: ImageData|ImageBitmap) {
+    const canvas = document.createElement("canvas")
+    const context = canvas.getContext("2d")
+
+    canvas.width = image.width
+    canvas.height = image.height
+
+    if (context != null) {
+        if (image instanceof ImageData) {
+            context.putImageData(image, 0, 0)
+        } else {
+            context.drawImage(image, 0, 0)
+        }
+    }
+    return canvas.toDataURL()
+}
 
 export default defineComponent({
     emits: ["tileChanged"],
@@ -62,7 +78,7 @@ export default defineComponent({
             this.$emit("tileChanged", tile)
         },
         dataURI(tile: ImageBitmap) {
-            return new Surface(tile).dataURI()
+            return dataURI(tile)
         }
     }
 })
