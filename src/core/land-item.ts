@@ -1,20 +1,13 @@
 import { Tile } from "./types"
-import { Painter, ScaleFactor, SceneItem, Surface } from "@/graphics"
-
-function tileToSurface(tile: Tile): Record<ScaleFactor, Surface> {
-    return Object.assign({}, ...[1, 2, 3, 4].map((scale) => ({
-        [scale]: new Surface(tile[scale as ScaleFactor])
-    })))
-}
+import { Painter, ScaleFactor, SceneItem } from "@/graphics"
 
 export function LandItem(tile: Tile): SceneItem {
     const state = {
         x: 0,
         y: 0,
-        surfaces: tileToSurface(tile),
         scale: 1,
     }
-    const currentSurface = () => state.surfaces[state.scale as ScaleFactor]
+    const image = () => tile[state.scale as ScaleFactor]
     return {
         get x() {
             return state.x
@@ -29,10 +22,10 @@ export function LandItem(tile: Tile): SceneItem {
             state.y = y
         },
         get width() {
-            return currentSurface().width
+            return image().width
         },
         get height() {
-            return currentSurface().height
+            return image().height
         },
         get scale(): ScaleFactor {
             return state.scale as ScaleFactor
@@ -41,7 +34,7 @@ export function LandItem(tile: Tile): SceneItem {
             state.scale = scale
         },
         draw(painter: Painter) {
-            painter.drawSurface(currentSurface(), state)
+            painter.drawImageBitmap(image(), state)
             return this
         }
     }
