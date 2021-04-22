@@ -35,6 +35,7 @@
     "eslint-plugin-vue": "^7.0.0",
     "lodash": "^4.17.21",
     "node-sass": "^4.12.0",
+    "open-simplex-noise": "^2.5.0",
     "pako": "^1.0.11",
     "promise-worker": "^2.0.1",
     "sass-loader": "^8.0.2",
