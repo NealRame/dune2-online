@@ -1,6 +1,6 @@
 import Home from "@/components/Home.vue"
 import Tiles from "@/components/Tiles.vue"
-import Perlin from "@/components/Perlin.vue"
+import Noise from "@/components/Noise.vue"
 
 import { createRouter, createWebHistory, RouteRecordRaw } from "vue-router"
 
@@ -13,9 +13,9 @@ const routes: Array<RouteRecordRaw> = [{
     name: "Tiles",
     component: Tiles,
 }, {
-    path: "/perlin",
-    name: "Perlin",
-    component: Perlin,
+    path: "/noise",
+    name: "Noise",
+    component: Noise,
 }]
 
 const router = createRouter({
