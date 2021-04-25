@@ -23,7 +23,7 @@
         <span>{{octaves}}</span>
 
         <button name="seed" @click="onSeedClicked">
-            <font-awesome-icon icon="random" />
+            <font-awesome-icon icon="sync-alt" />
         </button>
     </div>
 
