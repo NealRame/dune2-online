@@ -1,4 +1,5 @@
 export * from "./types"
+export * from "./noise"
+export * from "./range"
 export { Rect } from "./rect"
 export { Vector } from "./vector"
-export { Noise2DGenerator } from "./noise"
