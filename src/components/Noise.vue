@@ -11,7 +11,7 @@
         <span>{{scale}}</span>
 
         <label for="contrast">Contrast</label>
-        <input type="range" name="contrast" id="contrast" min="0" max="10" v-model="contrast">
+        <input type="range" name="contrast" id="contrast" min="-10" max="10" v-model="contrast">
         <span>{{contrast}}</span>
 
         <label for="amplitude">Amplitude</label>
@@ -100,10 +100,10 @@ export default defineComponent({
             const image1 = new ImageData(unref(width), unref(height))
             for (let x = 0; x < unref(width); ++x) {
                 for (let y = 0; y < unref(height); ++y) {
-                    const contrastValue = unref(contrast)
+                    const contrastValue = Number(unref(contrast))
                     const p = noise(x/unref(scale), y/unref(scale))
 
-                    const pc = contrastValue > 0
+                    const pc = contrastValue !== 0
                         ? 255/(1 + Math.exp(-unref(contrast)*p))
                         : 255*((p + 1)/2)
 
