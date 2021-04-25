@@ -81,9 +81,9 @@ export default defineComponent({
     },
     emits: ["update:scale", "update:contrast", "update:amplitude", "update:octaves"],
     setup(props, { emit }) {
+        const screen = ref<PaintDevice | null>(null)
         const width = ref(512)
         const height = ref(512)
-        const screen = ref<PaintDevice | null>(null)
         const scale = ref(128)
         const contrast = ref(0)
         const amplitude = ref(1)
