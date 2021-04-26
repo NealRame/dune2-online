@@ -1,5 +1,12 @@
 import { Color, ScaleFactor } from "@/graphics"
 
+export interface DataProgressNotifier {
+    begin(): void,
+    setLabel(label: string): void,
+    setValue(value: number): void,
+    end(): void,
+}
+
 // Palette
 export type Palette = readonly Color.RGBA[]
 
