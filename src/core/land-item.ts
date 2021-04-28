@@ -1,13 +1,25 @@
 import { Tile } from "./types"
 import { Painter, ScaleFactor, SceneItem } from "@/graphics"
+import { RectangularCoordinates } from "@/maths"
 
-export function LandItem(tile: Tile): SceneItem {
-    const state = {
-        x: 0,
-        y: 0,
-        scale: 1,
+type LandItemState = {
+    parent: SceneItem | null,
+    x: number,
+    y: number,
+}
+
+export function LandItem(
+    tile: Tile,
+    { x, y }: RectangularCoordinates,
+): SceneItem {
+    const state: LandItemState = {
+        x,
+        y,
+        parent: null,
     }
-    const image = () => tile[state.scale as ScaleFactor]
+    const currentScale = () => state.parent?.getScale() ?? 1
+    const currentImage = () => tile[currentScale()]
+
     return {
         get x() {
             return state.x
@@ -22,19 +34,23 @@ export function LandItem(tile: Tile): SceneItem {
             state.y = y
         },
         get width() {
-            return image().width
+            return currentImage().width
         },
         get height() {
-            return image().height
+            return currentImage().height
         },
-        get scale(): ScaleFactor {
-            return state.scale as ScaleFactor
+        getScale(): ScaleFactor {
+            return currentScale()
         },
-        set scale(scale: ScaleFactor) {
-            state.scale = scale
+        getParent(): SceneItem | null {
+            return state.parent
         },
-        draw(painter: Painter) {
-            painter.drawImageBitmap(image(), state)
+        setParent(parent: SceneItem | null): SceneItem {
+            state.parent = parent
+            return this
+        },
+        render(painter: Painter) {
+            painter.drawImageBitmap(currentImage(), state)
             return this
         }
     }

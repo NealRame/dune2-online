@@ -55,6 +55,7 @@ export default defineComponent({
             tilesets.value = GameData.tilesets()
             scene
                 .setPainter((unref(screen) as PaintDevice).painter())
+                .setScale(2)
                 .run()
             window.addEventListener("resize", resize)
             resize()
@@ -63,10 +64,10 @@ export default defineComponent({
         const onMouseClick = ({ x, y }: RectangularCoordinates) => {
             const tile = unref(currentTile)
             if (!isNil(tile)) {
-                const item = LandItem(tile)
-                item.x = Math.floor(x/32)*32
-                item.y = Math.floor(y/32)*32
-                item.scale = 2
+                const item = LandItem(tile, {
+                    x: Math.floor(x/32)*32,
+                    y: Math.floor(y/32)*32,
+                })
                 scene.addItem(item)
             }
         }

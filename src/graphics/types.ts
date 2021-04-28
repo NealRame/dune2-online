@@ -6,7 +6,10 @@ export interface PaintDevice {
 }
 
 export type ScaleFactor = 1 | 2 | 3 | 4
+
 export interface SceneItem extends RectangularCoordinates, Size {
-    draw(painter: Painter): SceneItem,
-    scale: ScaleFactor,
+    getScale(): ScaleFactor,
+    getParent(): SceneItem | null,
+    setParent(parent: SceneItem | null): SceneItem,
+    render(painter: Painter): SceneItem,
 }
