@@ -5,9 +5,9 @@ import { createApp } from "vue"
 
 import { library } from "@fortawesome/fontawesome-svg-core"
 import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome"
-import { faSyncAlt } from "@fortawesome/free-solid-svg-icons"
+import { faSyncAlt, faWrench } from "@fortawesome/free-solid-svg-icons"
 
-library.add(faSyncAlt)
+library.add(faSyncAlt, faWrench)
 
 createApp(App)
     .use(router)

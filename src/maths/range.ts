@@ -6,7 +6,7 @@
  * @param oMax output range upper bound
  * @returns a function
  */
-export function rangeMapper(
+export function createRangeMapper(
     iMin: number,
     iMax: number,
     oMin: number,

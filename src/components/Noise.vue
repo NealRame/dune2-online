@@ -70,7 +70,7 @@ canvas {
 <script lang="ts">
 import Screen from "@/components/Screen.vue"
 
-import { Noise2DGenerator } from "@/maths"
+import { createNoise2DGenerator } from "@/maths"
 import { PaintDevice } from "@/graphics"
 
 import { computed, defineComponent, onMounted, ref, unref } from "vue"
@@ -92,8 +92,9 @@ export default defineComponent({
         let seed = Date.now()
 
         const update = () => {
-            const noise = Noise2DGenerator({
+            const noise = createNoise2DGenerator({
                 seed,
+                scale: unref(scale),
                 amplitude: unref(amplitude),
                 octaves: unref(octaves),
             })
@@ -101,10 +102,10 @@ export default defineComponent({
             for (let x = 0; x < unref(width); ++x) {
                 for (let y = 0; y < unref(height); ++y) {
                     const contrastValue = Number(unref(contrast))
-                    const p = noise(x/unref(scale), y/unref(scale))
+                    const p = noise({ x, y })
 
                     const pc = contrastValue !== 0
-                        ? 255/(1 + Math.exp(-unref(contrast)*p))
+                        ? 255*(1 - Math.abs(Math.tanh(unref(contrast)*p)))
                         : 255*((p + 1)/2)
 
                     image1.data[4*(unref(width)*y + x) + 0] = pc
