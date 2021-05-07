@@ -53,7 +53,7 @@ function tileFromTypeAndSpice(type: TerrainType, spice: number): Tile {
         return terrainTiles[160]
     }
 
-    const _exhaustiveCheck: never = type;
+    const _exhaustiveCheck: never = type
     return _exhaustiveCheck
 }
 
