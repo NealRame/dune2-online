@@ -26,27 +26,17 @@
         <label for="terrainScale">Terrain scale</label>
         <input name="terrainScale" type="number" min="1" max="256" v-model="terrainScale"/>
 
-        <label for="terrainThreshold">Terrain threshold</label>
-        <input name="terrainThreshold" type="number" min="0" max="1" step="0.001" v-model="terrainThreshold"/>
-
         <label for="terrainDetails">Terrain details</label>
         <input name="terrainDetails" type="number" min="1" max="6" step="1" v-model="terrainDetails"/>
 
-        <hr>
+        <label for="terrainSandThreshold">Sand threshold</label>
+        <input name="terrainSandThreshold" type="number" min="0" max="1" step="0.001" v-model="terrainSandThreshold"/>
 
-        <label for="mountainsThreshold">Moutains threshold</label>
-        <input name="mountainsThreshold" type="number" min="0" max="1" step="0.001" v-model="mountainsThreshold"/>
+        <label for="terrainRockThreshold">Rock threshold</label>
+        <input name="terrainRockThreshold" type="number" min="0" max="1" step="0.001" v-model="terrainRockThreshold"/>
 
-        <label for="mountainsDetails">Moutains details</label>
-        <input name="mountainsDetails" type="number" min="1" max="6" step="1" v-model="mountainsDetails"/>
-
-        <hr>
-
-        <label for="dunesThreshold">Dunes threshold</label>
-        <input name="dunesThreshold" type="number" min="0" max="1" step="0.001" v-model="dunesThreshold"/>
-
-        <label for="dunesDetails">Dunes details</label>
-        <input name="dunesDetails" type="number" min="1" max="6" step="1" v-model="dunesDetails"/>
+        <label for="terrainMountainsThreshold">Moutains threshold</label>
+        <input name="terrainMountainsThreshold" type="number" min="0" max="1" step="0.001" v-model="terrainMountainsThreshold"/>
 
         <hr>
 
@@ -142,7 +132,7 @@ canvas {
 <script lang="ts">
 import Screen from "@/components/Screen.vue"
 
-import { GameData, LandItem, createLandMap, TerrainType } from "@/core"
+import { createMap } from "@/core"
 import { PaintDevice, Scene } from "@/graphics"
 
 import { computed, defineComponent, onMounted, ref, unref } from "vue"
@@ -155,12 +145,10 @@ export default defineComponent({
         "update:width",
         "update:height",
         "update:terrainScale",
-        "update:terrainThreshold",
         "update:terrainDetails",
-        "update:mountainsThreshold",
-        "update:mountainsDetails",
-        "update:dunesThreshold",
-        "update:dunesDetails",
+        "update:terrainSandThreshold",
+        "update:terrainRockThreshold",
+        "update:terrainMountainsThreshold",
         "update:spiceScale",
         "update:spiceThreshold",
         "update:spiceDetails",
@@ -168,69 +156,40 @@ export default defineComponent({
     setup(props, { emit }) {
         const showInspector = ref<boolean>(false)
         const screen = ref<PaintDevice | null>(null)
-        const width = ref<number>(110)
-        const height = ref<number>(50)
+
+        const width = ref<number>(64)
+        const height = ref<number>(64)
+
         const terrainScale = ref(32)
-        const terrainThreshold = ref(0.666)
         const terrainDetails = ref(1)
-        const mountainsThreshold = ref(0.1)
-        const mountainsDetails = ref(1)
-        const dunesThreshold = ref(0.666)
-        const dunesDetails = ref(3)
+        const terrainSandThreshold = ref(0.4)
+        const terrainRockThreshold = ref(0.650)
+        const terrainMountainsThreshold = ref(0.85)
+
         const spiceScale = ref(16)
         const spiceThreshold = ref(0.333)
         const spiceDetails = ref(1)
 
-        const tileset = GameData.tileset("Terrain")
         const scene = new Scene()
         let seed: number = Date.now()
 
         const update = () => {
-            const landMap = createLandMap({
-                width: unref(width),
-                height: unref(height),
-            }, {
-                seed,
-                terrainScale: unref(terrainScale),
-                terrainThreshold: unref(terrainThreshold),
-                terrainDetails: unref(terrainDetails),
-                mountainsThreshold: unref(mountainsThreshold),
-                mountainsDetails: unref(mountainsDetails),
-                dunesThreshold: unref(dunesThreshold),
-                dunesDetails: unref(dunesDetails),
-                spiceScale: unref(spiceScale),
-                spiceThreshold: unref(spiceThreshold),
-                spiceDetails: unref(spiceDetails),
-            })
-            scene.clear()
-            for (let i = 0; i < unref(width); ++i) {
-                for (let j = 0; j < unref(height); ++j) {
-                    const terrain = landMap[j][i]
-                    const k = 16
-                    switch (terrain.type) {
-                    case TerrainType.Sand:
-                        if (terrain.spice > 0) {
-                            scene.addItem(LandItem(tileset[191], { x: i*k, y: j*k }))
-                        } else {
-                            scene.addItem(LandItem(tileset[127], { x: i*k, y: j*k }))
-                        }
-                        break
-                    case TerrainType.Dunes:
-                        if (terrain.spice > 0) {
-                            scene.addItem(LandItem(tileset[207], { x: i*k, y: j*k }))
-                        } else {
-                            scene.addItem(LandItem(tileset[159], { x: i*k, y: j*k }))
-                        }
-                        break
-                    case TerrainType.Rock:
-                        scene.addItem(LandItem(tileset[143], { x: i*k, y: j*k }))
-                        break
-                    case TerrainType.Mountain:
-                        scene.addItem(LandItem(tileset[160], { x: i*k, y: j*k }))
-                        break
-                    }
-                }
-            }
+            scene
+                .clear()
+                .addItem(createMap({
+                    width: unref(width),
+                    height: unref(height),
+                }, {
+                    seed,
+                    terrainScale: unref(terrainScale),
+                    terrainDetails: unref(terrainDetails),
+                    terrainSandThreshold: unref(terrainSandThreshold),
+                    terrainRockThreshold: unref(terrainRockThreshold),
+                    terrainMountainsThreshold: unref(terrainMountainsThreshold),
+                    spiceScale: unref(spiceScale),
+                    spiceThreshold: unref(spiceThreshold),
+                    spiceDetails: unref(spiceDetails),
+                }))
         }
 
         const onSeedClicked = () => {
@@ -246,7 +205,7 @@ export default defineComponent({
             update()
             scene
                 .setPainter((unref(screen) as PaintDevice).painter())
-                .setScale(2)
+                .setScale(1)
                 .run()
         })
 
@@ -281,14 +240,6 @@ export default defineComponent({
                     emit("update:terrainScale", value)
                 },
             }),
-            terrainThreshold: computed({
-                get: () => terrainThreshold.value,
-                set: value => {
-                    terrainThreshold.value = value
-                    emit("update:terrainThreshold", value)
-                    update()
-                },
-            }),
             terrainDetails: computed({
                 get: () => terrainDetails.value,
                 set: value => {
@@ -297,35 +248,27 @@ export default defineComponent({
                     update()
                 },
             }),
-            mountainsThreshold: computed({
-                get: () => mountainsThreshold.value,
+            terrainSandThreshold: computed({
+                get: () => terrainSandThreshold.value,
                 set: value => {
-                    mountainsThreshold.value = value
-                    emit("update:mountainsThreshold", value)
+                    terrainSandThreshold.value = value
+                    emit("update:terrainSandThreshold", value)
                     update()
                 },
             }),
-            mountainsDetails: computed({
-                get: () => mountainsDetails.value,
+            terrainRockThreshold: computed({
+                get: () => terrainRockThreshold.value,
                 set: value => {
-                    mountainsDetails.value = value
-                    emit("update:mountainsDetails", value)
+                    terrainRockThreshold.value = value
+                    emit("update:terrainRockThreshold", value)
                     update()
                 },
             }),
-            dunesThreshold: computed({
-                get: () => dunesThreshold.value,
+            terrainMountainsThreshold: computed({
+                get: () => terrainMountainsThreshold.value,
                 set: value => {
-                    dunesThreshold.value = value
-                    emit("update:dunesThreshold", value)
-                    update()
-                },
-            }),
-            dunesDetails: computed({
-                get: () => dunesDetails.value,
-                set: value => {
-                    dunesDetails.value = value
-                    emit("update:dunesDetails", value)
+                    terrainMountainsThreshold.value = value
+                    emit("update:terrainMountainsThreshold", value)
                     update()
                 },
             }),
