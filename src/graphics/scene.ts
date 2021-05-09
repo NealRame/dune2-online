@@ -1,11 +1,20 @@
 import { cssHex } from "./color"
 import { Brush, Painter } from "./painter"
-import { ScaleFactor, SceneItem } from "./types"
+import { ScaleFactor, Scene, SceneItem } from "./types"
 
-import { isNil } from "lodash"
+import { Rect, RectangularCoordinates } from "@/maths"
+
+type SceneState = {
+    backgroundColor: Brush
+    gridEnabled: boolean
+    scaleFactor: ScaleFactor
+    viewport: Rect | null
+    items: SceneItem[]
+}
 
 type GridConfig = {
     enabled?: boolean,
+    offset?: RectangularCoordinates,
     space?: number,
     color?: string,
 }
@@ -14,6 +23,7 @@ function drawGrid(
     painter: Painter, {
         space = 16,
         color = "#222",
+        offset = { x: 0, y: 0 },
     }: GridConfig = { }
 ): void {
     const { width, height } = painter.size
@@ -22,14 +32,14 @@ function drawGrid(
         strokeStyle: color
     }
     // Draw vertical grid lines
-    for (let x = 0.5; x < width; x += space) {
+    for (let x = 0.5 + offset.x%space; x < width; x += space) {
         painter.drawLine(
             { x, y: 0 },
             { x, y: height }
         )
     }
     // Draw horizontal grid lines
-    for (let y = 0.5; y < height; y += space) {
+    for (let y = 0.5 + offset.y%space; y < height; y += space) {
         painter.drawLine(
             { y, x: 0 },
             { y, x: width }
@@ -37,94 +47,80 @@ function drawGrid(
     }
 }
 
-export class Scene implements SceneItem {
-    private painter_: Painter | null
-    private backgroundColor_: Brush
-    private gridEnabled_: boolean
-    private items_: Array<SceneItem>
-    private scaleFactor_: ScaleFactor
-
-    constructor(painter: Painter | null = null) {
-        this.painter_ = painter
-        this.items_ = []
-        this.backgroundColor_ = cssHex([0, 0, 0])
-        this.scaleFactor_ = 1
-        this.gridEnabled_ = true
+export function createScene(): Scene {
+    const state: SceneState = {
+        backgroundColor: cssHex([0, 0, 0]),
+        gridEnabled: false,
+        items: [],
+        scaleFactor: 1,
+        viewport: null,
     }
 
-    get x(): number {
-        return 0
-    }
+    return {
+        get scale(): ScaleFactor {
+            return state.scaleFactor
+        },
+        set scale(f: ScaleFactor) {
+            state.scaleFactor = f
+        },
+        get gridSpacing(): number {
+            return state.scaleFactor*16
+        },
+        get gridEnabled(): boolean {
+            return state.gridEnabled
+        },
+        set gridEnabled(enabled: boolean) {
+            state.gridEnabled = enabled
+        },
+        get viewport(): Rect | null {
+            return state.viewport
+        },
+        set viewport(rect: Rect | null) {
+            state.viewport = rect
+        },
+        get rect(): Rect {
+            const r = new Rect({ x: 0, y: 0 }, { width: 0, height: 0 })
+            for (const item of state.items) {
+                r.union(item.rect)
+            }
+            return r
+        },
+        addItem(item: SceneItem): Scene {
+            state.items.push(item)
+            item.parent = this
+            return this
+        },
+        clear(): Scene {
+            state.items = []
+            return this
+        },
+        render(painter: Painter): Scene {
+            const viewport = state.viewport ?? new Rect({ x: 0, y: 0 }, painter.size)
 
-    get y(): number {
-        return 0
-    }
+            painter.clear(state.backgroundColor)
+            // draw grid
+            if (state.gridEnabled) {
+                drawGrid(painter, {
+                    space: state.scaleFactor*16,
+                    offset: viewport.topLeft(),
+                })
+            }
+            // draw items
+            for (const item of state.items) {
+                if (viewport.intersects(item.rect)) {
+                    item.render(painter, viewport)
+                }
+            }
 
-    get width(): number {
-        return 0
-    }
-
-    get height(): number {
-        return 0
-    }
-
-    setScale(scale: ScaleFactor): Scene {
-        this.scaleFactor_ = scale
-        return this
-    }
-
-    getScale(): ScaleFactor {
-        return this.scaleFactor_
-    }
-
-    getParent(): null {
-        return null
-    }
-
-    setParent(): Scene {
-        return this
-    }
-
-    setPainter(painter: Painter | null = null): Scene {
-        this.painter_ = painter
-        return this
-    }
-
-    addItem(item: SceneItem): Scene {
-        item.setParent(this)
-        this.items_.push(item)
-        return this
-    }
-
-    clear(): Scene {
-        this.items_ = []
-        return this
-    }
-
-    render(painter: Painter): Scene {
-        painter.clear(this.backgroundColor_)
-        // draw grid
-        if (this.gridEnabled_ === true) {
-            drawGrid(painter, {
-                space: this.scaleFactor_*16,
-            })
-        }
-        // draw items
-        for (const item of this.items_) {
-            item.render(painter)
-        }
-
-        return this
-    }
-
-    run(): Scene {
-        const loop = () => {
-            if (!isNil(this.painter_)) {
-                this.render(this.painter_)
+            return this
+        },
+        run(painter: Painter): Scene {
+            const loop = () => {
+                this.render(painter)
                 requestAnimationFrame(loop)
             }
+            loop()
+            return this
         }
-        loop()
-        return this
     }
 }

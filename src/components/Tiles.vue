@@ -24,8 +24,8 @@ import Screen from "@/components/Screen.vue"
 import TilePalette from "@/components/TilePalette.vue"
 
 import { GameData, Tile, TilesetMap } from "@/core"
-import { PaintDevice, Painter, ScaleFactor, Scene, SceneItem } from "@/graphics"
-import { RectangularCoordinates } from "@/maths"
+import { createScene, PaintDevice, Painter, ScaleFactor, Scene, SceneItem } from "@/graphics"
+import { Rect, RectangularCoordinates } from "@/maths"
 
 import { defineComponent, onMounted, ref, unref } from "vue"
 import { debounce, isNil } from "lodash"
@@ -34,29 +34,34 @@ function createTileItem(
     position: RectangularCoordinates,
     tile: Tile
 ): SceneItem {
-    let parent: SceneItem | null = null
+    let parent: Scene | SceneItem | null = null
+    const getScale = () => parent?.scale ?? 1
     return {
         get x() { return position.x },
         get y() { return position.y },
         get width() {
-            return tile[this.getScale()].width
+            return tile[getScale()].width
         },
         get height() {
-            return tile[this.getScale()].height
+            return tile[getScale()].height
         },
-        getScale(): ScaleFactor {
-            return parent?.getScale() ?? 1
+        get rect(): Rect {
+            return new Rect(position, {
+                width: this.width,
+                height: this.height,
+            })
         },
-        getParent(): SceneItem | null {
+        get scale(): ScaleFactor {
+            return getScale()
+        },
+        get parent(): Scene | SceneItem | null {
             return parent
         },
-        setParent(p: SceneItem | null): SceneItem {
+        set parent(p: Scene | SceneItem | null) {
             parent = p
-            return this
         },
         render(painter: Painter): SceneItem {
-            const scale = this.getScale()
-            painter.drawImageBitmap(tile[scale], position)
+            painter.drawImageBitmap(tile[this.scale], position)
             return this
         }
     }
@@ -75,7 +80,7 @@ export default defineComponent({
         const tilesets = ref<TilesetMap | null>(null)
         const currentTile = ref<Tile | null>(null)
 
-        const scene = new Scene()
+        const scene = createScene()
 
         // handle window resize event
         const resize = debounce(() => {
@@ -86,10 +91,9 @@ export default defineComponent({
 
         onMounted(async () => {
             tilesets.value = GameData.tilesets()
-            scene
-                .setPainter((unref(screen) as PaintDevice).painter())
-                .setScale(unref(scale))
-                .run()
+            scene.scale = unref(scale)
+            scene.gridEnabled = true
+            scene.run((unref(screen) as PaintDevice).painter())
             window.addEventListener("resize", resize)
             resize()
         })
@@ -97,7 +101,7 @@ export default defineComponent({
         const onMouseClick = ({ x, y }: RectangularCoordinates) => {
             const tile = unref(currentTile)
             if (!isNil(tile)) {
-                const gridSpacing = 16*unref(scale)
+                const gridSpacing = scene.gridSpacing
                 const position = {
                     x: gridSpacing*Math.floor(x/gridSpacing),
                     y: gridSpacing*Math.floor(y/gridSpacing),

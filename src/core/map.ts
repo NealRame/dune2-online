@@ -1,8 +1,8 @@
 import { tileset } from "./data"
 import { Tile } from "./types"
 
-import { Painter, SceneItem } from "@/graphics"
-import { createNoise2DGenerator, createRangeMapper, RectangularCoordinates, Size } from "@/maths"
+import { Painter, ScaleFactor, Scene, SceneItem } from "@/graphics"
+import { createNoise2DGenerator, createRangeMapper, Rect, RectangularCoordinates, Size } from "@/maths"
 
 import { clamp, flow, times } from "lodash"
 
@@ -36,7 +36,8 @@ type Terrain = {
 
 type MapState = {
     map: Terrain[],
-    parent: SceneItem | null,
+    rect: Rect,
+    parent: Scene | SceneItem | null,
 }
 
 function tileFromTypeAndSpice(type: TerrainType, spice: number): Tile {
@@ -121,11 +122,11 @@ function createTerrain(width: number, height: number, config: LandMapConfig) {
 export function createMap({ width, height }: Size, config: Partial<LandMapConfig>): SceneItem {
     const state: MapState = {
         map: createTerrain(width, height, checkConfig(config)),
+        rect: new Rect({ x: 0, y: 0 }, { width, height }),
         parent: null,
     }
 
-    const getScale = () => state.parent?.getScale() ?? 1
-    const getParent = () => state.parent
+    const getScale = () => state.parent?.scale ?? 1
 
     return {
         get x(): number { return 0 },
@@ -136,20 +137,26 @@ export function createMap({ width, height }: Size, config: Partial<LandMapConfig
         get height(): number {
             return height*(state.map[0]?.tile[getScale()].height ?? 0)
         },
-        getScale,
-        getParent,
-        setParent(parent: SceneItem | null): SceneItem {
-            state.parent = parent
-            return this
+        get rect(): Rect {
+            return state.rect
         },
-        render(painter: Painter): SceneItem {
+        get scale(): ScaleFactor {
+            return getScale()
+        },
+        get parent(): Scene | SceneItem | null {
+            return state.parent
+        },
+        set parent(parent: Scene | SceneItem | null) {
+            state.parent = parent
+        },
+        render(painter: Painter, viewport: Rect): SceneItem {
             const scale = getScale()
             for (const terrain of state.map) {
                 const { x, y } = terrain.position
                 const bitmap = terrain.tile[scale]
                 painter.drawImageBitmap(bitmap, {
-                    x: x*bitmap.width,
-                    y: y*bitmap.height,
+                    x: x*bitmap.width - viewport.leftX,
+                    y: y*bitmap.height - viewport.topY,
                 })
             }
             return this

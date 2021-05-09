@@ -133,7 +133,7 @@ canvas {
 import Screen from "@/components/Screen.vue"
 
 import { createMap } from "@/core"
-import { PaintDevice, Scene } from "@/graphics"
+import { createScene, PaintDevice } from "@/graphics"
 
 import { computed, defineComponent, onMounted, ref, unref } from "vue"
 
@@ -170,7 +170,7 @@ export default defineComponent({
         const spiceThreshold = ref(0.333)
         const spiceDetails = ref(1)
 
-        const scene = new Scene()
+        const scene = createScene()
         let seed: number = Date.now()
 
         const update = () => {
@@ -203,10 +203,8 @@ export default defineComponent({
 
         onMounted(() => {
             update()
-            scene
-                .setPainter((unref(screen) as PaintDevice).painter())
-                .setScale(1)
-                .run()
+            scene.scale = 1
+            scene.run((unref(screen) as PaintDevice).painter())
         })
 
         return {
