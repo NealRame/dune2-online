@@ -123,8 +123,9 @@ export class Rect implements RectangularCoordinates, Size {
     }
 
     /**
+     * Return true if and only if the given rectangle intersect this rectangle.
      * @param rect
-     * @returns true if and only if the given Rect intersect this Rect
+     * @returns boolean
      */
     intersects(rect: Rect): boolean {
         return this.contains(rect.topRight())
@@ -134,8 +135,10 @@ export class Rect implements RectangularCoordinates, Size {
     }
 
     /**
+     * Returns the result of the intersection of this rectangle and the given
+     * one
      * @param rect
-     * @returns the result of the intersection of this Rect and the given one
+     * @returns Rect
      */
     intersected(rect: Rect): Rect {
         return new Rect({
