@@ -106,7 +106,7 @@ export class Rect implements RectangularCoordinates, Size {
      */
     contains({ x, y }: RectangularCoordinates): boolean {
         return x >= this.leftX && x <= this.rightX
-            && y >= this.bottomY && y <= this.topY
+            && y >= this.topY  && y <= this.bottomY
     }
 
     /**
