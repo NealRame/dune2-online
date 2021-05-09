@@ -151,6 +151,33 @@ export class Rect implements RectangularCoordinates, Size {
     }
 
     /**
+     * Unites this rectangle with the given rectangle.
+     * @param rect
+     * @returns Rect
+     */
+    union(rect: Rect): Rect {
+        const leftX = Math.min(this.leftX, rect.leftX)
+        const rightX = Math.max(this.rightX, rect.rightX)
+        const topY = Math.min(this.topY, rect.topY)
+        const bottomY = Math.max(this.bottomY, rect.bottomY)
+        this.x = leftX
+        this.y = topY
+        this.width = rightX - leftX
+        this.height = bottomY - topY
+        return this
+    }
+
+    /**
+     * Returns the bounding rectangle of this rectangle and the given
+     * rectangle.
+     * @param rect
+     * @returns Rect
+     */
+    united(rect: Rect): Rect {
+        return this.copy().union(rect)
+    }
+
+    /**
      * Crop this Rect to the given size.
      * @param size
      * @returns this
