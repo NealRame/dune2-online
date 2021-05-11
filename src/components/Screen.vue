@@ -3,10 +3,11 @@
 </template>
 
 <script lang="ts">
+import { Rect } from "@/maths"
 import { Painter } from "@/graphics"
 
-import { defineComponent, onMounted, ref, unref } from "vue"
 import { clamp, isNil } from "lodash"
+import { defineComponent, onMounted, ref, unref } from "vue"
 
 export default defineComponent({
     emits: ["mouseMotion", "mouseClick"],
@@ -55,7 +56,10 @@ export default defineComponent({
             rect() {
                 const canvas = unref(canvasRef)
                 if (!isNil(canvas)) {
-                    return canvas.getBoundingClientRect()
+                    return new Rect({ x: 0, y: 0 }, {
+                        width: canvas.width,
+                        height: canvas.height,
+                    })
                 }
             }
         }
