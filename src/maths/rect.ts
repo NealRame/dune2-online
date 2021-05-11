@@ -128,10 +128,16 @@ export class Rect implements RectangularCoordinates, Size {
      * @returns boolean
      */
     intersects(rect: Rect): boolean {
-        return this.contains(rect.topRight())
-            || this.contains(rect.bottomRight())
-            || this.contains(rect.bottomLeft())
-            || this.contains(rect.topLeft())
+        const ax1 = this.leftX
+        const ay1 = this.topY
+        const ax2 = this.rightX
+        const ay2 = this.bottomY
+        const bx1 = rect.leftX
+        const by1 = rect.topY
+        const bx2 = rect.rightX
+        const by2 = rect.bottomY
+        return ((ax2 >= bx1 && ax2 <= bx2) || (bx2 >= ax1 && bx2 <= ax2))
+            && ((ay2 >= by1 && ay2 <= by2) || (by2 >= ay1 && by2 <= ay2))
     }
 
     /**
