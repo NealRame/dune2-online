@@ -127,18 +127,23 @@ export function createMap({ width, height }: Size, config: Partial<LandMapConfig
     }
 
     const getScale = () => state.parent?.scale ?? 1
+    const getWidth = () => width*(state.map[0]?.tile[getScale()].width ?? 0)
+    const getHeight = () => height*(state.map[0]?.tile[getScale()].height ?? 0)
 
     return {
         get x(): number { return 0 },
         get y(): number { return 0 },
         get width(): number {
-            return width*(state.map[0]?.tile[getScale()].width ?? 0)
+            return getWidth()
         },
         get height(): number {
-            return height*(state.map[0]?.tile[getScale()].height ?? 0)
+            return getHeight()
         },
         get rect(): Rect {
-            return state.rect
+            return new Rect({ x: 0, y: 0 }, {
+                width: getWidth(),
+                height: getHeight()
+            })
         },
         get scale(): ScaleFactor {
             return getScale()
