@@ -16,10 +16,10 @@
 
     <div class="settings" v-show="showInspector">
         <label for="width">Width</label>
-        <input name="width" type="number" min="16" max="110" v-model="width"/>
+        <input name="width" type="number" min="16" max="256" v-model="width"/>
 
         <label for="height">Height</label>
-        <input name="height" type="number" min="16" max="128" v-model="height"/>
+        <input name="height" type="number" min="16" max="256" v-model="height"/>
 
         <hr>
 
@@ -134,6 +134,7 @@ import Screen from "@/components/Screen.vue"
 
 import { createMap } from "@/core"
 import { createScene, PaintDevice } from "@/graphics"
+import { Rect } from "@/maths"
 
 import { computed, defineComponent, onMounted, ref, unref } from "vue"
 
@@ -157,8 +158,11 @@ export default defineComponent({
         const showInspector = ref<boolean>(false)
         const screen = ref<PaintDevice | null>(null)
 
-        const width = ref<number>(64)
-        const height = ref<number>(64)
+        const screenWidth = ref<number>(1920)
+        const screenHeight = ref<number>(1280)
+
+        const width = ref<number>(200)
+        const height = ref<number>(200)
 
         const terrainScale = ref(32)
         const terrainDetails = ref(1)
@@ -192,6 +196,36 @@ export default defineComponent({
                 }))
         }
 
+        const onKeyPressed = (ev: KeyboardEvent) => {
+            const viewport = scene.viewport as Rect
+            const rect = scene.rect
+
+            if (ev.code === "ArrowLeft") {
+                const deltaX = rect.leftX - viewport.leftX
+                if (deltaX < 0) {
+                    viewport.x -= Math.min(scene.scale*16, -deltaX)
+                }
+            } else
+            if (ev.code === "ArrowRight") {
+                const deltaX = rect.rightX - viewport.rightX
+                if (deltaX > 0) {
+                    viewport.x += Math.min(scene.scale*16, deltaX)
+                }
+            } else
+            if (ev.code === "ArrowUp") {
+                const deltaY = viewport.topY - rect.topY
+                if (deltaY > 0) {
+                    viewport.y -= Math.min(scene.scale*16, deltaY)
+                }
+            } else
+            if (ev.code === "ArrowDown") {
+                const deltaY = rect.bottomY - viewport.bottomY
+                if (deltaY > 0) {
+                    viewport.y += Math.min(scene.scale*16, deltaY)
+                }
+            }
+        }
+
         const onSeedClicked = () => {
             seed = Date.now()
             update()
@@ -202,9 +236,13 @@ export default defineComponent({
         }
 
         onMounted(() => {
+            const paintDevice = (unref(screen) as PaintDevice)
+
             update()
             scene.scale = 1
-            scene.run((unref(screen) as PaintDevice).painter())
+            scene.viewport = paintDevice.rect()
+            scene.run(paintDevice.painter())
+            document.addEventListener("keydown", onKeyPressed)
         })
 
         return {
@@ -212,8 +250,8 @@ export default defineComponent({
             showInspector,
             onSeedClicked,
             toggleInspector,
-            screenWidth: computed(() => 16*unref(width)),
-            screenHeight: computed(() => 16*unref(height)),
+            screenWidth,
+            screenHeight,
             width: computed({
                 get: () => width.value,
                 set: value => {
