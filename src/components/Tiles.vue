@@ -5,7 +5,6 @@
         @mouseClick="onMouseClick"
     />
     <tile-palette
-        ref="tilePalette"
         v-model="currentTile"
         :tilesets="tilesets"
     />
