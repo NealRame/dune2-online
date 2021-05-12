@@ -132,8 +132,9 @@ import Screen from "@/components/Screen.vue"
 
 import { createMap } from "@/core"
 import { createScene, PaintDevice } from "@/graphics"
-import { Rect } from "@/maths"
+import { Rect, RectangularCoordinates, Vector } from "@/maths"
 
+import { clamp, debounce } from "lodash"
 import { computed, defineComponent, onMounted, ref, unref } from "vue"
 
 export default defineComponent({
@@ -156,8 +157,8 @@ export default defineComponent({
         const showInspector = ref<boolean>(false)
         const screen = ref<PaintDevice | null>(null)
 
-        const screenWidth = ref<number>(1920)
-        const screenHeight = ref<number>(1280)
+        const screenWidth = ref<number>(0)
+        const screenHeight = ref<number>(0)
 
         const width = ref<number>(200)
         const height = ref<number>(200)
@@ -174,6 +175,19 @@ export default defineComponent({
 
         const scene = createScene()
         let seed: number = Date.now()
+
+        const resize = debounce(() => {
+            const width = window.innerWidth
+            const height = window.innerHeight
+            const topLeft = scene.viewport?.topLeft() ?? { x: 0, y: 0 }
+
+            screenWidth.value = width
+            screenHeight.value = height
+            scene.viewport = new Rect(topLeft, {
+                width,
+                height,
+            })
+        }, 60)
 
         const update = () => {
             scene
@@ -232,11 +246,14 @@ export default defineComponent({
         onMounted(() => {
             const paintDevice = (unref(screen) as PaintDevice)
 
-            update()
             scene.scale = 1
-            scene.viewport = paintDevice.rect()
             scene.run(paintDevice.painter())
+
             document.addEventListener("keydown", onKeyPressed)
+            window.addEventListener("resize", resize)
+
+            resize()
+            update()
         })
 
         return {
