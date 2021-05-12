@@ -81,8 +81,6 @@ export default defineComponent({
         })
 
         return {
-            // width: widthRef,
-            // height: heightRef,
             canvas: canvasRef,
             painter() {
                 if (isNil(painter)) {
