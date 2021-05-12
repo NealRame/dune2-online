@@ -14,8 +14,8 @@ const routes: Array<RouteRecordRaw> = [{
     name: "Map",
     component: LandMap,
 }, {
-    path: "/tiles",
-    name: "Tiles",
+    path: "/terrainTiles",
+    name: "Terrain Tiles",
     component: Tiles,
 }, {
     path: "/noise",
