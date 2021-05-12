@@ -108,9 +108,9 @@ export class Vector implements RectangularCoordinates {
         return `(${this.x}, ${this.y})`
     }
 
-    static Null  = new Vector( 0,  0)
-    static Up    = new Vector( 0, -1)
-    static Right = new Vector( 1,  0)
-    static Down  = new Vector( 0,  1)
-    static Left  = new Vector(-1,  0)
+    static Null  = (): Vector => new Vector( 0,  0)
+    static Up    = (): Vector => new Vector( 0, -1)
+    static Right = (): Vector => new Vector( 1,  0)
+    static Down  = (): Vector => new Vector( 0,  1)
+    static Left  = (): Vector => new Vector(-1,  0)
 }
