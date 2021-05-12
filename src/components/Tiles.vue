@@ -20,7 +20,7 @@ canvas {
 </style>
 
 <script lang="ts">
-import Screen from "@/components/Screen.vue"
+import Screen, { ScreenMouseClickEvent } from "@/components/Screen.vue"
 import TilePalette from "@/components/TilePalette.vue"
 
 import { GameData, Tile, TilesetMap } from "@/core"
@@ -98,9 +98,10 @@ export default defineComponent({
             resize()
         })
 
-        const onMouseClick = ({ x, y }: RectangularCoordinates) => {
+        const onMouseClick = (ev: ScreenMouseClickEvent) => {
             const tile = unref(currentTile)
             if (!isNil(tile)) {
+                const { x, y } = ev.position
                 const gridSpacing = scene.gridSpacing
                 const position = {
                     x: gridSpacing*Math.floor(x/gridSpacing),

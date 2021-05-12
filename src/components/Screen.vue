@@ -3,17 +3,32 @@
 </template>
 
 <script lang="ts">
-import { Rect } from "@/maths"
+import { Rect, RectangularCoordinates } from "@/maths"
 import { Painter } from "@/graphics"
 
 import { clamp, isNil } from "lodash"
 import { defineComponent, onMounted, ref, unref } from "vue"
 
+export type ScreenMouseMotionEvent = {
+    button: boolean,
+    altKey: boolean,
+    ctrlKey: boolean,
+    metaKey: boolean,
+    movement: RectangularCoordinates,
+    position: RectangularCoordinates,
+}
+
+export type ScreenMouseClickEvent = {
+    altKey: boolean,
+    ctrlKey: boolean,
+    metaKey: boolean,
+    position: RectangularCoordinates,
+}
+
 export default defineComponent({
     emits: ["mouseMotion", "mouseClick"],
+    props: ["width", "height"],
     setup(props, { emit }) {
-        const widthRef = ref(0)
-        const heightRef = ref(0)
         const canvasRef = ref<HTMLCanvasElement | null>(null)
         let painter: Painter | null
 
@@ -21,17 +36,40 @@ export default defineComponent({
         const mouseMove = (e: MouseEvent) => {
             const canvas = unref(canvasRef) as HTMLCanvasElement
             const { left, top } = canvas.getBoundingClientRect()
-            const x = Math.round(clamp(e.clientX - left, 0, unref(widthRef)))
-            const y = Math.round(clamp(e.clientY - top, 0, unref(heightRef)))
-            emit("mouseMotion", { x, y })
+
+            emit("mouseMotion", {
+                button: e.buttons > 0,
+                altKey: e.altKey,
+                ctrlKey: e.ctrlKey,
+                metaKey: e.metaKey,
+                position: {
+                    // TODO consider borders thickness
+                    x: Math.round(clamp(e.clientX - left, 0, canvas.width)),
+                    y: Math.round(clamp(e.clientY - top, 0, canvas.height)),
+                },
+                movement: {
+                    x: e.movementX,
+                    y: e.movementY,
+                },
+            })
         }
+
         // handle mouse click event
         const mouseClick = (e: MouseEvent) => {
+            console.log()
             const canvas = unref(canvasRef) as HTMLCanvasElement
-            const { left, top, width, height } = canvas.getBoundingClientRect()
-            const x = Math.round(clamp(e.clientX - left, 0, width))
-            const y = Math.round(clamp(e.clientY - top, 0, height))
-            emit("mouseClick", { x, y })
+            const { left, top } = canvas.getBoundingClientRect()
+
+            emit("mouseClick", {
+                position: {
+                    // TODO consider borders thickness
+                    x: Math.round(clamp(e.clientX - left, 0, canvas.width)),
+                    y: Math.round(clamp(e.clientY - top, 0, canvas.height)),
+                },
+                altKey: e.altKey,
+                ctrlKey: e.ctrlKey,
+                metaKey: e.metaKey,
+            })
         }
 
         onMounted(() => {
@@ -44,8 +82,8 @@ export default defineComponent({
         })
 
         return {
-            width: widthRef,
-            height: heightRef,
+            // width: widthRef,
+            // height: heightRef,
             canvas: canvasRef,
             painter() {
                 if (isNil(painter)) {
