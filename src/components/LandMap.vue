@@ -1,6 +1,7 @@
 <template>
     <screen
         ref="screen"
+        @mouseMotion="onMouseMoved"
         :width="screenWidth"
         :height="screenHeight"
     />
@@ -128,7 +129,7 @@ canvas {
 </style>
 
 <script lang="ts">
-import Screen from "@/components/Screen.vue"
+import Screen, { ScreenMouseMotionEvent } from "@/components/Screen.vue"
 
 import { createMap } from "@/core"
 import { createScene, PaintDevice } from "@/graphics"
@@ -208,33 +209,33 @@ export default defineComponent({
                 }))
         }
 
-        const onKeyPressed = (ev: KeyboardEvent) => {
-            if (!ev.altKey) return
-
+        const updateViewport = ({ x: xOffset, y: yOffset }: RectangularCoordinates) => {
             const viewport = scene.viewport as Rect
             const rect = scene.rect
+            viewport.x = clamp(viewport.x + xOffset, 0, rect.rightX - viewport.width)
+            viewport.y = clamp(viewport.y + yOffset, 0, rect.bottomY - viewport.height)
+        }
 
+        const onKeyPressed = (ev: KeyboardEvent) => {
+            if (!ev.altKey) return
             if (ev.code === "ArrowLeft") {
-                if (viewport.leftX > 0) {
-                    viewport.x -= Math.min(scene.scale*16, viewport.leftX)
-                }
+                updateViewport(Vector.Left().mul(scene.scale*16))
             } else
             if (ev.code === "ArrowRight") {
-                const deltaX = rect.rightX - viewport.rightX
-                if (deltaX > 0) {
-                    viewport.x += Math.min(scene.scale*16, deltaX)
-                }
+                updateViewport(Vector.Right().mul(scene.scale*16))
             } else
             if (ev.code === "ArrowUp") {
-                if (viewport.topY > 0) {
-                    viewport.y -= Math.min(scene.scale*16, viewport.topY)
-                }
+                updateViewport(Vector.Up().mul(scene.scale*16))
             } else
             if (ev.code === "ArrowDown") {
-                const deltaY = rect.bottomY - viewport.bottomY
-                if (deltaY > 0) {
-                    viewport.y += Math.min(scene.scale*16, deltaY)
-                }
+                updateViewport(Vector.Down().mul(scene.scale*16))
+            }
+        }
+
+        const onMouseMoved = (ev: ScreenMouseMotionEvent) => {
+            if (ev.button) {
+                const { movement: { x, y } } = ev
+                updateViewport((new Vector(x, y)).mul(-1))
             }
         }
 
@@ -342,6 +343,7 @@ export default defineComponent({
             }),
             showInspector,
             onSeedClicked,
+            onMouseMoved,
         }
     }
 })
