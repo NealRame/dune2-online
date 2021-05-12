@@ -56,7 +56,6 @@ export default defineComponent({
 
         // handle mouse click event
         const mouseClick = (e: MouseEvent) => {
-            console.log()
             const canvas = unref(canvasRef) as HTMLCanvasElement
             const { left, top } = canvas.getBoundingClientRect()
 
