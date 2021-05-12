@@ -1,6 +1,6 @@
 import Home from "@/components/Home.vue"
 import LandMap from "@/components/LandMap.vue"
-import Tiles from "@/components/Tiles.vue"
+import Tiles from "@/components/TerrainTiles.vue"
 import Noise from "@/components/Noise.vue"
 
 import { createRouter, createWebHistory, RouteRecordRaw } from "vue-router"
