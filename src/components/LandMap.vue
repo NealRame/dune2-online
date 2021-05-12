@@ -200,10 +200,10 @@ export default defineComponent({
             const viewport = scene.viewport as Rect
             const rect = scene.rect
 
+            if (!ev.altKey) return
             if (ev.code === "ArrowLeft") {
-                const deltaX = rect.leftX - viewport.leftX
-                if (deltaX < 0) {
-                    viewport.x -= Math.min(scene.scale*16, -deltaX)
+                if (viewport.leftX > 0) {
+                    viewport.x -= Math.min(scene.scale*16, viewport.leftX)
                 }
             } else
             if (ev.code === "ArrowRight") {
@@ -213,9 +213,8 @@ export default defineComponent({
                 }
             } else
             if (ev.code === "ArrowUp") {
-                const deltaY = viewport.topY - rect.topY
-                if (deltaY > 0) {
-                    viewport.y -= Math.min(scene.scale*16, deltaY)
+                if (viewport.topY > 0) {
+                    viewport.y -= Math.min(scene.scale*16, viewport.topY)
                 }
             } else
             if (ev.code === "ArrowDown") {
