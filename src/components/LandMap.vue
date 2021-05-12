@@ -6,7 +6,7 @@
     />
 
     <div id="fabs">
-        <button id="open-settings" @click="toggleInspector">
+        <button id="open-settings" @click="showInspector=!showInspector">
             <font-awesome-icon icon="wrench" />
         </button>
         <button id="seed" @click="onSeedClicked">
@@ -229,10 +229,6 @@ export default defineComponent({
             update()
         }
 
-        const toggleInspector = () => {
-            showInspector.value = !showInspector.value
-        }
-
         onMounted(() => {
             const paintDevice = (unref(screen) as PaintDevice)
 
@@ -245,9 +241,6 @@ export default defineComponent({
 
         return {
             screen,
-            showInspector,
-            onSeedClicked,
-            toggleInspector,
             screenWidth,
             screenHeight,
             width: computed({
@@ -330,6 +323,8 @@ export default defineComponent({
                     update()
                 },
             }),
+            showInspector,
+            onSeedClicked,
         }
     }
 })
