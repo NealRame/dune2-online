@@ -197,10 +197,11 @@ export default defineComponent({
         }
 
         const onKeyPressed = (ev: KeyboardEvent) => {
+            if (!ev.altKey) return
+
             const viewport = scene.viewport as Rect
             const rect = scene.rect
 
-            if (!ev.altKey) return
             if (ev.code === "ArrowLeft") {
                 if (viewport.leftX > 0) {
                     viewport.x -= Math.min(scene.scale*16, viewport.leftX)
