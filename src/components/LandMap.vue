@@ -53,9 +53,7 @@
 
 <style lang="scss" scoped>
 canvas {
-    border: 1px solid whitesmoke;
     display: block;
-    margin: 16px auto;
 }
 
 #fabs {
