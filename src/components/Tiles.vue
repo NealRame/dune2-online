@@ -6,7 +6,7 @@
     />
     <tile-palette
         v-model="currentTile"
-        :tilesets="tilesets"
+        :tileset="terrainTiles"
     />
 </template>
 
@@ -22,7 +22,7 @@ canvas {
 import Screen, { ScreenMouseClickEvent } from "@/components/Screen.vue"
 import TilePalette from "@/components/TilePalette.vue"
 
-import { GameData, Tile, TilesetMap } from "@/core"
+import { GameData, Tile, Tileset } from "@/core"
 import { createScene, PaintDevice, Painter, ScaleFactor, Scene, SceneItem } from "@/graphics"
 import { Rect, RectangularCoordinates } from "@/maths"
 
@@ -76,7 +76,7 @@ export default defineComponent({
         const screenWidth = ref(0)
         const screenHeight = ref(0)
         const scale = ref<ScaleFactor>(4)
-        const tilesets = ref<TilesetMap | null>(null)
+        const terrainTiles = ref<Tileset | null>(null)
         const currentTile = ref<Tile | null>(null)
 
         const scene = createScene()
@@ -89,7 +89,7 @@ export default defineComponent({
         }, 60)
 
         onMounted(async () => {
-            tilesets.value = GameData.tilesets()
+            terrainTiles.value = GameData.tileset("Terrain")
             scene.scale = unref(scale)
             scene.gridEnabled = true
             scene.run((unref(screen) as PaintDevice).painter)
@@ -115,7 +115,7 @@ export default defineComponent({
             screenWidth,
             screenHeight,
             currentTile,
-            tilesets,
+            terrainTiles,
             onMouseClick,
         }
     }
