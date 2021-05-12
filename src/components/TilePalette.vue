@@ -12,7 +12,7 @@
             </ul>
         </form>
     </div>
-</template>>
+</template>
 
 <style lang="scss" scoped>
 .tile-palette {
