@@ -7,7 +7,7 @@ import { Rect, RectangularCoordinates } from "@/maths"
 import { Painter } from "@/graphics"
 
 import { clamp, isNil } from "lodash"
-import { defineComponent, onMounted, ref, unref } from "vue"
+import { computed, defineComponent, onMounted, ref, unref } from "vue"
 
 export type ScreenMouseMotionEvent = {
     button: boolean,
@@ -82,21 +82,34 @@ export default defineComponent({
 
         return {
             canvas: canvasRef,
-            painter() {
+            painter: computed((): Painter => {
                 if (isNil(painter)) {
                     throw new Error("No painter available yet")
                 }
                 return painter
-            },
-            rect() {
+            }),
+            rect: computed((): Rect => {
                 const canvas = unref(canvasRef)
-                if (!isNil(canvas)) {
-                    return new Rect({ x: 0, y: 0 }, {
-                        width: canvas.width,
-                        height: canvas.height,
-                    })
-                }
-            }
+                return new Rect({ x: 0, y: 0 }, {
+                    width: canvas?.width ?? 0,
+                    height: canvas?.height ?? 0,
+                })
+            })
+            // painter() {
+            //     if (isNil(painter)) {
+            //         throw new Error("No painter available yet")
+            //     }
+            //     return painter
+            // },
+            // rect() {
+            //     const canvas = unref(canvasRef)
+            //     if (!isNil(canvas)) {
+            //         return new Rect({ x: 0, y: 0 }, {
+            //             width: canvas.width,
+            //             height: canvas.height,
+            //         })
+            //     }
+            // }
         }
     }
 })

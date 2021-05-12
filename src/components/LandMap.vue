@@ -248,7 +248,7 @@ export default defineComponent({
             const paintDevice = (unref(screen) as PaintDevice)
 
             scene.scale = 1
-            scene.run(paintDevice.painter())
+            scene.run(paintDevice.painter)
 
             document.addEventListener("keydown", onKeyPressed)
             window.addEventListener("resize", resize)

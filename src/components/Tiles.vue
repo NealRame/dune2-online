@@ -84,7 +84,7 @@ export default defineComponent({
 
         // handle window resize event
         const resize = debounce(() => {
-            const { x: leftPos } = (unref(screen) as PaintDevice).rect()
+            const { x: leftPos } = (unref(screen) as PaintDevice).rect
             screenWidth.value = window.innerWidth - leftPos
             screenHeight.value = window.innerHeight
         }, 60)
@@ -93,7 +93,7 @@ export default defineComponent({
             tilesets.value = GameData.tilesets()
             scene.scale = unref(scale)
             scene.gridEnabled = true
-            scene.run((unref(screen) as PaintDevice).painter())
+            scene.run((unref(screen) as PaintDevice).painter)
             window.addEventListener("resize", resize)
             resize()
         })
