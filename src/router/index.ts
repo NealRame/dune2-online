@@ -1,5 +1,5 @@
 import Home from "@/components/Home.vue"
-import LandMap from "@/components/LandMap.vue"
+import LandMap from "@/components/Map.vue"
 import Tiles from "@/components/TerrainTiles.vue"
 import Noise from "@/components/Noise.vue"
 
