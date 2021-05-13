@@ -8,10 +8,16 @@
 
     <div id="fabs">
         <button id="open-settings" @click="showInspector=!showInspector">
-            <font-awesome-icon icon="wrench" />
+            <font-awesome-icon icon="wrench"/>
         </button>
         <button id="seed" @click="onSeedClicked">
-            <font-awesome-icon icon="sync-alt" />
+            <font-awesome-icon icon="sync-alt"/>
+        </button>
+        <button id="zoom-in">
+            <font-awesome-icon icon="search-plus" @click="onZoomInClicked"/>
+        </button>
+        <button id="zoom-out">
+            <font-awesome-icon icon="search-minus" @click="onZoomOutClicked"/>
         </button>
     </div>
 
@@ -244,6 +250,18 @@ export default defineComponent({
             update()
         }
 
+        const onZoomInClicked = () => {
+            if (scene.scale < 4) {
+                scene.scale += 1
+            }
+        }
+
+        const onZoomOutClicked = () => {
+            if (scene.scale > 1) {
+                scene.scale -= 1
+            }
+        }
+
         onMounted(() => {
             const paintDevice = (unref(screen) as PaintDevice)
 
@@ -344,6 +362,8 @@ export default defineComponent({
             showInspector,
             onSeedClicked,
             onMouseMoved,
+            onZoomInClicked,
+            onZoomOutClicked,
         }
     }
 })
