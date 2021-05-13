@@ -137,8 +137,8 @@ canvas {
 <script lang="ts">
 import Screen, { ScreenMouseMotionEvent } from "@/components/Screen.vue"
 
-import { createMap } from "@/core"
-import { createScene, PaintDevice } from "@/graphics"
+import { createScene, createMap } from "@/core"
+import { PaintDevice } from "@/graphics"
 import { Rect, RectangularCoordinates, Vector } from "@/maths"
 
 import { clamp, debounce } from "lodash"

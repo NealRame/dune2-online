@@ -22,8 +22,8 @@ canvas {
 import Screen, { ScreenMouseClickEvent } from "@/components/Screen.vue"
 import TilePalette from "@/components/TilePalette.vue"
 
-import { GameData, Tile, Tileset } from "@/core"
-import { createScene, PaintDevice, Painter, ScaleFactor, Scene, SceneItem } from "@/graphics"
+import { createScene, GameData, ScaleFactor, Scene, SceneItem, Tile, Tileset } from "@/core"
+import { PaintDevice, Painter } from "@/graphics"
 import { Rect, RectangularCoordinates } from "@/maths"
 
 import { defineComponent, onMounted, ref, unref } from "vue"

@@ -1,7 +1,7 @@
 import { tileset } from "./data"
-import { Tile } from "./types"
+import { Tile, ScaleFactor, Scene, SceneItem } from "./types"
 
-import { Painter, ScaleFactor, Scene, SceneItem } from "@/graphics"
+import { Painter } from "@/graphics"
 import { createNoise2DGenerator, createRangeMapper, Rect, RectangularCoordinates, Size } from "@/maths"
 
 import { clamp, flow, times } from "lodash"

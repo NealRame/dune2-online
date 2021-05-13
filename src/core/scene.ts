@@ -1,7 +1,7 @@
-import { cssHex } from "./color"
-import { Brush, Painter } from "./painter"
 import { ScaleFactor, Scene, SceneItem } from "./types"
 
+import { cssHex } from "@/graphics/color"
+import { Brush, Painter } from "@/graphics/painter"
 import { Rect, RectangularCoordinates } from "@/maths"
 
 type SceneState = {
