@@ -27,3 +27,6 @@ pnpm-debug.log*
 
 # Test example
 /tests/unit/example.spec.js
+
+# Chrome user profile files
+/.chrome
