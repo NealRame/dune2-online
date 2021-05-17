@@ -4,8 +4,7 @@ import { Tile, Tileset, ScaleFactor, Scene, SceneItem } from "./types"
 import { Painter } from "@/graphics"
 import { createNoise2DGenerator, createRangeMapper, Rect, RectangularCoordinates, Size } from "@/maths"
 
-import { clamp, cond, conforms, constant, flow, isNil, negate, stubTrue, times } from "lodash"
-import { equals } from "lodash/fp"
+import { chain, clamp, flow, isNil, times } from "lodash"
 
 export type LandMapConfig = {
     // Noise seed
@@ -20,11 +19,14 @@ export type LandMapConfig = {
     spiceScale: number,                 // clamped to [16, 64]
     spiceDetails: number,               // clamped to [ 1, 6 ]
     spiceThreshold: number,             // clamped to [ 0, 1 ]
+    spiceSaturationThreshold: number    // clamped to [ spiceThreshold, 1 ]
 }
 
 enum TerrainType {
     Dunes = 0,
     Sand,
+    SpiceField,
+    SaturatedSpiceField,
     Rock,
     Mountain,
 }
@@ -85,47 +87,27 @@ function selectTile(
             if (terrain.type === TerrainType.Rock) {
                 return (type === TerrainType.Rock || type === TerrainType.Mountain) ? 1 : 0
             }
+            if (terrain.type === TerrainType.SpiceField) {
+                return (type === TerrainType.SpiceField || type === TerrainType.SaturatedSpiceField) ? 1 : 0
+            }
             return type === terrain.type ? 1 : 0
         })
         .reduce((prev, cur, index) => prev + (cur << index), 0)
-    const spiceMask = neighbors
-        .map((neighbor): number => {
-            if (isNil(neighbor)) return terrain.spice > 0 ? 1 : 0
-            if (neighbor.type === TerrainType.Sand || neighbor.type === TerrainType.Dunes) return neighbor.spice > 0 ? 1 : 0
-            return 0
-        })
-        .reduce((prev, cur, index) => prev + (cur << index), 0)
 
-    return cond([[
-        conforms({
-            type: equals(TerrainType.Sand),
-            spice: negate(equals(0)),
-        }),
-        () => tiles[176 + spiceMask]
-    ], [
-        conforms({
-            type: equals(TerrainType.Dunes),
-            spice: negate(equals(0)),
-        }),
-        () => tiles[192 + typeMask]
-    ], [
-        conforms({
-            type: equals(TerrainType.Dunes),
-        }),
-        () => tiles[144 + typeMask]
-    ], [
-        conforms({
-            type: equals(TerrainType.Rock),
-        }),
-        () => tiles[128 + typeMask]
-    ], [
-        conforms({
-            type: equals(TerrainType.Mountain),
-        }), () => tiles[160 + typeMask]
-    ], [
-        stubTrue,
-        constant(tiles[127])
-    ]])(terrain)
+    switch (terrain.type) {
+    case TerrainType.Rock:
+        return tiles[128 + typeMask]
+    case TerrainType.Dunes:
+        return tiles[144 + typeMask]
+    case TerrainType.Mountain:
+        return tiles[160 + typeMask]
+    case TerrainType.SpiceField:
+        return tiles[176 + typeMask]
+    case TerrainType.SaturatedSpiceField:
+        return tiles[192 + typeMask]
+    }
+
+    return tiles[127]
 }
 
 function terrainTileSelector(size: Size)
@@ -140,65 +122,105 @@ function terrainTileSelector(size: Size)
 }
 
 function checkConfig(config: Partial<LandMapConfig>): LandMapConfig {
+    const spiceThreshold = clamp(config.spiceThreshold ?? 0.6, 0, 1)
+    const spiceSaturationThreshold = clamp(config.spiceSaturationThreshold ?? (1 + spiceThreshold)/2, spiceThreshold, 1)
     return {
         // Noise seed
         seed: config.seed ?? Date.now(),
         // Terrain values
         terrainScale: clamp(Math.floor(config.terrainScale ?? 32), 16, 64),
         terrainDetails: clamp(Math.floor(config.terrainDetails ?? 1), 1, 6),
-        terrainSandThreshold: clamp(config.terrainSandThreshold ?? 0.4, 0, 1),
-        terrainRockThreshold: clamp(config.terrainRockThreshold ?? 0.65, 0, 1),
-        terrainMountainsThreshold: clamp(config.terrainMountainsThreshold ?? 0.85, 0, 1),
+        terrainSandThreshold: clamp(config.terrainSandThreshold ?? 2/5, 0, 1),
+        terrainRockThreshold: clamp(config.terrainRockThreshold ?? 5/8, 0, 1),
+        terrainMountainsThreshold: clamp(config.terrainMountainsThreshold ?? 7/8, 0, 1),
         // Spice field values
         spiceScale: clamp(Math.floor(config.spiceScale ?? 16), 16, 64),
-        spiceThreshold: clamp(config.spiceThreshold ?? 0.333, 0, 1),
         spiceDetails: clamp(Math.floor(config.spiceDetails ?? 1), 1, 6),
+        spiceThreshold,
+        spiceSaturationThreshold,
     }
 }
 
-function terrainTypeGenerator(config: LandMapConfig): (p: RectangularCoordinates) => TerrainType {
-    return flow(
+function terrainTypeGenerator(config: LandMapConfig)
+    : (t: Partial<Terrain>) => Partial<Terrain> {
+    const terrainNoise = flow(
         createNoise2DGenerator({
             seed: config.seed,
             scale: config.terrainScale,
             octaves: config.terrainDetails,
         }),
         createRangeMapper(-1, 1, 0, 1),
-        (v: number): TerrainType => {
-            if (v < config.terrainSandThreshold) {
-                return TerrainType.Dunes
-            }
-            if (v < config.terrainRockThreshold) {
-                return TerrainType.Sand
-            }
-            if (v < config.terrainMountainsThreshold) {
-                return TerrainType.Rock
-            }
-            return TerrainType.Mountain
-        }
     )
+    return terrain => {
+        const { position } = terrain
+
+        if (isNil(position)) {
+            throw new Error("position not initialized!")
+        }
+
+        const v = terrainNoise(position)
+
+        if (v < config.terrainSandThreshold) {
+            terrain.type = TerrainType.Dunes
+        } else if (v < config.terrainRockThreshold) {
+            terrain.type = TerrainType.Sand
+        } else if (v < config.terrainMountainsThreshold) {
+            terrain.type = TerrainType.Rock
+        } else {
+            terrain.type = TerrainType.Mountain
+        }
+
+        return terrain
+    }
 }
 
-function spiceAmountGenerator(config: LandMapConfig): (p: RectangularCoordinates) => number {
-    return flow(
+function spiceFieldGenerator(config: LandMapConfig)
+    : (t: Partial<Terrain>) => Partial<Terrain> {
+    const spiceNoise = flow(
         createNoise2DGenerator({
             seed: config.seed + 1,
             scale: config.spiceScale,
             octaves: config.spiceDetails,
         }),
-        createRangeMapper(-1, 1, 0, 1),
-        (n: number) => n < config.spiceThreshold ? 1 : 0
+        createRangeMapper(-1, 1, 0, 1)
     )
+
+    return terrain => {
+        const { position, type } = terrain
+
+        if (isNil(position)) {
+            throw new Error("position not initialized!")
+        }
+
+        if (isNil(type)) {
+            throw new Error("type not initialized!")
+        }
+
+        if (type === TerrainType.Sand || type === TerrainType.Dunes) {
+            const n = spiceNoise(position)
+
+            if (n >= config.spiceThreshold && n < config.spiceSaturationThreshold) {
+                terrain.type = TerrainType.SpiceField
+                terrain.spice = 0.5
+            } else if (n >= config.spiceSaturationThreshold) {
+                terrain.type = TerrainType.SaturatedSpiceField
+                terrain.spice = 1.0
+            }
+        }
+
+        return terrain
+    }
 }
 
-function terrainGenerator(config: LandMapConfig): (p: RectangularCoordinates) => Terrain {
+function terrainGenerator(config: LandMapConfig)
+    : (p: RectangularCoordinates) => Terrain {
     const generateTerrainType = terrainTypeGenerator(config)
-    const generateSpiceAmount = spiceAmountGenerator(config)
-
+    const generateSpiceField = spiceFieldGenerator(config)
     return position => {
-        const spice = generateSpiceAmount(position)
-        const type = generateTerrainType(position)
-        return { position, spice, type }
+        return chain({ position })
+            .tap(generateTerrainType)
+            .tap(generateSpiceField)
+            .value() as Terrain
     }
 }
 

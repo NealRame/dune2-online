@@ -50,11 +50,15 @@
         <label for="spiceScale">Spice scale</label>
         <input name="spiceScale" type="number" min="16" max="64" step="1" v-model="spiceScale"/>
 
+        <label for="spiceDetails">Spice details</label>
+        <input name="spiceDetails" type="number" min="1" max="6" step="1" v-model="spiceDetails"/>
+
         <label for="spiceThreshold">Spice threshold</label>
         <input name="spiceThreshold" type="number" min="0" max="1" step="0.001" v-model="spiceThreshold"/>
 
-        <label for="spiceDetails">Spice details</label>
-        <input name="spiceDetails" type="number" min="1" max="6" step="1" v-model="spiceDetails"/>
+        <label for="spiceSaturationThreshold">Spice saturation threshold</label>
+        <input name="spiceSaturationThreshold" type="number" min="0" max="1" step="0.001" v-model="spiceSaturationThreshold"/>
+
     </div>
 </template>
 
@@ -157,8 +161,9 @@ export default defineComponent({
         "update:terrainRockThreshold",
         "update:terrainMountainsThreshold",
         "update:spiceScale",
-        "update:spiceThreshold",
         "update:spiceDetails",
+        "update:spiceThreshold",
+        "update:spiceSaturationThreshold",
     ],
     setup(props, { emit }) {
         const showInspector = ref<boolean>(false)
@@ -177,7 +182,8 @@ export default defineComponent({
         const terrainMountainsThreshold = ref(0.85)
 
         const spiceScale = ref(16)
-        const spiceThreshold = ref(0.333)
+        const spiceThreshold = ref(0.6)
+        const spiceSaturationThreshold = ref(0.8)
         const spiceDetails = ref(1)
 
         const scene = createScene()
@@ -210,8 +216,9 @@ export default defineComponent({
                     terrainRockThreshold: unref(terrainRockThreshold),
                     terrainMountainsThreshold: unref(terrainMountainsThreshold),
                     spiceScale: unref(spiceScale),
-                    spiceThreshold: unref(spiceThreshold),
                     spiceDetails: unref(spiceDetails),
+                    spiceThreshold: unref(spiceThreshold),
+                    spiceSaturationThreshold: unref(spiceSaturationThreshold),
                 }))
         }
 
@@ -343,6 +350,14 @@ export default defineComponent({
                     update()
                 },
             }),
+            spiceDetails: computed({
+                get: () => spiceDetails.value,
+                set: value => {
+                    spiceDetails.value = value
+                    emit("update:spiceDetails", value)
+                    update()
+                },
+            }),
             spiceThreshold: computed({
                 get: () => spiceThreshold.value,
                 set: value => {
@@ -351,11 +366,11 @@ export default defineComponent({
                     update()
                 },
             }),
-            spiceDetails: computed({
-                get: () => spiceDetails.value,
+            spiceSaturationThreshold: computed({
+                get: () => spiceSaturationThreshold.value,
                 set: value => {
-                    spiceDetails.value = value
-                    emit("update:spiceDetails", value)
+                    spiceSaturationThreshold.value = value
+                    emit("update:spiceSaturationThreshold", value)
                     update()
                 },
             }),
