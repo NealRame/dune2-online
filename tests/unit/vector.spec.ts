@@ -20,4 +20,21 @@ describe("Vector", () => {
             expect(v.norm).to.equals(Math.sqrt(x*x + y*y))
         })
     })
+    describe("#opposite", () => {
+        it("returns opposite vector", () => {
+            const x = 1
+            const y = 0
+            const v = new Vector(x, y)
+            expect(v.opposite.x).to.equals(-x)
+            expect(v.opposite.y).to.equals(-y)
+        })
+        it("does not mutate the vector", () => {
+            const x = 1
+            const y = 0
+            const v1 = new Vector(x, y)
+            const v2 = v1.opposite // eslint-disable-line @typescript-eslint/no-unused-vars
+            expect(v1.x).to.equals(x)
+            expect(v1.y).to.equals(y)
+        })
+    })
 })
