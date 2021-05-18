@@ -22,8 +22,8 @@ describe("Vector", () => {
     })
     describe("#opposite", () => {
         it("returns opposite vector", () => {
-            const x = 1
-            const y = 0
+            const x = 6276
+            const y = 8636
             const v = new Vector(x, y)
             expect(v.opposite.x).to.equals(-x)
             expect(v.opposite.y).to.equals(-y)
