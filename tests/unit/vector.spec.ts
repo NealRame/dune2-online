@@ -4,7 +4,7 @@ import { expect } from "chai"
 
 describe("Vector", () => {
     describe("constructor", () => {
-        it("construct a new Vector with the given coordinates", () => {
+        it("constructs a new Vector with the given coordinates", () => {
             const x = 3410
             const y = 8186
             const v = new Vector(x, y)
