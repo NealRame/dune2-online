@@ -37,4 +37,20 @@ describe("Vector", () => {
             expect(v1.y).to.equals(y)
         })
     })
+    describe("#add", () => {
+        it("adds the vector like object to this vector", () => {
+            const x1 = 7653
+            const y1 = 1949
+            const x2 = 6183
+            const y2 = 5983
+            const v = new Vector(x1, y1)
+            v.add({ x: x2, y: y2 })
+            expect(v.x).to.equals(x1 + x2)
+            expect(v.y).to.equals(y1 + y2)
+        })
+        it("returns this vector", () => {
+            const v = new Vector(7702, 3668)
+            expect(v.add({ x: 4268, y: 7033 })).equals(v)
+        })
+    })
 })
