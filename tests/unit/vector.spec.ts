@@ -53,4 +53,20 @@ describe("Vector", () => {
             expect(v.add({ x: 4268, y: 7033 })).equals(v)
         })
     })
+    describe("#sub", () => {
+        it("substracts the vector like object to this vector", () => {
+            const x1 = 8047
+            const y1 = 7168
+            const x2 = 8731
+            const y2 = 3987
+            const v = new Vector(x1, y1)
+            v.sub({ x: x2, y: y2 })
+            expect(v.x).to.equals(x1 - x2)
+            expect(v.y).to.equals(y1 - y2)
+        })
+        it("returns this vector", () => {
+            const v = new Vector(2170, 1286)
+            expect(v.sub({ x: 758, y: 4357 })).equals(v)
+        })
+    })
 })
