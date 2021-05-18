@@ -16,7 +16,7 @@ describe("Vector", () => {
         it("returns the magnitude of the vector", () => {
             const x = 3
             const y = 4
-            const v = new Vector(3, 4)
+            const v = new Vector(x, y)
             expect(v.norm).to.equals(Math.sqrt(x*x + y*y))
         })
     })
