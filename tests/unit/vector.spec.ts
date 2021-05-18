@@ -69,4 +69,19 @@ describe("Vector", () => {
             expect(v.sub({ x: 758, y: 4357 })).equals(v)
         })
     })
+    describe("#mul", () => {
+        it("substracts the vector like object to this vector", () => {
+            const x = 3191
+            const y = 9513
+            const k = 4385
+            const v = new Vector(x, y)
+            v.mul(k)
+            expect(v.x).to.equals(k*x)
+            expect(v.y).to.equals(k*y)
+        })
+        it("returns this vector", () => {
+            const v = new Vector(9953, 1494)
+            expect(v.mul(7292)).equals(v)
+        })
+    })
 })
