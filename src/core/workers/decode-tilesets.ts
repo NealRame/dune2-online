@@ -1,35 +1,35 @@
 import { base64ToByteArray } from "@/utils"
-import { Palette, Tile, TilesetMap } from "@/core"
+import { Palette, Image } from "@/core"
 
 import { isNil } from "lodash"
 import { ungzip } from "pako"
 
 import registerPromiseWorker from "promise-worker/register"
 
-type TileData = {
+type Data = {
     w: number,
     h: number,
     data: Uint8Array,
     remap?: Uint8Array,
 }
 
-function tileToImageData(tile: TileData, palette: Palette, scale=1) {
-    const image = new ImageData(tile.w*scale, tile.h*scale)
+function scaledImageData(item: Data, palette: Palette, scale: number) {
+    const image = new ImageData(item.w*scale, item.h*scale)
 
-    for (let row = 0; row < tile.h; ++row) {
+    for (let row = 0; row < item.h; ++row) {
         const imageRowOffset = 4*scale*row*image.width
 
-        for (let col = 0; col < tile.w; ++col) {
-            const tilePixelIndex = row*tile.w + col
-            const tilePixelColor = palette[
-                isNil(tile.remap)
-                    ? tile.data[tilePixelIndex]
-                    : tile.remap[tile.data[tilePixelIndex]]
+        for (let col = 0; col < item.w; ++col) {
+            const pixelIndex = row*item.w + col
+            const pixelColor = palette[
+                isNil(item.remap)
+                    ? item.data[pixelIndex]
+                    : item.remap[item.data[pixelIndex]]
             ]
             const imagePixelIndex = imageRowOffset + 4*scale*col
 
             for (let i = 0; i < scale; ++i) {
-                image.data.set(tilePixelColor, imagePixelIndex + 4*i)
+                image.data.set(pixelColor, imagePixelIndex + 4*i)
             }
         }
 
@@ -45,17 +45,19 @@ function tileToImageData(tile: TileData, palette: Palette, scale=1) {
     return image
 }
 
-async function createTile(tileData: TileData, palette: Palette): Promise<Tile> {
-    const tile: Partial<Tile> = {}
-    for (const scale of [1, 2, 3, 4] as const) {
-        tile[scale] = await createImageBitmap(tileToImageData(tileData, palette, scale))
+function ImageCreator(palette: Palette)
+    : (i: Data) => Promise<Image> {
+    return async data => {
+        const image: Partial<Image> = {}
+        for (const scale of [1, 2, 3, 4] as const) {
+            image[scale] = await createImageBitmap(scaledImageData(data, palette, scale))
+        }
+        return image as Image
     }
-    return tile as Tile
 }
 
-async function decodeTilesets(inflatedData: string, palette: Palette): Promise<TilesetMap> {
-    const tilesets: Partial<TilesetMap> = {}
-    const tilesetsData = JSON.parse(
+async function decodeTilesets(inflatedData: string, palette: Palette): Promise<Image[]> {
+    const items: Data[] = JSON.parse(
         inflatedData,
         function (key: string, value: unknown) {
             if (key === "data" || key === "remap") {
@@ -64,14 +66,7 @@ async function decodeTilesets(inflatedData: string, palette: Palette): Promise<T
             return value
         }
     )
-
-    for (const group of ["Terrain", "Units"] as const) {
-        tilesets[group] = await Promise.all(tilesetsData[group].map(
-            (tileData: TileData) => createTile(tileData, palette)
-        ))
-    }
-
-    return tilesets as TilesetMap
+    return await Promise.all(items.map(ImageCreator(palette)))
 }
 
 registerPromiseWorker(async ({ data, palette }) => {

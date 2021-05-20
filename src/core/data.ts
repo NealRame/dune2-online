@@ -1,51 +1,40 @@
-import { DataProgressNotifier, GameData, Palette, SoundsetMap, Tileset, TilesetGroup, TilesetMap } from "./types"
+import { DataProgressNotifier, GameData, Image, ImageLib, ImageSet, Palette } from "./types"
 import * as Workers from "./workers"
 
 import { fetchData } from "@/utils"
 import { isNil } from "lodash"
 
-async function fetchGameData(progress: DataProgressNotifier) {
-    type FetchedData = Record<keyof GameData, Uint8Array>
-
-    const fetchedData: Partial<FetchedData> = {}
-    for (const item of ["palette", "tilesets", "soundsets"] as const) {
-        progress.setLabel(`Fetching ${item} ...`)
-        fetchedData[item] = await fetchData(
-            `/assets/${item}.json.gz`,
-            (current: number, total: number) => {
-                progress.setValue(Math.min(current/total, 1))
-            }
-        )
-    }
-    return fetchedData as FetchedData
-}
-
-async function decodeGameData(progress: DataProgressNotifier) {
-    const fetchedData = await fetchGameData(progress)
-    const gameData: Partial<GameData> = {}
-
-    progress.setLabel("Decoding palette ...")
-    gameData.palette = await Workers.decodePalette(
-        fetchedData.palette
-    ) as Palette
-    progress.setValue(1/3)
-
-    progress.setLabel("Decoding tilesets ...")
-    gameData.tilesets = await Workers.decodeTilesets(
-        fetchedData.tilesets, gameData.palette
-    ) as TilesetMap
-    progress.setValue(2/3)
-
-    progress.setLabel("Decoding soundsets ...")
-    gameData.soundsets = await Workers.decodeSoundsets(
-        fetchedData.soundsets
-    ) as SoundsetMap
-    progress.setValue(3/3)
-
-    return gameData as GameData
-}
-
 let gameData: GameData | null = null
+
+async function fetchGameData(progress: DataProgressNotifier) {
+    const fetchProgress = (current: number, total: number) => {
+        progress.setValue(Math.min(current/total, 1))
+    }
+
+    // Fetch palette
+    progress.setLabel("Fetching palette data ...")
+    const paletteData = await fetchData("/assets/palette.json.gz", fetchProgress)
+    const palette = await Workers.decodePalette(paletteData) as Palette
+
+    // Fetch image set
+    const images = await Promise.all(ImageSet.map(async set => {
+        progress.setLabel(`Fetching ${set} data ...`)
+        const data = await fetchData(
+            `/assets/images.${set}.json.gz`,
+            fetchProgress
+        )
+
+        progress.setLabel(`Decoding ${set} images ...`)
+        return {
+            [set]: await Workers.decodeTilesets(data, palette) as Image[]
+        }
+    }))
+
+    return {
+        palette,
+        images: Object.assign({}, ...images) as ImageLib
+    }
+}
 
 function checkGameData(): GameData {
     if (isNil(gameData)) {
@@ -57,7 +46,7 @@ function checkGameData(): GameData {
 export async function load(progress: DataProgressNotifier): Promise<void> {
     if (isNil(gameData)) {
         progress.begin()
-        gameData = await decodeGameData(progress)
+        gameData = await fetchGameData(progress)
         progress.end()
     }
 }
@@ -66,10 +55,10 @@ export function palette(): Palette {
     return checkGameData().palette
 }
 
-export function tileset(group: TilesetGroup): Tileset {
-    return checkGameData().tilesets[group]
+export function imageSet(set: keyof ImageLib): readonly Image[] {
+    return checkGameData().images[set]
 }
 
-export function tilesets(): TilesetMap {
-    return checkGameData().tilesets
+export function imageLib(): ImageLib {
+    return checkGameData().images
 }

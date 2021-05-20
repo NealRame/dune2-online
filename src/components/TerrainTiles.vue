@@ -5,8 +5,8 @@
         @mouseClick="onMouseClick"
     />
     <tile-palette
-        v-model="currentTile"
-        :tileset="terrainTiles"
+        v-model="currentItem"
+        :items="terrains"
     />
 </template>
 
@@ -22,16 +22,16 @@ canvas {
 import Screen, { ScreenMouseClickEvent } from "@/components/Screen.vue"
 import TilePalette from "@/components/TilePalette.vue"
 
-import { createScene, GameData, ScaleFactor, Scene, SceneItem, Tile, Tileset } from "@/core"
+import { createScene, GameData, Image, ScaleFactor, Scene, SceneItem } from "@/core"
 import { PaintDevice, Painter } from "@/graphics"
 import { Rect, RectangularCoordinates } from "@/maths"
 
 import { defineComponent, onMounted, ref, unref } from "vue"
 import { debounce, isNil } from "lodash"
 
-function createTileItem(
+function createTile(
     position: RectangularCoordinates,
-    tile: Tile
+    image: Image,
 ): SceneItem {
     let parent: Scene | SceneItem | null = null
     const getScale = () => parent?.scale ?? 1
@@ -39,10 +39,10 @@ function createTileItem(
         get x() { return position.x },
         get y() { return position.y },
         get width() {
-            return tile[getScale()].width
+            return image[getScale()].width
         },
         get height() {
-            return tile[getScale()].height
+            return image[getScale()].height
         },
         get rect(): Rect {
             return new Rect(position, {
@@ -60,7 +60,7 @@ function createTileItem(
             parent = p
         },
         render(painter: Painter): SceneItem {
-            painter.drawImageBitmap(tile[this.scale], position)
+            painter.drawImageBitmap(image[this.scale], position)
             return this
         }
     }
@@ -76,8 +76,8 @@ export default defineComponent({
         const screenWidth = ref(0)
         const screenHeight = ref(0)
         const scale = ref<ScaleFactor>(4)
-        const terrainTiles = ref<Tileset | null>(null)
-        const currentTile = ref<Tile | null>(null)
+        const terrains = ref<readonly Image[] | null>(null)
+        const currentItem = ref<Image | null>(null)
 
         const scene = createScene()
 
@@ -89,7 +89,8 @@ export default defineComponent({
         }, 60)
 
         onMounted(async () => {
-            terrainTiles.value = GameData.tileset("Terrain")
+            terrains.value = GameData.imageSet("terrain")
+
             scene.scale = unref(scale)
             scene.gridEnabled = true
             scene.run((unref(screen) as PaintDevice).painter)
@@ -98,15 +99,15 @@ export default defineComponent({
         })
 
         const onMouseClick = (ev: ScreenMouseClickEvent) => {
-            const tile = unref(currentTile)
-            if (!isNil(tile)) {
+            const image = unref(currentItem)
+            if (!isNil(image)) {
                 const { x, y } = ev.position
                 const gridSpacing = scene.gridSpacing
                 const position = {
                     x: gridSpacing*Math.floor(x/gridSpacing),
                     y: gridSpacing*Math.floor(y/gridSpacing),
                 }
-                scene.addItem(createTileItem(position, tile))
+                scene.addItem(createTile(position, image))
             }
         }
 
@@ -114,8 +115,8 @@ export default defineComponent({
             screen,
             screenWidth,
             screenHeight,
-            currentTile,
-            terrainTiles,
+            currentItem,
+            terrains,
             onMouseClick,
         }
     }

@@ -1,10 +1,10 @@
 <template>
     <form>
         <ol>
-            <li v-for="(tile, index) in tileset" :key="index">
+            <li v-for="(item, index) in items" :key="index">
                 <label>
-                    <input type="radio" name="tile" :value="index" @change="onChange"/>
-                    <img :src="dataURI(tile[3])" :title="index">
+                    <input type="radio" :value="index" @change="onChange"/>
+                    <img :src="dataURI(item[3])" :title="index">
                 </label>
             </li>
         </ol>
@@ -60,15 +60,15 @@ form {
 import { computed, defineComponent } from "vue"
 
 export default defineComponent({
-    props: ["tileset", "modelValue"],
+    props: ["items", "modelValue"],
     emits: ["update:modelValue"],
     setup(props, { emit }) {
-        const currentTile = computed({
+        const currentItem = computed({
             get: () => props.modelValue,
             set: value => emit("update:modelValue", value)
         })
         return {
-            currentTile,
+            currentItem,
             dataURI(image: ImageData|ImageBitmap) {
                 const canvas = document.createElement("canvas")
                 const context = canvas.getContext("2d")
@@ -86,8 +86,8 @@ export default defineComponent({
                 return canvas.toDataURL()
             },
             onChange(ev: InputEvent): void {
-                const tileIndex = Number((ev.target as HTMLInputElement).value)
-                currentTile.value = props.tileset[tileIndex]
+                const index = Number((ev.target as HTMLInputElement).value)
+                currentItem.value = props.items[index]
             },
         }
     },

@@ -1,5 +1,5 @@
-import { tileset } from "./data"
-import { Tile, Tileset, ScaleFactor, Scene, SceneItem } from "./types"
+import { imageSet } from "./data"
+import { Image, ScaleFactor, Scene, SceneItem } from "./types"
 
 import { Painter } from "@/graphics"
 import { createNoise2DGenerator, createRangeMapper, Rect, RectangularCoordinates, Size } from "@/maths"
@@ -38,7 +38,7 @@ type Terrain = {
 }
 
 type MapState = {
-    map: Array<Terrain & { tile: Tile }>,
+    map: Array<Terrain & { image: Image }>,
     parent: Scene | SceneItem | null,
 }
 
@@ -79,8 +79,8 @@ function neighborhood<T extends Terrain>(size: Size)
 function selectTile(
     terrain: Terrain,
     neighbors: Neighborhood<Terrain>,
-    tiles: Tileset
-): Tile {
+    images: readonly Image[],
+): Image {
     const typeMask = neighbors
         .map((neighbor): number => {
             const type = (neighbor ?? terrain).type
@@ -96,28 +96,28 @@ function selectTile(
 
     switch (terrain.type) {
     case TerrainType.Rock:
-        return tiles[128 + typeMask]
+        return images[128 + typeMask]
     case TerrainType.Dunes:
-        return tiles[144 + typeMask]
+        return images[144 + typeMask]
     case TerrainType.Mountain:
-        return tiles[160 + typeMask]
+        return images[160 + typeMask]
     case TerrainType.SpiceField:
-        return tiles[176 + typeMask]
+        return images[176 + typeMask]
     case TerrainType.SaturatedSpiceField:
-        return tiles[192 + typeMask]
+        return images[192 + typeMask]
     }
 
-    return tiles[127]
+    return images[127]
 }
 
 function terrainTileSelector(size: Size)
-    : (t: Terrain, i: number, m: Terrain[]) => [Terrain, Tile] {
-    const tiles = tileset("Terrain")
+    : (t: Terrain, i: number, m: Terrain[]) => [Terrain, Image] {
+    const images = imageSet("terrain")
     const neighbors = neighborhood(size)
 
     return (terrain, index, map) => [
         terrain,
-        selectTile(terrain, neighbors(terrain, map), tiles)
+        selectTile(terrain, neighbors(terrain, map), images)
     ]
 }
 
@@ -228,7 +228,7 @@ function createTerrain(size: Size, config: LandMapConfig) {
     return times(size.width*size.height, indexToPositionConverter(size))
         .map(terrainGenerator(config))
         .map(terrainTileSelector(size))
-        .map(([terrain, tile]) => Object.assign({}, terrain, { tile }))
+        .map(([terrain, image]) => Object.assign({}, terrain, { image }))
 }
 
 export function createMap(size: Size, config: Partial<LandMapConfig>): SceneItem {
@@ -238,8 +238,8 @@ export function createMap(size: Size, config: Partial<LandMapConfig>): SceneItem
     }
 
     const getScale = () => state.parent?.scale ?? 1
-    const getWidth = () => size.width*(state.map[0]?.tile[getScale()].width ?? 0)
-    const getHeight = () => size.height*(state.map[0]?.tile[getScale()].height ?? 0)
+    const getWidth = () => size.width*(state.map[0]?.image[getScale()].width ?? 0)
+    const getHeight = () => size.height*(state.map[0]?.image[getScale()].height ?? 0)
 
     return {
         get x(): number { return 0 },
@@ -269,7 +269,7 @@ export function createMap(size: Size, config: Partial<LandMapConfig>): SceneItem
             const scale = getScale()
             for (const terrain of state.map) {
                 const { x, y } = terrain.position
-                const bitmap = terrain.tile[scale]
+                const bitmap = terrain.image[scale]
                 painter.drawImageBitmap(bitmap, {
                     x: x*bitmap.width - viewport.leftX,
                     y: y*bitmap.height - viewport.topY,
