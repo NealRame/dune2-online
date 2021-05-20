@@ -1,7 +1,8 @@
 import { Color, Painter } from "@/graphics"
 import { Rect, RectangularCoordinates, Size } from "@/maths"
 
-export type ScaleFactor = 1 | 2 | 3 | 4
+export const ScaleFactors = [1, 2, 3, 4] as const
+export type ScaleFactor = typeof ScaleFactors[number]
 
 export interface DataProgressNotifier {
     begin(): void,

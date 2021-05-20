@@ -1,3 +1,5 @@
+import { ScaleFactors } from "../types"
+
 import { base64ToByteArray } from "@/utils"
 import { Palette, Image } from "@/core"
 
@@ -49,7 +51,7 @@ function ImageCreator(palette: Palette)
     : (i: Data) => Promise<Image> {
     return async data => {
         const image: Partial<Image> = {}
-        for (const scale of [1, 2, 3, 4] as const) {
+        for (const scale of ScaleFactors) {
             image[scale] = await createImageBitmap(scaledImageData(data, palette, scale))
         }
         return image as Image
