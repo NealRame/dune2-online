@@ -22,48 +22,11 @@ canvas {
 import Screen, { ScreenMouseClickEvent } from "@/components/Screen.vue"
 import TilePalette from "@/components/TilePalette.vue"
 
-import { createScene, GameData, Image, ScaleFactor, Scene, SceneItem } from "@/core"
-import { PaintDevice, Painter } from "@/graphics"
-import { Rect, RectangularCoordinates } from "@/maths"
+import { createScene, createTile, GameData, Image, ScaleFactor } from "@/core"
+import { PaintDevice } from "@/graphics"
 
 import { defineComponent, onMounted, ref, unref } from "vue"
 import { debounce, isNil } from "lodash"
-
-function createTile(
-    position: RectangularCoordinates,
-    image: Image,
-): SceneItem {
-    let parent: Scene | SceneItem | null = null
-    const getScale = () => parent?.scale ?? 1
-    return {
-        get position() {
-            const { x, y } = position
-            return { x, y }
-        },
-        get size() {
-            return {
-                width: image[getScale()].width,
-                height: image[getScale()].height,
-            }
-        },
-        get rect(): Rect {
-            return new Rect(position, this.size)
-        },
-        get scale(): ScaleFactor {
-            return getScale()
-        },
-        get parent(): Scene | SceneItem | null {
-            return parent
-        },
-        set parent(p: Scene | SceneItem | null) {
-            parent = p
-        },
-        render(painter: Painter): SceneItem {
-            painter.drawImageBitmap(image[this.scale], position)
-            return this
-        }
-    }
-}
 
 export default defineComponent({
     components: {
