@@ -6,7 +6,7 @@
     />
     <tile-palette
         v-model="currentItem"
-        :items="terrains"
+        :items="tiles"
     />
 </template>
 
@@ -22,23 +22,24 @@ canvas {
 import Screen, { ScreenMouseClickEvent } from "@/components/Screen.vue"
 import TilePalette from "@/components/TilePalette.vue"
 
-import { createScene, createTile, GameData, Image, ScaleFactor } from "@/core"
+import { createScene, createTile, GameData, Image, ImageLib, ScaleFactor } from "@/core"
 import { PaintDevice } from "@/graphics"
 
 import { defineComponent, onMounted, ref, unref } from "vue"
 import { debounce, isNil } from "lodash"
 
 export default defineComponent({
+    props: ["set"],
     components: {
         Screen,
         TilePalette,
     },
-    setup() {
+    setup(props) {
         const screen = ref<PaintDevice | null>(null)
         const screenWidth = ref(0)
         const screenHeight = ref(0)
         const scale = ref<ScaleFactor>(4)
-        const terrains = ref<readonly Image[] | null>(null)
+        const tiles = ref<readonly Image[] | null>(null)
         const currentItem = ref<Image | null>(null)
 
         const scene = createScene()
@@ -51,7 +52,8 @@ export default defineComponent({
         }, 60)
 
         onMounted(async () => {
-            terrains.value = GameData.imageSet("terrain")
+            console.log(props.set)
+            tiles.value = GameData.imageSet(props.set as keyof ImageLib)
 
             scene.scale = unref(scale)
             scene.gridEnabled = true
@@ -78,7 +80,7 @@ export default defineComponent({
             screenWidth,
             screenHeight,
             currentItem,
-            terrains,
+            tiles,
             onMouseClick,
         }
     }

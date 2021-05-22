@@ -1,26 +1,27 @@
 import Home from "@/components/Home.vue"
 import LandMap from "@/components/Map.vue"
-import Tiles from "@/components/TerrainTiles.vue"
+import Tiles from "@/components/Tiles.vue"
 import Noise from "@/components/Noise.vue"
 
 import { createRouter, createWebHistory, RouteRecordRaw } from "vue-router"
 
 const routes: Array<RouteRecordRaw> = [{
-    path: "/",
-    name: "Home",
     component: Home,
+    name: "Home",
+    path: "/",
 }, {
-    path: "/map",
-    name: "Map",
     component: LandMap,
+    name: "Map",
+    path: "/map",
 }, {
-    path: "/terrainTiles",
-    name: "Terrain Tiles",
     component: Tiles,
+    name: "Tiles",
+    path: "/tiles/:set",
+    props: true,
 }, {
-    path: "/noise",
-    name: "Noise",
     component: Noise,
+    name: "Noise",
+    path: "/noise",
 }]
 
 const router = createRouter({
