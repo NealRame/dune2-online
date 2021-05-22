@@ -206,8 +206,8 @@ export default defineComponent({
             scene
                 .clear()
                 .addItem(createMap({
-                    width: unref(width),
-                    height: unref(height),
+                    columns: unref(width),
+                    rows: unref(height),
                 }, {
                     seed,
                     terrainScale: unref(terrainScale),

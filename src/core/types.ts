@@ -1,6 +1,11 @@
 import { Color, Painter } from "@/graphics"
 import { Rect, RectangularCoordinates, Size } from "@/maths"
 
+export type Shape = {
+    columns: number,
+    rows: number,
+}
+
 export const ScaleFactors = [1, 2, 3, 4] as const
 export type ScaleFactor = typeof ScaleFactors[number]
 
@@ -37,8 +42,10 @@ export interface Scene {
     run(painter: Painter): Scene,
 }
 
-export interface SceneItem extends RectangularCoordinates, Size {
+export interface SceneItem {
     parent: Scene | SceneItem | null,
+    position: RectangularCoordinates,
+    readonly size: Size,
     readonly rect: Rect,
     readonly scale: ScaleFactor,
     render(painter: Painter, viewport: Rect): SceneItem,

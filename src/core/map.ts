@@ -1,8 +1,8 @@
 import { imageSet } from "./data"
-import { Image, ScaleFactor, Scene, SceneItem } from "./types"
+import { Image, ScaleFactor, Scene, SceneItem, Shape } from "./types"
 
 import { Painter } from "@/graphics"
-import { createNoise2DGenerator, createRangeMapper, Rect, RectangularCoordinates, Size } from "@/maths"
+import { createNoise2DGenerator, createRangeMapper, Rect, RectangularCoordinates } from "@/maths"
 
 import { chain, clamp, flow, isNil, times } from "lodash"
 
@@ -44,23 +44,23 @@ type MapState = {
 
 type Neighborhood<T extends Terrain> = [T|null, T|null, T|null, T|null]
 
-function indexToPositionConverter({ width }: Size)
+function indexToPositionConverter({ columns }: Shape)
     : (n: number) => RectangularCoordinates {
-    return n => ({ x: n%width, y: Math.floor(n/width) })
+    return n => ({ x: n%columns, y: Math.floor(n/columns) })
 }
 
-function positionToIndexConverter({ width, height }: Size)
+function positionToIndexConverter({ columns, rows }: Shape)
     : (p: RectangularCoordinates) => number {
     return ({ x, y }) => {
-        return x >= 0 && x < width && y >= 0 && y < height
-            ? y*width + x
+        return x >= 0 && x < columns && y >= 0 && y < rows
+            ? y*columns + x
             : -1
     }
 }
 
-function neighborhood<T extends Terrain>(size: Size)
+function neighborhood<T extends Terrain>(shape: Shape)
     : (t: T, m: T[]) => Neighborhood<T> {
-    const positionToIndex = positionToIndexConverter(size)
+    const positionToIndex = positionToIndexConverter(shape)
     return (terrain, map) => {
         const { x, y } = terrain.position
         const north = positionToIndex({ x, y: y - 1 })
@@ -110,10 +110,10 @@ function selectTile(
     return images[127]
 }
 
-function terrainTileSelector(size: Size)
+function terrainTileSelector(shape: Shape)
     : (t: Terrain, i: number, m: Terrain[]) => [Terrain, Image] {
     const images = imageSet("terrain")
-    const neighbors = neighborhood(size)
+    const neighbors = neighborhood(shape)
 
     return (terrain, index, map) => [
         terrain,
@@ -224,37 +224,37 @@ function terrainGenerator(config: LandMapConfig)
     }
 }
 
-function createTerrain(size: Size, config: LandMapConfig) {
-    return times(size.width*size.height, indexToPositionConverter(size))
+function createTerrain(shape: Shape, config: LandMapConfig) {
+    return times(shape.columns*shape.rows, indexToPositionConverter(shape))
         .map(terrainGenerator(config))
-        .map(terrainTileSelector(size))
+        .map(terrainTileSelector(shape))
         .map(([terrain, image]) => Object.assign({}, terrain, { image }))
 }
 
-export function createMap(size: Size, config: Partial<LandMapConfig>): SceneItem {
+export function createMap(shape: Shape, config: Partial<LandMapConfig>): SceneItem {
     const state: MapState = {
-        map: createTerrain(size, checkConfig(config)),
+        map: createTerrain(shape, checkConfig(config)),
         parent: null,
     }
 
     const getScale = () => state.parent?.scale ?? 1
-    const getWidth = () => size.width*(state.map[0]?.image[getScale()].width ?? 0)
-    const getHeight = () => size.height*(state.map[0]?.image[getScale()].height ?? 0)
+    const getSize = () => {
+        const image = state.map[0]?.image[getScale()]
+        return {
+            width: shape.columns*(image?.width ?? 0),
+            height: shape.rows*(image?.height ?? 0),
+        }
+    }
 
     return {
-        get x(): number { return 0 },
-        get y(): number { return 0 },
-        get width(): number {
-            return getWidth()
+        get position() {
+            return { x: 0, y: 0 }
         },
-        get height(): number {
-            return getHeight()
+        get size() {
+            return getSize()
         },
         get rect(): Rect {
-            return new Rect({ x: 0, y: 0 }, {
-                width: getWidth(),
-                height: getHeight()
-            })
+            return new Rect({ x: 0, y: 0 }, getSize())
         },
         get scale(): ScaleFactor {
             return getScale()

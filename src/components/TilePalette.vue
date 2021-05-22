@@ -3,7 +3,7 @@
         <ol>
             <li v-for="(item, index) in items" :key="index">
                 <label>
-                    <input type="radio" :value="index" @change="onChange"/>
+                    <input type="radio" name="palette-item" :value="index" @change="onChange"/>
                     <img :src="dataURI(item[3])" :title="index">
                 </label>
             </li>

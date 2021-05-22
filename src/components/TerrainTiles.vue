@@ -36,19 +36,18 @@ function createTile(
     let parent: Scene | SceneItem | null = null
     const getScale = () => parent?.scale ?? 1
     return {
-        get x() { return position.x },
-        get y() { return position.y },
-        get width() {
-            return image[getScale()].width
+        get position() {
+            const { x, y } = position
+            return { x, y }
         },
-        get height() {
-            return image[getScale()].height
+        get size() {
+            return {
+                width: image[getScale()].width,
+                height: image[getScale()].height,
+            }
         },
         get rect(): Rect {
-            return new Rect(position, {
-                width: this.width,
-                height: this.height,
-            })
+            return new Rect(position, this.size)
         },
         get scale(): ScaleFactor {
             return getScale()
