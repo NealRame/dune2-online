@@ -1,35 +1,61 @@
 import { AbstractSceneItem } from "./scene-item"
-import { Image, Shape } from "./types"
+import { Image, ScaleFactor, Shape } from "./types"
 
 import { Painter } from "@/graphics"
 import { RectangularCoordinates, Size } from "@/maths"
 
+import { isMatch } from "lodash"
+
+function imageSize(image: Image, scale: ScaleFactor): Size {
+    const { width, height } = image[scale]
+    return { width, height }
+}
+
+function checkShape({ columns, rows }: Shape, images: Image[]) {
+    if (columns*rows > images.length) {
+        throw new Error("Inconsistent number of images for the shape of the sprite")
+    }
+}
+
+function checkSizeOfImages(images: Image[]) {
+    const [head, ...tail] = images
+    const size = imageSize(head, 1)
+    for (const image of tail) {
+        if (!isMatch(imageSize(image, 1), size)) {
+            throw new Error("All image must have the same size")
+        }
+    }
+}
+
 export class Tile extends AbstractSceneItem {
-    private shape_: Shape
     private images_: Image[]
+    private columns_: number
+    private rows_: number
 
     constructor(shape: Shape, images: Image[]) {
         super()
-        if (shape.columns*shape.rows > images.length) {
-            throw new Error("Inconsistent number of images for the shape of the sprite")
-        }
-        this.shape_ = shape
+
+        checkShape(shape, images)
+        checkSizeOfImages(images)
+
+        this.columns_ = shape.columns
+        this.rows_ = shape.rows
         this.images_ = images
     }
 
     get size(): Size {
-        const bitmap = this.images_[0][this.scale]
+        const { width, height } = imageSize(this.images_[0], this.scale)
         return {
-            width: this.shape_.columns*bitmap.width,
-            height: this.shape_.rows*bitmap.height,
+            width: width*this.columns_,
+            height: height*this.rows_,
         }
     }
 
     render(painter: Painter): Tile {
-        const { width, height } = this.images_[0][this.scale]
-        for (let row = 0, y = this.position.y; row < this.shape_.rows; row += 1, y += height) {
-            for (let col = 0, x = this.position.x; col < this.shape_.columns; col += 1, x += width) {
-                const index = this.shape_.columns*row + col
+        const { width, height } = imageSize(this.images_[0], this.scale)
+        for (let row = 0, y = this.y; row < this.rows_; row += 1, y += height) {
+            for (let col = 0, x = this.x; col < this.columns_; col += 1, x += width) {
+                const index = this.columns_*row + col
                 const scale = this.scale
                 const bitmap = this.images_[index][scale]
                 painter.drawImageBitmap(bitmap, { x, y })
