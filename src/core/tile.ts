@@ -1,69 +1,50 @@
-import { Image, ScaleFactor, Scene, SceneItem } from "./types"
+import { AbstractSceneItem } from "./scene-item"
+import { Image, Shape } from "./types"
 
 import { Painter } from "@/graphics"
-import { Rect, RectangularCoordinates, Size } from "@/maths"
+import { RectangularCoordinates, Size } from "@/maths"
 
-export class Tile implements SceneItem {
-    x: number
-    y: number
+export class Tile extends AbstractSceneItem {
+    private shape_: Shape
+    private images_: Image[]
 
-    private parent_: Scene | SceneItem | null
-    private image_: Image
-
-    constructor(image: Image) {
-        this.parent_ = null
-
-        this.x = 0
-        this.y = 0
-        this.image_ = image
-    }
-
-    get position(): RectangularCoordinates {
-        return {
-            x: this.x,
-            y: this.y,
+    constructor(shape: Shape, images: Image[]) {
+        super()
+        if (shape.columns*shape.rows > images.length) {
+            throw new Error("Inconsistent number of images for the shape of the sprite")
         }
-    }
-
-    set position({ x, y }: RectangularCoordinates) {
-        this.x = x
-        this.y = y
+        this.shape_ = shape
+        this.images_ = images
     }
 
     get size(): Size {
+        const bitmap = this.images_[0][this.scale]
         return {
-            width: this.image_[this.scale].width,
-            height: this.image_[this.scale].height,
+            width: this.shape_.columns*bitmap.width,
+            height: this.shape_.rows*bitmap.height,
         }
     }
 
-    get rect(): Rect {
-        return new Rect(this.position, this.size)
-    }
-
-    get scale(): ScaleFactor {
-        return this.parent?.scale ?? 1
-    }
-
-    get parent(): Scene | SceneItem | null {
-        return this.parent_
-    }
-
-    set parent(p: Scene | SceneItem | null) {
-        this.parent_ = p
-    }
-
     render(painter: Painter): Tile {
-        painter.drawImageBitmap(this.image_[this.scale], this.position)
+        const { width, height } = this.images_[0][this.scale]
+        for (let row = 0, y = this.position.y; row < this.shape_.rows; row += 1, y += height) {
+            for (let col = 0, x = this.position.x; col < this.shape_.columns; col += 1, x += width) {
+                const index = this.shape_.columns*row + col
+                const scale = this.scale
+                const bitmap = this.images_[index][scale]
+                painter.drawImageBitmap(bitmap, { x, y })
+            }
+        }
         return this
     }
 }
 
 export function createTile(
     position: RectangularCoordinates,
-    image: Image,
+    shape: Shape,
+    images: Image[],
 ): Tile {
-    const tile = new Tile(image)
+    const tile = new Tile(shape, images)
     tile.position = position
     return tile
 }

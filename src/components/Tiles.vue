@@ -52,7 +52,6 @@ export default defineComponent({
         }, 60)
 
         onMounted(async () => {
-            console.log(props.set)
             tiles.value = GameData.imageSet(props.set as keyof ImageLib)
 
             scene.scale = unref(scale)
@@ -71,7 +70,11 @@ export default defineComponent({
                     x: gridSpacing*Math.floor(x/gridSpacing),
                     y: gridSpacing*Math.floor(y/gridSpacing),
                 }
-                scene.addItem(createTile(position, image))
+                scene.addItem(createTile(
+                    position,
+                    { columns: 1, rows: 1 },
+                    [image]
+                ))
             }
         }
 
