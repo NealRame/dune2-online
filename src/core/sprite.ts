@@ -2,9 +2,10 @@ import { AbstractSceneItem } from "./scene-item"
 import { Tile } from "./tile"
 
 import { Painter } from "@/graphics"
-import { RectangularCoordinates, Size } from "@/maths"
+import { Rect, RectangularCoordinates, Size } from "@/maths"
 
 import { noop } from "lodash"
+import { ScaleFactor } from "./types"
 
 export class Sprite extends AbstractSceneItem {
     onUpdate: () => void
@@ -22,10 +23,6 @@ export class Sprite extends AbstractSceneItem {
         this.onUpdate = onUpdate
     }
 
-    get size(): Size {
-        return this.frames_[this.frameIndex_]?.size ?? 0
-    }
-
     get frameCount(): number {
         return this.frames_.length
     }
@@ -36,6 +33,10 @@ export class Sprite extends AbstractSceneItem {
 
     set frameIndex(index: number) {
         this.frameIndex_ = index
+    }
+
+    getSize(scale: ScaleFactor): Size {
+        return this.frames_[this.frameIndex_]?.getSize(scale) ?? 0
     }
 
     addFrame(frame: Tile): Sprite {
@@ -50,12 +51,12 @@ export class Sprite extends AbstractSceneItem {
         return this
     }
 
-    render(painter: Painter): Sprite {
+    render(painter: Painter, scale: ScaleFactor, viewport: Rect): Sprite {
         painter
             .save()
             .translate(this.position)
         if (this.frameIndex_ <= this.frames_.length) {
-            this.frames_[this.frameIndex_].render(painter)
+            this.frames_[this.frameIndex_].render(painter, scale, viewport)
         }
         painter.restore()
         return this

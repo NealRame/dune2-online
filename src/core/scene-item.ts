@@ -21,16 +21,6 @@ export abstract class AbstractSceneItem implements SceneItem {
         this.y = y
     }
 
-    abstract get size(): Size
-
-    get rect(): Rect {
-        return new Rect(this.position, this.size)
-    }
-
-    get scale(): ScaleFactor {
-        return this.parent?.scale ?? 1
-    }
-
     get parent(): Scene | SceneItem | null {
         return this.parent_
     }
@@ -39,13 +29,19 @@ export abstract class AbstractSceneItem implements SceneItem {
         this.parent_ = p
     }
 
+    abstract getSize(scale: ScaleFactor): Size
+
+    getRect(scale: ScaleFactor): Rect {
+        return new Rect(this.position, this.getSize(scale))
+    }
+
     update(): AbstractSceneItem {
         return this
     }
 
-    render(painter: Painter, viewport: Rect): SceneItem {
+    render(painter: Painter, scale: ScaleFactor, viewport: Rect): SceneItem {
         for (const item of this.items_) {
-            item.render(painter, viewport)
+            item.render(painter, scale, viewport)
         }
         return this
     }

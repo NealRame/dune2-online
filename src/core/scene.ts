@@ -81,7 +81,7 @@ export function createScene(): Scene {
         get rect(): Rect {
             const r = new Rect({ x: 0, y: 0 }, { width: 0, height: 0 })
             for (const item of state.items) {
-                r.union(item.rect)
+                r.union(item.getRect(this.scale))
             }
             return r
         },
@@ -113,8 +113,8 @@ export function createScene(): Scene {
             }
             // draw items
             for (const item of state.items) {
-                if (viewport.intersects(item.rect)) {
-                    item.render(painter, viewport)
+                if (viewport.intersects(item.getRect(state.scaleFactor))) {
+                    item.render(painter, state.scaleFactor, viewport)
                 }
             }
 

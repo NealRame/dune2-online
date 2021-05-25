@@ -57,8 +57,10 @@ form {
 </style>
 
 <script lang="ts">
-import { Tile } from "@/core"
+import { ScaleFactor, Tile } from "@/core"
 import { Painter } from "@/graphics"
+import { Rect } from "@/maths"
+
 import { computed, defineComponent } from "vue"
 
 export default defineComponent({
@@ -72,14 +74,20 @@ export default defineComponent({
         return {
             currentItem,
             dataURI(tile: Tile) {
-                const { width, height } = tile.size
+                const scale: ScaleFactor = 2
                 const canvas = document.createElement("canvas")
-                const painter = new Painter(canvas)
+                const { width, height } = tile.getSize(scale)
 
                 canvas.width = width
                 canvas.height = height
-
-                tile.render(painter)
+                tile.render(
+                    new Painter(canvas),
+                    scale,
+                    new Rect({ x: 0, y: 0 }, {
+                        width,
+                        height
+                    })
+                )
 
                 return canvas.toDataURL()
             },

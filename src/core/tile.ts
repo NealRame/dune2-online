@@ -2,7 +2,7 @@ import { AbstractSceneItem } from "./scene-item"
 import { Image, ScaleFactor, Shape } from "./types"
 
 import { Painter } from "@/graphics"
-import { RectangularCoordinates, Size } from "@/maths"
+import { Rect, RectangularCoordinates, Size } from "@/maths"
 
 import { isMatch } from "lodash"
 
@@ -43,22 +43,23 @@ export class Tile extends AbstractSceneItem {
         this.images_ = images
     }
 
-    get size(): Size {
-        const { width, height } = imageSize(this.images_[0], this.scale)
+    getSize(scale: ScaleFactor): Size {
+        const { width, height } = imageSize(this.images_[0], scale)
         return {
             width: width*this.columns_,
             height: height*this.rows_,
         }
     }
 
-    render(painter: Painter): Tile {
-        const { width, height } = imageSize(this.images_[0], this.scale)
+    render(painter: Painter, scale: ScaleFactor, viewport: Rect): Tile {
+        const { width, height } = imageSize(this.images_[0], scale)
         for (let row = 0, y = this.y; row < this.rows_; row += 1, y += height) {
             for (let col = 0, x = this.x; col < this.columns_; col += 1, x += width) {
-                const index = this.columns_*row + col
-                const scale = this.scale
-                const bitmap = this.images_[index][scale]
-                painter.drawImageBitmap(bitmap, { x, y })
+                if (viewport.intersects(new Rect({ x, y }, { width, height }))) {
+                    const index = this.columns_*row + col
+                    const bitmap = this.images_[index][scale]
+                    painter.drawImageBitmap(bitmap, { x, y })
+                }
             }
         }
         return this

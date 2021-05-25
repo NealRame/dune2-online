@@ -237,9 +237,8 @@ export function createMap(shape: Shape, config: Partial<LandMapConfig>): SceneIt
         parent: null,
     }
 
-    const getScale = () => state.parent?.scale ?? 1
-    const getSize = () => {
-        const image = state.map[0]?.image[getScale()]
+    const getSize = (scale: ScaleFactor) => {
+        const image = state.map[0]?.image[scale]
         return {
             width: shape.columns*(image?.width ?? 0),
             height: shape.rows*(image?.height ?? 0),
@@ -250,26 +249,20 @@ export function createMap(shape: Shape, config: Partial<LandMapConfig>): SceneIt
         get position() {
             return { x: 0, y: 0 }
         },
-        get size() {
-            return getSize()
-        },
-        get rect(): Rect {
-            return new Rect({ x: 0, y: 0 }, getSize())
-        },
-        get scale(): ScaleFactor {
-            return getScale()
-        },
         get parent(): Scene | SceneItem | null {
             return state.parent
         },
         set parent(parent: Scene | SceneItem | null) {
             state.parent = parent
         },
+        getSize,
+        getRect(scale: ScaleFactor): Rect {
+            return new Rect({ x: 0, y: 0 }, getSize(scale))
+        },
         update(): SceneItem {
             return this
         },
-        render(painter: Painter, viewport: Rect): SceneItem {
-            const scale = getScale()
+        render(painter: Painter, scale: ScaleFactor, viewport: Rect): SceneItem {
             for (const terrain of state.map) {
                 const { x, y } = terrain.position
                 const bitmap = terrain.image[scale]

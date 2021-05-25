@@ -53,9 +53,8 @@ export interface Scene {
 export interface SceneItem {
     parent: Scene | SceneItem | null,
     position: RectangularCoordinates,
-    readonly size: Size,
-    readonly rect: Rect,
-    readonly scale: ScaleFactor,
+    getSize(scale: ScaleFactor): Size,
+    getRect(scale: ScaleFactor): Rect,
     update(): SceneItem,
-    render(painter: Painter, viewport: Rect): SceneItem,
+    render(painter: Painter, scale: ScaleFactor, viewport: Rect): SceneItem,
 }
