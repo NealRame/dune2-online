@@ -1,4 +1,4 @@
-import { DataProgressNotifier, GameData, Image, ImageLib, ImageSet, Palette } from "./types"
+import { DataProgressNotifier, GameData, Image, ImageLib, ImageSet, Palette, TileDescriptor } from "./types"
 import * as Workers from "./workers"
 
 import { fetchData } from "@/utils"
@@ -14,7 +14,12 @@ async function fetchGameData(progress: DataProgressNotifier) {
     // Fetch palette
     progress.setLabel("Fetching palette data ...")
     const paletteData = await fetchData("/assets/palette.json.gz", fetchProgress)
-    const palette = await Workers.decodePalette(paletteData) as Palette
+    const palette = await Workers.decodePalette(paletteData)
+
+    // Fetch tiles mapping
+    progress.setLabel("Fetching tiles mapping data ...")
+    const tilesDescriptorsData = await fetchData("/assets/tiles.json.gz", fetchProgress)
+    const tiles = await Workers.decodeTileDescriptors(tilesDescriptorsData)
 
     // Fetch image set
     const images = await Promise.all(ImageSet.map(async set => {
@@ -26,13 +31,14 @@ async function fetchGameData(progress: DataProgressNotifier) {
 
         progress.setLabel(`Decoding ${set} images ...`)
         return {
-            [set]: await Workers.decodeImages(data, palette) as Image[]
+            [set]: await Workers.decodeImages(data, palette)
         }
     }))
 
     return {
         palette,
-        images: Object.assign({}, ...images) as ImageLib
+        tiles,
+        images: Object.assign({}, ...images) as ImageLib,
     }
 }
 
@@ -61,4 +67,8 @@ export function imageSet(set: keyof ImageLib): readonly Image[] {
 
 export function imageLib(): ImageLib {
     return checkGameData().images
+}
+
+export function tiles(): TileDescriptor[] {
+    return checkGameData().tiles
 }

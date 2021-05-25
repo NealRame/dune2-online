@@ -19,6 +19,12 @@ export interface DataProgressNotifier {
 // Palette
 export type Palette = readonly Color.RGBA[]
 
+// Tile descriptor
+export type TileDescriptor = {
+    shape: Shape,
+    images: number[],
+}
+
 // Image set
 export const ImageSet = ["misc", "terrain", "units"] as const
 export type Image = Record<ScaleFactor, ImageBitmap>
@@ -28,6 +34,7 @@ export type ImageLib = Record<typeof ImageSet[number], readonly Image[]>
 export type GameData = {
     palette: Palette,
     images: ImageLib,
+    tiles: TileDescriptor[],
 }
 
 export interface Scene {
