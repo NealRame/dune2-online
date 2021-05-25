@@ -265,6 +265,9 @@ export function createMap(shape: Shape, config: Partial<LandMapConfig>): SceneIt
         set parent(parent: Scene | SceneItem | null) {
             state.parent = parent
         },
+        update(): SceneItem {
+            return this
+        },
         render(painter: Painter, viewport: Rect): SceneItem {
             const scale = getScale()
             for (const terrain of state.map) {
