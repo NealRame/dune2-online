@@ -4,14 +4,22 @@ import { Tile } from "./tile"
 import { Painter } from "@/graphics"
 import { RectangularCoordinates, Size } from "@/maths"
 
+import { noop } from "lodash"
+
 export class Sprite extends AbstractSceneItem {
+    onUpdate: () => void
+
     private frames_: Tile[]
     private frameIndex_: number
 
-    constructor() {
+    constructor(
+        position: RectangularCoordinates,
+        onUpdate: () => void,
+    ) {
         super()
-        this.frameIndex_ = 0
         this.frames_ = []
+        this.frameIndex_ = 0
+        this.onUpdate = onUpdate
     }
 
     get size(): Size {
@@ -37,21 +45,35 @@ export class Sprite extends AbstractSceneItem {
         return this
     }
 
+    update(): Sprite {
+        this.onUpdate()
+        return this
+    }
+
     render(painter: Painter): Sprite {
+        painter
+            .save()
+            .translate(this.position)
         if (this.frameIndex_ <= this.frames_.length) {
             this.frames_[this.frameIndex_].render(painter)
         }
+        painter.restore()
         return this
     }
 }
 
-export function createSprite(
-    position: RectangularCoordinates,
-    ...frames: Tile[]
-): Sprite {
-    const sprite = new Sprite()
-    sprite.position = position
-    for (const frame of frames) {
+export type SpriteConfig = {
+    position?: RectangularCoordinates,
+    onUpdate?(): void,
+    frames?: Tile[],
+}
+
+export function createSprite(config: SpriteConfig): Sprite {
+    const sprite = new Sprite(
+        config.position ?? { x: 0, y: 0 },
+        config.onUpdate ?? noop
+    )
+    for (const frame of config.frames ?? []) {
         sprite.addFrame(frame)
     }
     return sprite
