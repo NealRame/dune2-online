@@ -45,6 +45,7 @@ export interface Scene {
     readonly rect: Rect,
     addItem(item: SceneItem): Scene, // eslint-disable-line no-use-before-define
     clear(): Scene,
+    update(): Scene,
     render(painter: Painter): Scene,
     run(painter: Painter): Scene,
 }

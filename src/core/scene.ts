@@ -94,6 +94,12 @@ export function createScene(): Scene {
             state.items = []
             return this
         },
+        update(): Scene {
+            for (const item of state.items) {
+                item.update()
+            }
+            return this
+        },
         render(painter: Painter): Scene {
             const viewport = state.viewport ?? new Rect({ x: 0, y: 0 }, painter.size)
 
@@ -116,7 +122,8 @@ export function createScene(): Scene {
         },
         run(painter: Painter): Scene {
             const loop = () => {
-                this.render(painter)
+                this.update()
+                    .render(painter)
                 requestAnimationFrame(loop)
             }
             loop()
