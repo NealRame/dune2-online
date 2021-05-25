@@ -22,7 +22,7 @@ canvas {
 import Screen, { ScreenMouseClickEvent } from "@/components/Screen.vue"
 import TilePalette from "@/components/TilePalette.vue"
 
-import { createScene, createTile, GameData, Image, ImageLib, ScaleFactor } from "@/core"
+import { createScene, createTile, GameData, ImageLib, ScaleFactor, Tile } from "@/core"
 import { PaintDevice } from "@/graphics"
 
 import { defineComponent, onMounted, ref, unref } from "vue"
@@ -39,8 +39,8 @@ export default defineComponent({
         const screenWidth = ref(0)
         const screenHeight = ref(0)
         const scale = ref<ScaleFactor>(4)
-        const tiles = ref<readonly Image[] | null>(null)
-        const currentItem = ref<Image | null>(null)
+        const tiles = ref<readonly Tile[] | null>(null)
+        const currentItem = ref<number | null>(null)
 
         const scene = createScene()
 
@@ -52,7 +52,12 @@ export default defineComponent({
         }, 60)
 
         onMounted(async () => {
-            tiles.value = GameData.imageSet(props.set as keyof ImageLib)
+            tiles.value = GameData
+                .imageSet(props.set as keyof ImageLib)
+                .map(image => createTile({
+                    shape: { columns: 1, rows: 1 },
+                    images: [image]
+                }))
 
             scene.scale = unref(scale)
             scene.gridEnabled = true
@@ -63,19 +68,21 @@ export default defineComponent({
 
         const onMouseClick = (ev: ScreenMouseClickEvent) => {
             const image = unref(currentItem)
-            if (!isNil(image)) {
-                const { x, y } = ev.position
-                const gridSpacing = scene.gridSpacing
-                const position = {
-                    x: gridSpacing*Math.floor(x/gridSpacing),
-                    y: gridSpacing*Math.floor(y/gridSpacing),
-                }
-                scene.addItem(createTile(
-                    position,
-                    { columns: 1, rows: 1 },
-                    [image]
-                ))
+
+            if (isNil(image)) return
+
+            const { x, y } = ev.position
+            const gridSpacing = scene.gridSpacing
+            const position = {
+                x: gridSpacing*Math.floor(x/gridSpacing),
+                y: gridSpacing*Math.floor(y/gridSpacing),
             }
+
+            scene.addItem(createTile({
+                position,
+                shape: { columns: 1, rows: 1 },
+                images: [GameData.imageSet(props.set as keyof ImageLib)[image]]
+            }))
         }
 
         return {

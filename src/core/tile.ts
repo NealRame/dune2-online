@@ -65,12 +65,15 @@ export class Tile extends AbstractSceneItem {
     }
 }
 
-export function createTile(
-    position: RectangularCoordinates,
+export type TileConfig = {
+    position?: RectangularCoordinates,
     shape: Shape,
-    images: Image[],
-): Tile {
-    const tile = new Tile(shape, images)
+    images: Image[]
+}
+
+export function createTile(config: TileConfig): Tile {
+    const position = config.position ?? { x: 0, y: 0 }
+    const tile = new Tile(config.shape, config.images)
     tile.position = position
     return tile
 }

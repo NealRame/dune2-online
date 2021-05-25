@@ -4,7 +4,7 @@
             <li v-for="(item, index) in items" :key="index">
                 <label>
                     <input type="radio" name="palette-item" :value="index" @change="onChange"/>
-                    <img :src="dataURI(item[3])" :title="index">
+                    <img :src="dataURI(item)" :title="index">
                 </label>
             </li>
         </ol>
@@ -57,6 +57,8 @@ form {
 </style>
 
 <script lang="ts">
+import { Tile } from "@/core"
+import { Painter } from "@/graphics"
 import { computed, defineComponent } from "vue"
 
 export default defineComponent({
@@ -69,25 +71,21 @@ export default defineComponent({
         })
         return {
             currentItem,
-            dataURI(image: ImageData|ImageBitmap) {
+            dataURI(tile: Tile) {
+                const { width, height } = tile.size
                 const canvas = document.createElement("canvas")
-                const context = canvas.getContext("2d")
+                const painter = new Painter(canvas)
 
-                canvas.width = image.width
-                canvas.height = image.height
+                canvas.width = width
+                canvas.height = height
 
-                if (context != null) {
-                    if (image instanceof ImageData) {
-                        context.putImageData(image, 0, 0)
-                    } else {
-                        context.drawImage(image, 0, 0)
-                    }
-                }
+                tile.render(painter)
+
                 return canvas.toDataURL()
             },
             onChange(ev: InputEvent): void {
                 const index = Number((ev.target as HTMLInputElement).value)
-                currentItem.value = props.items[index]
+                currentItem.value = index
             },
         }
     },
