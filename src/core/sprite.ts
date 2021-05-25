@@ -4,23 +4,19 @@ import { Tile } from "./tile"
 import { Painter } from "@/graphics"
 import { Rect, RectangularCoordinates, Size } from "@/maths"
 
-import { noop } from "lodash"
+import { isNil } from "lodash"
 import { ScaleFactor } from "./types"
 
-export class Sprite extends AbstractSceneItem {
-    onUpdate: () => void
+type SpriteUpdateDelegate = () => void
 
+export class Sprite extends AbstractSceneItem {
     private frames_: Tile[]
     private frameIndex_: number
 
-    constructor(
-        position: RectangularCoordinates,
-        onUpdate: () => void,
-    ) {
+    constructor(position: RectangularCoordinates) {
         super(position)
         this.frames_ = []
         this.frameIndex_ = 0
-        this.onUpdate = onUpdate
     }
 
     get frameCount(): number {
@@ -47,7 +43,6 @@ export class Sprite extends AbstractSceneItem {
     }
 
     update(): Sprite {
-        this.onUpdate()
         return this
     }
 
@@ -65,17 +60,25 @@ export class Sprite extends AbstractSceneItem {
 
 export type SpriteConfig = {
     position?: RectangularCoordinates,
-    onUpdate?(): void,
+    onUpdate?: SpriteUpdateDelegate,
     frames?: Tile[],
 }
 
 export function createSprite(config: SpriteConfig): Sprite {
-    const sprite = new Sprite(
-        config.position ?? { x: 0, y: 0 },
-        config.onUpdate ?? noop
-    )
-    for (const frame of config.frames ?? []) {
+    const position = config.position ?? { x: 0, y: 0 }
+    const frames = config.frames ?? []
+    const sprite = isNil(config.onUpdate)
+        ? new Sprite(position)
+        : new (class extends Sprite {
+            update() {
+                (config.onUpdate as SpriteUpdateDelegate).call(this)
+                return this
+            }
+        })(position)
+
+    for (const frame of frames) {
         sprite.addFrame(frame)
     }
+
     return sprite
 }
