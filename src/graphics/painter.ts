@@ -62,6 +62,13 @@ export class Painter {
         return this
     }
 
+    // Transformation
+
+    translate({ x, y }: RectangularCoordinates): Painter {
+        this.context_.translate(x, y)
+        return this
+    }
+
     // Drawing routines
 
     clear(brush: Brush): Painter {
