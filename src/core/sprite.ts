@@ -17,7 +17,7 @@ export class Sprite extends AbstractSceneItem {
         position: RectangularCoordinates,
         onUpdate: () => void,
     ) {
-        super()
+        super(position)
         this.frames_ = []
         this.frameIndex_ = 0
         this.onUpdate = onUpdate

@@ -28,12 +28,16 @@ function checkSizeOfImages(images: Image[]) {
 }
 
 export class Tile extends AbstractSceneItem {
-    private images_: Image[]
     private columns_: number
     private rows_: number
+    private images_: Image[]
 
-    constructor(shape: Shape, images: Image[]) {
-        super()
+    constructor(
+        position: RectangularCoordinates,
+        shape: Shape,
+        images: Image[]
+    ) {
+        super(position)
 
         checkShape(shape, images)
         checkSizeOfImages(images)
@@ -73,8 +77,9 @@ export type TileConfig = {
 }
 
 export function createTile(config: TileConfig): Tile {
-    const position = config.position ?? { x: 0, y: 0 }
-    const tile = new Tile(config.shape, config.images)
-    tile.position = position
-    return tile
+    return new Tile(
+        config.position ?? { x: 0, y: 0 },
+        config.shape,
+        config.images
+    )
 }

@@ -9,6 +9,10 @@ export abstract class AbstractSceneItem implements SceneItem {
     private items_: SceneItem[] = []
     private parent_: Scene | SceneItem | null = null
 
+    constructor(position: RectangularCoordinates) {
+        this.position = position
+    }
+
     get position(): RectangularCoordinates {
         return {
             x: this.x,
