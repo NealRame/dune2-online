@@ -55,5 +55,6 @@ export interface SceneItem {
     readonly size: Size,
     readonly rect: Rect,
     readonly scale: ScaleFactor,
+    update(): SceneItem,
     render(painter: Painter, viewport: Rect): SceneItem,
 }

@@ -39,6 +39,10 @@ export abstract class AbstractSceneItem implements SceneItem {
         this.parent_ = p
     }
 
+    update(): AbstractSceneItem {
+        return this
+    }
+
     render(painter: Painter, viewport: Rect): SceneItem {
         for (const item of this.items_) {
             item.render(painter, viewport)
