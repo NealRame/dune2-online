@@ -50,6 +50,18 @@ export class Painter {
         this.context_.fillStyle = brush
     }
 
+    // State management
+
+    save(): Painter {
+        this.context_.save()
+        return this
+    }
+
+    restore(): Painter {
+        this.context_.restore()
+        return this
+    }
+
     // Drawing routines
 
     clear(brush: Brush): Painter {
