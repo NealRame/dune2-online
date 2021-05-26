@@ -1,4 +1,4 @@
-import { DataProgressNotifier, GameData, Image, ImageLib, ImageSet, Palette, TileDescriptor } from "./types"
+import { DataProgressNotifier, GameData, Image, ImageLib, ImageSet, Palette, TileDescriptor } from "../types"
 import * as Workers from "./workers"
 
 import { fetchData } from "@/utils"

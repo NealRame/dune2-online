@@ -1,4 +1,4 @@
-import { ScaleFactors } from "../types"
+import { ScaleFactors } from "../../types"
 
 import { base64ToByteArray } from "@/utils"
 import { Palette, Image } from "@/core"

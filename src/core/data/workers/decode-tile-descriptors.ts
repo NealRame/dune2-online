@@ -1,4 +1,4 @@
-import { TileDescriptor } from "../types"
+import { TileDescriptor } from "../../types"
 
 import { ungzip } from "pako"
 

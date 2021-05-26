@@ -1,5 +1,5 @@
 /* eslint-disable import/no-webpack-loader-syntax */
-import { Image, TileDescriptor } from "../types"
+import { Image, TileDescriptor } from "../../types"
 
 import DecodePaletteWorker from "worker-loader!./decode-palette"
 import DecodeTileDescriptors from "worker-loader!./decode-tile-descriptors"
