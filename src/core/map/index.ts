@@ -1,8 +1,8 @@
-import { imageSet } from "./data"
-import { Image, ScaleFactor, Scene, SceneItem, Shape } from "./types"
+import { imageSet } from "../data"
+import { Image, ScaleFactor, Scene, SceneItem, Shape } from "../types"
 
 import { Painter } from "@/graphics"
-import { createNoise2DGenerator, createRangeMapper, Rect, RectangularCoordinates } from "@/maths"
+import { createNoise2DGenerator, createRangeMapper, Rect, RectangularCoordinates, Vector } from "@/maths"
 
 import { chain, clamp, flow, isNil, times } from "lodash"
 
@@ -264,12 +264,18 @@ export function createMap(shape: Shape, config: Partial<LandMapConfig>): SceneIt
         },
         render(painter: Painter, scale: ScaleFactor, viewport: Rect): SceneItem {
             for (const terrain of state.map) {
-                const { x, y } = terrain.position
                 const bitmap = terrain.image[scale]
-                painter.drawImageBitmap(bitmap, {
-                    x: x*bitmap.width - viewport.leftX,
-                    y: y*bitmap.height - viewport.topY,
-                })
+
+                const { x, y } = terrain.position
+                const { width, height } = bitmap
+
+                const bitmapPos = new Vector(x*bitmap.width, y*bitmap.height)
+                const bitmapRect = new Rect(bitmapPos, { width, height })
+
+                if (viewport.intersects(bitmapRect)) {
+                    bitmapPos.sub(viewport.topLeft())
+                    painter.drawImageBitmap(bitmap, bitmapPos)
+                }
             }
             return this
         }
