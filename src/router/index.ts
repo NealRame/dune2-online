@@ -1,5 +1,6 @@
 import Home from "@/components/Home.vue"
 import LandMap from "@/components/Map.vue"
+import Sprites from "@/components/Sprites.vue"
 import Tiles from "@/components/Tiles.vue"
 import Noise from "@/components/Noise.vue"
 
@@ -18,6 +19,10 @@ const routes: Array<RouteRecordRaw> = [{
     name: "Tiles",
     path: "/tiles/:set",
     props: true,
+}, {
+    component: Sprites,
+    name: "Sprites",
+    path: "/sprites"
 }, {
     component: Noise,
     name: "Noise",
