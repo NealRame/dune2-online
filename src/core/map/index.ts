@@ -1,79 +1,16 @@
-import { imageSet } from "../data"
-import { Image, ScaleFactor, Scene, SceneItem, Shape } from "../types"
+import { neighborhood } from "./utils"
+import { generateMap } from "./generator"
+import { imageSet } from "@/core/data"
+import { Image, LandMapConfig, Neighborhood, ScaleFactor, Scene, SceneItem, Shape, Terrain, TerrainType } from "@/core/types"
 
 import { Painter } from "@/graphics"
-import { createNoise2DGenerator, createRangeMapper, Rect, RectangularCoordinates, Vector } from "@/maths"
+import { Rect, Vector } from "@/maths"
 
-import { chain, clamp, flow, isNil, times } from "lodash"
-
-export type LandMapConfig = {
-    // Noise seed
-    seed: number,
-    // Terrain values
-    terrainScale: number,               // clamped to [16, 64]
-    terrainDetails: number,             // clamped to [ 1, 6 ]
-    terrainSandThreshold: number,       // clamped to [ 0, 1 ]
-    terrainRockThreshold: number,       // clamped to [ 0, 1 ]
-    terrainMountainsThreshold: number,  // clamped to [ 0, 1 ]
-    // Spice field values
-    spiceScale: number,                 // clamped to [16, 64]
-    spiceDetails: number,               // clamped to [ 1, 6 ]
-    spiceThreshold: number,             // clamped to [ 0, 1 ]
-    spiceSaturationThreshold: number    // clamped to [ spiceThreshold, 1 ]
-}
-
-enum TerrainType {
-    Dunes = 0,
-    Sand,
-    SpiceField,
-    SaturatedSpiceField,
-    Rock,
-    Mountain,
-}
-
-type Terrain = {
-    position: RectangularCoordinates,
-    spice: number,
-    type: TerrainType
-}
+import { clamp } from "lodash"
 
 type MapState = {
     map: Array<Terrain & { image: Image }>,
     parent: Scene | SceneItem | null,
-}
-
-type Neighborhood<T extends Terrain> = [T|null, T|null, T|null, T|null]
-
-function indexToPositionConverter({ columns }: Shape)
-    : (n: number) => RectangularCoordinates {
-    return n => ({ x: n%columns, y: Math.floor(n/columns) })
-}
-
-function positionToIndexConverter({ columns, rows }: Shape)
-    : (p: RectangularCoordinates) => number {
-    return ({ x, y }) => {
-        return x >= 0 && x < columns && y >= 0 && y < rows
-            ? y*columns + x
-            : -1
-    }
-}
-
-function neighborhood<T extends Terrain>(shape: Shape)
-    : (t: T, m: T[]) => Neighborhood<T> {
-    const positionToIndex = positionToIndexConverter(shape)
-    return (terrain, map) => {
-        const { x, y } = terrain.position
-        const north = positionToIndex({ x, y: y - 1 })
-        const east  = positionToIndex({ x: x + 1, y })
-        const south = positionToIndex({ x, y: y + 1 })
-        const west  = positionToIndex({ x: x - 1, y })
-        return [
-            north >= 0 ? map[north] : null,
-            east  >= 0 ? map[east]  : null,
-            south >= 0 ? map[south] : null,
-            west  >= 0 ? map[west]  : null,
-        ]
-    }
 }
 
 function selectTile(
@@ -141,99 +78,13 @@ function checkConfig(config: Partial<LandMapConfig>): LandMapConfig {
     }
 }
 
-function terrainTypeGenerator(config: LandMapConfig)
-    : (t: Partial<Terrain>) => Partial<Terrain> {
-    const terrainNoise = flow(
-        createNoise2DGenerator({
-            seed: config.seed,
-            scale: config.terrainScale,
-            octaves: config.terrainDetails,
-        }),
-        createRangeMapper(-1, 1, 0, 1),
-    )
-    return terrain => {
-        const { position } = terrain
-
-        if (isNil(position)) {
-            throw new Error("position not initialized!")
-        }
-
-        const v = terrainNoise(position)
-
-        if (v < config.terrainSandThreshold) {
-            terrain.type = TerrainType.Dunes
-        } else if (v < config.terrainRockThreshold) {
-            terrain.type = TerrainType.Sand
-        } else if (v < config.terrainMountainsThreshold) {
-            terrain.type = TerrainType.Rock
-        } else {
-            terrain.type = TerrainType.Mountain
-        }
-
-        return terrain
-    }
-}
-
-function spiceFieldGenerator(config: LandMapConfig)
-    : (t: Partial<Terrain>) => Partial<Terrain> {
-    const spiceNoise = flow(
-        createNoise2DGenerator({
-            seed: config.seed + 1,
-            scale: config.spiceScale,
-            octaves: config.spiceDetails,
-        }),
-        createRangeMapper(-1, 1, 0, 1)
-    )
-
-    return terrain => {
-        const { position, type } = terrain
-
-        if (isNil(position)) {
-            throw new Error("position not initialized!")
-        }
-
-        if (isNil(type)) {
-            throw new Error("type not initialized!")
-        }
-
-        if (type === TerrainType.Sand || type === TerrainType.Dunes) {
-            const n = spiceNoise(position)
-
-            if (n >= config.spiceThreshold && n < config.spiceSaturationThreshold) {
-                terrain.type = TerrainType.SpiceField
-                terrain.spice = 0.5
-            } else if (n >= config.spiceSaturationThreshold) {
-                terrain.type = TerrainType.SaturatedSpiceField
-                terrain.spice = 1.0
-            }
-        }
-
-        return terrain
-    }
-}
-
-function terrainGenerator(config: LandMapConfig)
-    : (p: RectangularCoordinates) => Terrain {
-    const generateTerrainType = terrainTypeGenerator(config)
-    const generateSpiceField = spiceFieldGenerator(config)
-    return position => {
-        return chain({ position })
-            .tap(generateTerrainType)
-            .tap(generateSpiceField)
-            .value() as Terrain
-    }
-}
-
-function createTerrain(shape: Shape, config: LandMapConfig) {
-    return times(shape.columns*shape.rows, indexToPositionConverter(shape))
-        .map(terrainGenerator(config))
-        .map(terrainTileSelector(shape))
-        .map(([terrain, image]) => Object.assign({}, terrain, { image }))
-}
-
 export function createMap(shape: Shape, config: Partial<LandMapConfig>): SceneItem {
+    const map = generateMap(shape, checkConfig(config))
+        .map(terrainTileSelector(shape))
+        .map(([terrain, image]) => Object.assign(terrain, { image }))
+
     const state: MapState = {
-        map: createTerrain(shape, checkConfig(config)),
+        map,
         parent: null,
     }
 
