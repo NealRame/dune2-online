@@ -29,6 +29,10 @@ export class Painter {
         }
     }
 
+    get rect(): Rect {
+        return new Rect({ x: 0, y: 0 }, this.size)
+    }
+
     get pen(): Pen {
         return {
             lineWidth: this.context_.lineWidth,
