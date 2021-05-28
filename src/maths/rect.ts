@@ -1,7 +1,7 @@
 import { RectangularCoordinates, Size } from "./types"
 import { Vector } from "./vector"
 
-import { isNumber, clamp } from "lodash"
+import { isNumber } from "lodash"
 
 /**
  * @class Rect
@@ -146,13 +146,22 @@ export class Rect implements RectangularCoordinates, Size {
      * @param rect
      * @returns Rect
      */
-    intersected(rect: Rect): Rect {
+    intersected(rect: Rect): Rect|null {
+        if (!this.intersects(rect)) {
+            return null
+        }
+
+        const leftX = Math.max(this.leftX, rect.leftX)
+        const rightX = Math.min(this.rightX, rect.rightX)
+        const topY = Math.max(this.topY, rect.topY)
+        const bottomY = Math.min(this.bottomY, rect.bottomY)
+
         return new Rect({
-            x: clamp(rect.leftX, 0, this.leftX),
-            y: clamp(rect.topY, 0, this.topY),
+            x: leftX,
+            y: topY,
         }, {
-            width: clamp(this.width - rect.leftX, 0, rect.width),
-            height: clamp(this.height - rect.topY, 0, rect.height),
+            width: rightX - leftX,
+            height: bottomY - topY,
         })
     }
 
