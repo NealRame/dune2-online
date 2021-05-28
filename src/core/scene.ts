@@ -56,6 +56,8 @@ export function createScene(): Scene {
         viewport: null,
     }
 
+    const getGridSpacing = () => state.scaleFactor*16
+
     return {
         get scale(): ScaleFactor {
             return state.scaleFactor
@@ -64,7 +66,7 @@ export function createScene(): Scene {
             state.scaleFactor = f
         },
         get gridSpacing(): number {
-            return state.scaleFactor*16
+            return getGridSpacing()
         },
         get gridEnabled(): boolean {
             return state.gridEnabled
@@ -81,13 +83,12 @@ export function createScene(): Scene {
         get rect(): Rect {
             const r = new Rect({ x: 0, y: 0 }, { width: 0, height: 0 })
             for (const item of state.items) {
-                r.union(item.getRect(this.scale))
+                r.union(item.rect)
             }
-            return r
+            return r.scale(this.scale)
         },
         addItem(item: SceneItem): Scene {
             state.items.push(item)
-            item.parent = this
             return this
         },
         clear(): Scene {
@@ -101,20 +102,28 @@ export function createScene(): Scene {
             return this
         },
         render(painter: Painter): Scene {
+            const gridSpacing = getGridSpacing()
             const viewport = state.viewport ?? new Rect({ x: 0, y: 0 }, painter.size)
+            const scaleFactor = state.scaleFactor
 
             painter.clear(state.backgroundColor)
             // draw grid
             if (state.gridEnabled) {
                 drawGrid(painter, {
-                    space: state.scaleFactor*16,
+                    space: gridSpacing,
                     offset: viewport.topLeft(),
                 })
             }
             // draw items
             for (const item of state.items) {
-                if (viewport.intersects(item.getRect(state.scaleFactor))) {
-                    item.render(painter, state.scaleFactor, viewport)
+                const itemRect = item.rect.scale(gridSpacing)
+                if (viewport.intersects(itemRect)) {
+                    item.render(
+                        painter,
+                        gridSpacing,
+                        scaleFactor,
+                        viewport.intersected(itemRect)
+                    )
                 }
             }
 

@@ -2,7 +2,7 @@ import { AbstractSceneItem } from "./scene-item"
 import { Image, ScaleFactor, Shape } from "./types"
 
 import { Painter } from "@/graphics"
-import { Rect, RectangularCoordinates, Size } from "@/maths"
+import { Rect, RectangularCoordinates, Size, Vector } from "@/maths"
 
 import { isMatch } from "lodash"
 
@@ -28,8 +28,6 @@ function checkSizeOfImages(images: Image[]) {
 }
 
 export class Tile extends AbstractSceneItem {
-    private columns_: number
-    private rows_: number
     private images_: Image[]
 
     constructor(
@@ -42,30 +40,26 @@ export class Tile extends AbstractSceneItem {
         checkShape(shape, images)
         checkSizeOfImages(images)
 
-        this.columns_ = shape.columns
-        this.rows_ = shape.rows
+        this.width = shape.columns
+        this.height = shape.rows
         this.images_ = images
     }
 
-    getSize(scale: ScaleFactor): Size {
-        const { width, height } = imageSize(this.images_[0], scale)
-        return {
-            width: width*this.columns_,
-            height: height*this.rows_,
-        }
-    }
+    render(painter: Painter, gridSpacing: number, scaleFactor: ScaleFactor, viewport: Rect): Tile {
+        const size = imageSize(this.images_[0], scaleFactor)
+        const pos = new Vector(this.x, this.y).mul(gridSpacing)
 
-    render(painter: Painter, scale: ScaleFactor, viewport: Rect): Tile {
-        const { width, height } = imageSize(this.images_[0], scale)
-        for (let row = 0, y = this.y; row < this.rows_; row += 1, y += height) {
-            for (let col = 0, x = this.x; col < this.columns_; col += 1, x += width) {
-                if (viewport.intersects(new Rect({ x, y }, { width, height }))) {
-                    const index = this.columns_*row + col
-                    const bitmap = this.images_[index][scale]
-                    painter.drawImageBitmap(bitmap, { x, y })
+        for (let row = 0, y = pos.y; row < this.height; row += 1, y += size.height) {
+            for (let col = 0, x = pos.x; col < this.width; col += 1, x += size.width) {
+                const position = { x, y }
+                if (viewport.intersects(new Rect(position, size))) {
+                    const index = this.width*row + col
+                    const bitmap = this.images_[index][scaleFactor]
+                    painter.drawImageBitmap(bitmap, position)
                 }
             }
         }
+
         return this
     }
 }

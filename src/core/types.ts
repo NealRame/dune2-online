@@ -51,12 +51,11 @@ export interface Scene {
 }
 
 export interface SceneItem {
-    parent: Scene | SceneItem | null,
     position: RectangularCoordinates,
-    getSize(scale: ScaleFactor): Size,
-    getRect(scale: ScaleFactor): Rect,
+    size: Size,
+    rect: Rect,
     update(): SceneItem,
-    render(painter: Painter, scale: ScaleFactor, viewport: Rect): SceneItem,
+    render(painter: Painter, gridSpacing: number, scale: ScaleFactor, viewport: Rect): SceneItem,
 }
 
 export type LandMapConfig = {

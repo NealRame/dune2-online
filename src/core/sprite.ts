@@ -2,7 +2,7 @@ import { AbstractSceneItem } from "./scene-item"
 import { Tile } from "./tile"
 
 import { Painter } from "@/graphics"
-import { Rect, RectangularCoordinates, Size } from "@/maths"
+import { Rect, RectangularCoordinates, Size, Vector } from "@/maths"
 
 import { isNil } from "lodash"
 import { ScaleFactor } from "./types"
@@ -31,14 +31,12 @@ export class Sprite extends AbstractSceneItem {
         this.frameIndex_ = index
     }
 
-    getSize(scale: ScaleFactor): Size {
-        return this.frames_[this.frameIndex_]?.getSize(scale) ?? 0
+    get size(): Size {
+        return this.frames_[this.frameIndex_]?.size ?? 0
     }
 
     addFrame(frame: Tile): Sprite {
         this.frames_.push(frame)
-        frame.position = this.position
-        frame.parent = this
         return this
     }
 
@@ -46,14 +44,20 @@ export class Sprite extends AbstractSceneItem {
         return this
     }
 
-    render(painter: Painter, scale: ScaleFactor, viewport: Rect): Sprite {
-        painter
-            .save()
-            .translate(this.position)
+    render(painter: Painter, gridSpacing: number, scale: ScaleFactor, viewport: Rect): Sprite {
+        const pos = new Vector(this.x, this.y).mul(gridSpacing)
+
+        painter.save()
+        painter.translate(pos)
+
+        viewport = viewport.translated(pos.opposite)
+
         if (this.frameIndex_ <= this.frames_.length) {
-            this.frames_[this.frameIndex_].render(painter, scale, viewport)
+            this.frames_[this.frameIndex_].render(painter, gridSpacing, scale, viewport)
         }
+
         painter.restore()
+
         return this
     }
 }

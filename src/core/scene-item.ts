@@ -1,16 +1,20 @@
-import { ScaleFactor, Scene, SceneItem } from "./types"
+import { ScaleFactor, SceneItem } from "./types"
 
 import { Painter } from "@/graphics"
 import { Rect, RectangularCoordinates, Size } from "@/maths"
+import { isNil } from "lodash"
 
 export abstract class AbstractSceneItem implements SceneItem {
     x = 0
     y = 0
+    width = 0
+    height = 0
     private items_: SceneItem[] = []
-    private parent_: Scene | SceneItem | null = null
 
-    constructor(position: RectangularCoordinates) {
-        this.position = position
+    constructor(position?: RectangularCoordinates) {
+        if (!isNil(position)) {
+            this.position = position
+        }
     }
 
     get position(): RectangularCoordinates {
@@ -25,28 +29,28 @@ export abstract class AbstractSceneItem implements SceneItem {
         this.y = y
     }
 
-    get parent(): Scene | SceneItem | null {
-        return this.parent_
+    get size(): Size {
+        return {
+            width: this.width,
+            height: this.height
+        }
     }
 
-    set parent(p: Scene | SceneItem | null) {
-        this.parent_ = p
-    }
-
-    abstract getSize(scale: ScaleFactor): Size
-
-    getRect(scale: ScaleFactor): Rect {
-        return new Rect(this.position, this.getSize(scale))
+    get rect(): Rect {
+        return new Rect(this.position, this.size)
     }
 
     update(): AbstractSceneItem {
         return this
     }
 
-    render(painter: Painter, scale: ScaleFactor, viewport: Rect): SceneItem {
+    render(painter: Painter, gridSpacing: number, scale: ScaleFactor, viewport: Rect): SceneItem {
+        painter.save()
+        painter.translate(this.position)
         for (const item of this.items_) {
-            item.render(painter, scale, viewport)
+            item.render(painter, gridSpacing, scale, viewport)
         }
+        painter.restore()
         return this
     }
 }

@@ -1,10 +1,11 @@
 import { neighborhood } from "./utils"
 import { generateMap } from "./generator"
+
 import { imageSet } from "@/core/data"
 import { Image, LandMapConfig, Neighborhood, ScaleFactor, Scene, SceneItem, Shape, Terrain, TerrainType } from "@/core/types"
 
 import { Painter } from "@/graphics"
-import { Rect, Vector } from "@/maths"
+import { Rect, Size, Vector } from "@/maths"
 
 import { clamp } from "lodash"
 
@@ -106,9 +107,14 @@ export function createMap(shape: Shape, config: Partial<LandMapConfig>): SceneIt
         set parent(parent: Scene | SceneItem | null) {
             state.parent = parent
         },
-        getSize,
-        getRect(scale: ScaleFactor): Rect {
-            return new Rect({ x: 0, y: 0 }, getSize(scale))
+        get size(): Size {
+            return {
+                width: shape.columns,
+                height: shape.rows,
+            }
+        },
+        get rect(): Rect {
+            return new Rect(this.position, this.size)
         },
         update(): SceneItem {
             return this

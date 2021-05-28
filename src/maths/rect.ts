@@ -228,6 +228,8 @@ export class Rect implements RectangularCoordinates, Size {
      */
     scale(k: {kx: number, ky: number} | number): Rect {
         const { kx, ky } = isNumber(k) ? { kx: k, ky: k } : k
+        this.x *= kx
+        this.y *= ky
         this.width *= kx
         this.height *= ky
         return this
