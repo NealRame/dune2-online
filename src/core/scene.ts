@@ -4,6 +4,8 @@ import { cssHex } from "@/graphics/color"
 import { Brush, Painter } from "@/graphics/painter"
 import { Rect, RectangularCoordinates } from "@/maths"
 
+import { isNil } from "lodash"
+
 type SceneState = {
     backgroundColor: Brush
     gridEnabled: boolean
@@ -103,10 +105,11 @@ export function createScene(): Scene {
         },
         render(painter: Painter): Scene {
             const gridSpacing = getGridSpacing()
-            const viewport = state.viewport ?? new Rect({ x: 0, y: 0 }, painter.size)
             const scaleFactor = state.scaleFactor
+            const viewport = state.viewport ?? painter.rect.scaled(1/gridSpacing)
 
             painter.clear(state.backgroundColor)
+
             // draw grid
             if (state.gridEnabled) {
                 drawGrid(painter, {
@@ -114,16 +117,12 @@ export function createScene(): Scene {
                     offset: viewport.topLeft(),
                 })
             }
+
             // draw items
             for (const item of state.items) {
-                const itemRect = item.rect.scale(gridSpacing)
-                if (viewport.intersects(itemRect)) {
-                    item.render(
-                        painter,
-                        gridSpacing,
-                        scaleFactor,
-                        viewport.intersected(itemRect)
-                    )
+                const itemRect = item.rect.intersected(viewport)
+                if (!isNil(itemRect)) {
+                    item.render(painter, gridSpacing, scaleFactor, itemRect)
                 }
             }
 

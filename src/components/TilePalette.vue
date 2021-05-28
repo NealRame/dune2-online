@@ -59,7 +59,6 @@ form {
 <script lang="ts">
 import { ScaleFactor, Tile } from "@/core"
 import { Painter } from "@/graphics"
-import { Rect } from "@/maths"
 
 import { computed, defineComponent } from "vue"
 
@@ -76,18 +75,12 @@ export default defineComponent({
             dataURI(tile: Tile) {
                 const scale: ScaleFactor = 2
                 const canvas = document.createElement("canvas")
-                const { width, height } = tile.getSize(scale)
+                const gridSpacing = 16*scale
+                const rect = tile.rect
 
-                canvas.width = width
-                canvas.height = height
-                tile.render(
-                    new Painter(canvas),
-                    scale,
-                    new Rect({ x: 0, y: 0 }, {
-                        width,
-                        height
-                    })
-                )
+                canvas.width = gridSpacing*rect.width
+                canvas.height = gridSpacing*rect.height
+                tile.render(new Painter(canvas), gridSpacing, scale, rect)
 
                 return canvas.toDataURL()
             },

@@ -95,24 +95,26 @@ export default defineComponent({
             screenHeight.value = window.innerHeight
         }, 60)
 
+        const screenToSceneCoordinates = (position: RectangularCoordinates) => {
+            const gridSpacing = scene.gridSpacing
+            return {
+                x: Math.floor(position.x/gridSpacing),
+                y: Math.floor(position.y/gridSpacing),
+            }
+        }
+
         const onMouseClick = (ev: ScreenMouseClickEvent) => {
             const tileDescriptors = GameData.tiles()
             const index = unref(currentItem)
 
             if (isNil(index)) return
 
-            const { x, y } = ev.position
-            const gridSpacing = scene.gridSpacing
-
             const tileConf = tileDescriptors[index]
 
             console.log(tileConf)
 
             scene.addItem(makeTile({
-                position: {
-                    x: gridSpacing*Math.floor(x/gridSpacing),
-                    y: gridSpacing*Math.floor(y/gridSpacing),
-                },
+                position: screenToSceneCoordinates(ev.position),
                 ...tileConf
             }))
         }
@@ -122,8 +124,6 @@ export default defineComponent({
             scene.scale = unref(scale)
 
             tiles.value = GameData.tiles().map(makeTile)
-
-            const gridSpacing = scene.gridSpacing
 
             const repairFacility = makeSprite([277, 278, 279, 280, 281, 282, 283, 284])
             const radar = makeSprite([311, 312, 313, 314])
@@ -136,40 +136,40 @@ export default defineComponent({
             const rocketTurret = makeSprite(range(297, 305))
 
             radar.position = {
-                x: gridSpacing,
-                y: gridSpacing,
+                x: 1,
+                y: 1,
             }
             liteFactory.position = {
-                x: gridSpacing,
-                y: 4*gridSpacing,
+                x: 1,
+                y: 4,
             }
             heavyFactory.position = {
-                x: 4*gridSpacing,
-                y: gridSpacing,
+                x: 4,
+                y: 1,
             }
             repairFacility.position = {
-                x: 4*gridSpacing,
-                y: 4*gridSpacing,
+                x: 4,
+                y: 4,
             }
             refinery.position = {
-                x: 4*gridSpacing,
-                y: 7*gridSpacing,
+                x: 4,
+                y: 7,
             }
             palace.position = {
-                x: 8*gridSpacing,
-                y: gridSpacing,
+                x: 8,
+                y: 1,
             }
             spaceport.position = {
-                x: 12*gridSpacing,
-                y: gridSpacing,
+                x: 12,
+                y: 1,
             }
             turret.position = {
-                x: 8*gridSpacing,
-                y: 5*gridSpacing,
+                x: 8,
+                y: 5,
             }
             rocketTurret.position = {
-                x: 10*gridSpacing,
-                y: 5*gridSpacing,
+                x: 10,
+                y: 5,
             }
 
             scene
@@ -182,7 +182,7 @@ export default defineComponent({
                 .addItem(palace)
                 .addItem(turret)
                 .addItem(rocketTurret)
-            scene.run((unref(screen) as PaintDevice).painter)
+                .run((unref(screen) as PaintDevice).painter)
 
             window.addEventListener("resize", resize)
 

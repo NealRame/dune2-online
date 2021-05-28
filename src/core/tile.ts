@@ -46,20 +46,25 @@ export class Tile extends AbstractSceneItem {
     }
 
     render(painter: Painter, gridSpacing: number, scaleFactor: ScaleFactor, viewport: Rect): Tile {
-        const size = imageSize(this.images_[0], scaleFactor)
-        const pos = new Vector(this.x, this.y).mul(gridSpacing)
+        const pos = new Vector(this.x, this.y)
 
-        for (let row = 0, y = pos.y; row < this.height; row += 1, y += size.height) {
-            for (let col = 0, x = pos.x; col < this.width; col += 1, x += size.width) {
-                const position = { x, y }
-                if (viewport.intersects(new Rect(position, size))) {
-                    const index = this.width*row + col
+        viewport.translate(pos.opposite)
+        painter.save().translate(pos.mul(gridSpacing))
+
+        for (let y = 0; y < this.height; ++y) {
+            for (let x = 0; x < this.width; ++x) {
+                if (viewport.contains({ x, y })) {
+                    const index = this.width*y + x
                     const bitmap = this.images_[index][scaleFactor]
-                    painter.drawImageBitmap(bitmap, position)
+                    painter.drawImageBitmap(bitmap, {
+                        x: x*gridSpacing,
+                        y: y*gridSpacing,
+                    })
                 }
             }
         }
 
+        painter.restore()
         return this
     }
 }

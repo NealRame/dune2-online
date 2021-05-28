@@ -197,8 +197,8 @@ export default defineComponent({
             screenWidth.value = width
             screenHeight.value = height
             scene.viewport = new Rect(topLeft, {
-                width,
-                height,
+                width: width/scene.gridSpacing,
+                height: height/scene.gridSpacing,
             })
         }, 60)
 
@@ -232,23 +232,30 @@ export default defineComponent({
         const onKeyPressed = (ev: KeyboardEvent) => {
             if (!ev.altKey) return
             if (ev.code === "ArrowLeft") {
-                updateViewport(Vector.Left().mul(scene.scale*16))
+                updateViewport(Vector.Left())
             } else
             if (ev.code === "ArrowRight") {
-                updateViewport(Vector.Right().mul(scene.scale*16))
+                updateViewport(Vector.Right())
             } else
             if (ev.code === "ArrowUp") {
-                updateViewport(Vector.Up().mul(scene.scale*16))
+                updateViewport(Vector.Up())
             } else
             if (ev.code === "ArrowDown") {
-                updateViewport(Vector.Down().mul(scene.scale*16))
+                updateViewport(Vector.Down())
             }
+        }
+
+        const screenToSceneCoordinates = (position: RectangularCoordinates) => {
+            const gridSpacing = scene.gridSpacing
+            return new Vector(
+                Math.floor(position.x/gridSpacing), // x
+                Math.floor(position.y/gridSpacing), // y
+            )
         }
 
         const onMouseMoved = (ev: ScreenMouseMotionEvent) => {
             if (ev.button) {
-                const { movement: { x, y } } = ev
-                updateViewport((new Vector(x, y)).mul(-1))
+                updateViewport(screenToSceneCoordinates(ev.movement).opposite)
             }
         }
 
