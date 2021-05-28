@@ -1,5 +1,5 @@
 import { AbstractSceneItem } from "./scene-item"
-import { Image, ScaleFactor, Shape } from "./types"
+import { Image, ScaleFactor } from "./types"
 
 import { Painter } from "@/graphics"
 import { Rect, RectangularCoordinates, Size, Vector } from "@/maths"
@@ -11,8 +11,8 @@ function imageSize(image: Image, scale: ScaleFactor): Size {
     return { width, height }
 }
 
-function checkShape({ columns, rows }: Shape, images: Image[]) {
-    if (columns*rows > images.length) {
+function checkShape({ width, height }: Size, images: Image[]) {
+    if (width*height > images.length) {
         throw new Error("Inconsistent number of images for the shape of the sprite")
     }
 }
@@ -32,16 +32,16 @@ export class Tile extends AbstractSceneItem {
 
     constructor(
         position: RectangularCoordinates,
-        shape: Shape,
+        size: Size,
         images: Image[]
     ) {
         super(position)
 
-        checkShape(shape, images)
+        checkShape(size, images)
         checkSizeOfImages(images)
 
-        this.width = shape.columns
-        this.height = shape.rows
+        this.width = size.width
+        this.height = size.height
         this.images_ = images
     }
 
@@ -71,14 +71,14 @@ export class Tile extends AbstractSceneItem {
 
 export type TileConfig = {
     position?: RectangularCoordinates,
-    shape: Shape,
+    size: Size,
     images: Image[]
 }
 
 export function createTile(config: TileConfig): Tile {
     return new Tile(
         config.position ?? { x: 0, y: 0 },
-        config.shape,
+        config.size,
         config.images
     )
 }

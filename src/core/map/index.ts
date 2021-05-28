@@ -1,8 +1,8 @@
-import { neighborhood } from "./utils"
+import { neighborhood, partition } from "./utils"
 import { generateMap } from "./generator"
 
 import { imageSet } from "@/core/data"
-import { Image, LandMapConfig, Neighborhood, ScaleFactor, Scene, SceneItem, Shape, Terrain, TerrainType } from "@/core/types"
+import { Image, LandMapConfig, Neighborhood, ScaleFactor, Scene, SceneItem, Terrain, TerrainType } from "@/core/types"
 
 import { Painter } from "@/graphics"
 import { Rect, Size, Vector } from "@/maths"
@@ -48,10 +48,10 @@ function selectTile(
     return images[127]
 }
 
-function terrainTileSelector(shape: Shape)
+function terrainTileSelector(size: Size)
     : (t: Terrain, i: number, m: Terrain[]) => [Terrain, Image] {
     const images = imageSet("terrain")
-    const neighbors = neighborhood(shape)
+    const neighbors = neighborhood(size)
 
     return (terrain, index, map) => [
         terrain,
@@ -79,9 +79,9 @@ function checkConfig(config: Partial<LandMapConfig>): LandMapConfig {
     }
 }
 
-export function createMap(shape: Shape, config: Partial<LandMapConfig>): SceneItem {
-    const map = generateMap(shape, checkConfig(config))
-        .map(terrainTileSelector(shape))
+export function createMap(size: Size, config: Partial<LandMapConfig>): SceneItem {
+    const map = generateMap(size, checkConfig(config))
+        .map(terrainTileSelector(size))
         .map(([terrain, image]) => Object.assign(terrain, { image }))
 
     const state: MapState = {
@@ -89,29 +89,15 @@ export function createMap(shape: Shape, config: Partial<LandMapConfig>): SceneIt
         parent: null,
     }
 
-    const getSize = (scale: ScaleFactor) => {
-        const image = state.map[0]?.image[scale]
-        return {
-            width: shape.columns*(image?.width ?? 0),
-            height: shape.rows*(image?.height ?? 0),
-        }
-    }
+    console.log(size)
+    console.log(partition(size, { width: 32, height: 32 }))
 
     return {
         get position() {
             return { x: 0, y: 0 }
         },
-        get parent(): Scene | SceneItem | null {
-            return state.parent
-        },
-        set parent(parent: Scene | SceneItem | null) {
-            state.parent = parent
-        },
         get size(): Size {
-            return {
-                width: shape.columns,
-                height: shape.rows,
-            }
+            return size
         },
         get rect(): Rect {
             return new Rect(this.position, this.size)
@@ -119,18 +105,19 @@ export function createMap(shape: Shape, config: Partial<LandMapConfig>): SceneIt
         update(): SceneItem {
             return this
         },
-        render(painter: Painter, scale: ScaleFactor, viewport: Rect): SceneItem {
+        render(
+            painter: Painter,
+            gridSpacing: number,
+            scale: ScaleFactor,
+            viewport: Rect
+        ): SceneItem {
             for (const terrain of state.map) {
+                const { x, y } = terrain.position
+                const bitmapPos = new Vector(x, y)
                 const bitmap = terrain.image[scale]
 
-                const { x, y } = terrain.position
-                const { width, height } = bitmap
-
-                const bitmapPos = new Vector(x*bitmap.width, y*bitmap.height)
-                const bitmapRect = new Rect(bitmapPos, { width, height })
-
-                if (viewport.intersects(bitmapRect)) {
-                    bitmapPos.sub(viewport.topLeft())
+                if (viewport.contains(bitmapPos)) {
+                    bitmapPos.sub(viewport.topLeft()).mul(gridSpacing)
                     painter.drawImageBitmap(bitmap, bitmapPos)
                 }
             }

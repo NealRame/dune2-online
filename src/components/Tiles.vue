@@ -27,7 +27,7 @@ import { PaintDevice } from "@/graphics"
 
 import { defineComponent, onMounted, ref, unref } from "vue"
 import { debounce, isNil } from "lodash"
-import { RectangularCoordinates, Vector } from "@/maths"
+import { RectangularCoordinates } from "@/maths"
 
 export default defineComponent({
     props: ["set"],
@@ -56,7 +56,7 @@ export default defineComponent({
             tiles.value = GameData
                 .imageSet(props.set as keyof ImageLib)
                 .map(image => createTile({
-                    shape: { columns: 1, rows: 1 },
+                    size: { width: 1, height: 1 },
                     images: [image]
                 }))
 
@@ -82,7 +82,7 @@ export default defineComponent({
 
             scene.addItem(createTile({
                 position: screenToSceneCoordinates(ev.position),
-                shape: { columns: 1, rows: 1 },
+                size: { width: 1, height: 1 },
                 images: [GameData.imageSet(props.set as keyof ImageLib)[image]]
             }))
         }

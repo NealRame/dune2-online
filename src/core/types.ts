@@ -1,11 +1,6 @@
 import { Color, Painter } from "@/graphics"
 import { Rect, RectangularCoordinates, Size } from "@/maths"
 
-export type Shape = {
-    columns: number,
-    rows: number,
-}
-
 export const ScaleFactors = [1, 2, 3, 4] as const
 export type ScaleFactor = typeof ScaleFactors[number]
 
@@ -21,7 +16,7 @@ export type Palette = readonly Color.RGBA[]
 
 // Tile descriptor
 export type TileDescriptor = {
-    shape: Shape,
+    size: Size,
     images: number[],
 }
 

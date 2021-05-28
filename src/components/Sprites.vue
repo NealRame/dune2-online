@@ -22,22 +22,22 @@ canvas {
 import Screen, { ScreenMouseClickEvent } from "@/components/Screen.vue"
 import TilePalette from "@/components/TilePalette.vue"
 
-import { createScene, createSprite, createTile, GameData, Shape, ScaleFactor, Tile } from "@/core"
-import { RectangularCoordinates } from "@/maths"
+import { createScene, createSprite, createTile, GameData, ScaleFactor, Tile } from "@/core"
+import { RectangularCoordinates, Size } from "@/maths"
 import { PaintDevice } from "@/graphics"
 
 import { defineComponent, onMounted, ref, unref } from "vue"
 import { debounce, isNil, range } from "lodash"
 
-function makeTile({ position, shape, images }: {
+function makeTile({ position, size, images }: {
     position?: RectangularCoordinates,
-    shape: Shape,
+    size: Size,
     images: number[],
 }): Tile {
     const terrains = GameData.imageSet("terrain")
     return createTile({
         position,
-        shape,
+        size,
         images: images.map((index: number) => terrains[index])
     })
 }
