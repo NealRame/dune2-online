@@ -10,3 +10,10 @@ declare module "*.json" {
     const value: {[key: string]: any }
     export default value
 }
+
+declare module "worker-loader!*" {
+    class WebpackWorker extends Worker {
+        constructor()
+    }
+    export default WebpackWorker
+}
