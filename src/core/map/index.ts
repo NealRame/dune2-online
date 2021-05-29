@@ -6,7 +6,7 @@ import { imageSet } from "@/core/data"
 import { Image, LandMapConfig, Neighborhood, ScaleFactor, SceneItem, Terrain, TerrainType } from "@/core/types"
 
 import { Painter } from "@/graphics"
-import { Rect, Size } from "@/maths"
+import { Rect, Size, Vector } from "@/maths"
 
 import { clamp } from "lodash"
 
@@ -81,7 +81,7 @@ export function createMap(size: Size, config: Partial<LandMapConfig>): SceneItem
 
     return {
         get position() {
-            return { x: 0, y: 0 }
+            return Vector.Null()
         },
         get size(): Size {
             return size

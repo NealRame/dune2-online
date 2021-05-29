@@ -23,7 +23,7 @@ import Screen, { ScreenMouseClickEvent } from "@/components/Screen.vue"
 import TilePalette from "@/components/TilePalette.vue"
 
 import { createScene, createSprite, createTile, GameData, ScaleFactor, Tile } from "@/core"
-import { RectangularCoordinates, Size } from "@/maths"
+import { RectangularCoordinates, Size, Vector } from "@/maths"
 import { PaintDevice } from "@/graphics"
 
 import { defineComponent, onMounted, ref, unref } from "vue"
@@ -134,42 +134,15 @@ export default defineComponent({
             const turret = makeSprite(range(287, 295))
             const rocketTurret = makeSprite(range(297, 305))
 
-            radar.position = {
-                x: 1,
-                y: 1,
-            }
-            liteFactory.position = {
-                x: 1,
-                y: 4,
-            }
-            heavyFactory.position = {
-                x: 4,
-                y: 1,
-            }
-            repairFacility.position = {
-                x: 4,
-                y: 4,
-            }
-            refinery.position = {
-                x: 4,
-                y: 7,
-            }
-            palace.position = {
-                x: 8,
-                y: 1,
-            }
-            spaceport.position = {
-                x: 12,
-                y: 1,
-            }
-            turret.position = {
-                x: 8,
-                y: 5,
-            }
-            rocketTurret.position = {
-                x: 10,
-                y: 5,
-            }
+            radar.position = new Vector(1, 1)
+            liteFactory.position = new Vector(1, 4)
+            heavyFactory.position = new Vector(4, 1)
+            repairFacility.position = new Vector(4, 4)
+            refinery.position = new Vector(4, 7)
+            palace.position = new Vector(8, 1)
+            spaceport.position = new Vector(12, 1)
+            turret.position = new Vector(8, 5)
+            rocketTurret.position = new Vector(10, 5)
 
             scene
                 .addItem(radar)

@@ -2,7 +2,7 @@ import { AbstractSceneItem } from "./scene-item"
 import { Image, ScaleFactor } from "./types"
 
 import { Painter } from "@/graphics"
-import { Rect, RectangularCoordinates, Size, Vector } from "@/maths"
+import { Rect, RectangularCoordinates, Size } from "@/maths"
 
 import { isMatch } from "lodash"
 
@@ -43,7 +43,7 @@ export class Tile extends AbstractSceneItem {
     }
 
     render(painter: Painter, gridSpacing: number, scaleFactor: ScaleFactor, viewport: Rect): Tile {
-        const pos = new Vector(this.x, this.y)
+        const pos = this.position
 
         viewport.translate(pos.opposite)
         painter.save().translate(pos.mul(gridSpacing))

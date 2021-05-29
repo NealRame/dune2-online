@@ -1,7 +1,7 @@
 import { ScaleFactor, SceneItem } from "./types"
 
 import { Painter } from "@/graphics"
-import { Rect, RectangularCoordinates, Size } from "@/maths"
+import { Rect, Size, Vector } from "@/maths"
 import { isNil } from "lodash"
 
 export abstract class AbstractSceneItem implements SceneItem {
@@ -19,14 +19,11 @@ export abstract class AbstractSceneItem implements SceneItem {
         }
     }
 
-    get position(): RectangularCoordinates {
-        return {
-            x: this.x,
-            y: this.y,
-        }
+    get position(): Vector {
+        return new Vector(this.x, this.y)
     }
 
-    set position({ x, y }: RectangularCoordinates) {
+    set position({ x, y }: Vector) {
         this.x = x
         this.y = y
     }

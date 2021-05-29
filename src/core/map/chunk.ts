@@ -1,7 +1,7 @@
 import { AbstractSceneItem } from "@/core/scene-item"
 import { Image, ScaleFactor, ScaleFactors } from "@/core/types"
 import { Painter } from "@/graphics"
-import { Rect, RectangularCoordinates, Vector } from "@/maths"
+import { Rect, RectangularCoordinates } from "@/maths"
 
 function ChunkImageDataCreator(
     chunkRect: Rect,
@@ -48,7 +48,7 @@ export class Chunk extends AbstractSceneItem {
     }
 
     render(painter: Painter, gridSpacing: number, scale: ScaleFactor, viewport: Rect): Chunk {
-        const pos = (new Vector(this.x, this.y)).sub(viewport.topLeft()).mul(gridSpacing)
+        const pos = this.position.sub(viewport.topLeft()).mul(gridSpacing)
         painter.drawImageData(this.image_[scale], pos)
         return this
     }

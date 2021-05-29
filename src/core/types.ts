@@ -1,5 +1,5 @@
 import { Color, Painter } from "@/graphics"
-import { Rect, RectangularCoordinates, Size } from "@/maths"
+import { Rect, RectangularCoordinates, Size, Vector } from "@/maths"
 
 export const ScaleFactors = [1, 2, 3, 4] as const
 export type ScaleFactor = typeof ScaleFactors[number]
@@ -46,7 +46,7 @@ export interface Scene {
 }
 
 export interface SceneItem {
-    position: RectangularCoordinates,
+    position: Vector,
     size: Size,
     rect: Rect,
     update(): SceneItem,
