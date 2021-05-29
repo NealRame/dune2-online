@@ -1,11 +1,11 @@
 import { AbstractSceneItem } from "./scene-item"
 import { Tile } from "./tile"
+import { ScaleFactor } from "./types"
 
 import { Painter } from "@/graphics"
 import { Rect, RectangularCoordinates, Size, Vector } from "@/maths"
 
 import { isNil } from "lodash"
-import { ScaleFactor } from "./types"
 
 type SpriteUpdateDelegate = () => void
 
@@ -14,7 +14,7 @@ export class Sprite extends AbstractSceneItem {
     private frameIndex_: number
 
     constructor(position: RectangularCoordinates) {
-        super(position)
+        super(new Rect(position, { width: 0, height: 0 }))
         this.frames_ = []
         this.frameIndex_ = 0
     }
@@ -32,11 +32,20 @@ export class Sprite extends AbstractSceneItem {
     }
 
     get size(): Size {
-        return this.frames_[this.frameIndex_]?.size ?? 0
+        return {
+            width: this.width,
+            height: this.height,
+        }
     }
 
     addFrame(frame: Tile): Sprite {
         this.frames_.push(frame)
+        const { width, height } = this.frames_.reduce(
+            (rect, frame) => rect.united(frame.rect),
+            new Rect({ x: 0, y: 0 }, { width: 0, height: 0 })
+        )
+        this.width = width
+        this.height = height
         return this
     }
 

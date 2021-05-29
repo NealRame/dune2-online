@@ -9,11 +9,13 @@ export abstract class AbstractSceneItem implements SceneItem {
     y = 0
     width = 0
     height = 0
-    private items_: SceneItem[] = []
 
-    constructor(position?: RectangularCoordinates) {
-        if (!isNil(position)) {
-            this.position = position
+    constructor(rect?: Rect) {
+        if (!isNil(rect)) {
+            this.x = rect.x
+            this.y = rect.y
+            this.width = rect.width
+            this.height = rect.height
         }
     }
 
@@ -44,13 +46,5 @@ export abstract class AbstractSceneItem implements SceneItem {
         return this
     }
 
-    render(painter: Painter, gridSpacing: number, scale: ScaleFactor, viewport: Rect): SceneItem {
-        painter.save()
-        painter.translate(this.position)
-        for (const item of this.items_) {
-            item.render(painter, gridSpacing, scale, viewport)
-        }
-        painter.restore()
-        return this
-    }
+    abstract render(painter: Painter, gridSpacing: number, scale: ScaleFactor, viewport: Rect): SceneItem
 }

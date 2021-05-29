@@ -31,17 +31,14 @@ export class Tile extends AbstractSceneItem {
     private images_: Image[]
 
     constructor(
-        position: RectangularCoordinates,
-        size: Size,
+        rect: Rect,
         images: Image[]
     ) {
-        super(position)
+        super(rect)
 
-        checkShape(size, images)
+        checkShape(this.size, images)
         checkSizeOfImages(images)
 
-        this.width = size.width
-        this.height = size.height
         this.images_ = images
     }
 
@@ -77,8 +74,7 @@ export type TileConfig = {
 
 export function createTile(config: TileConfig): Tile {
     return new Tile(
-        config.position ?? { x: 0, y: 0 },
-        config.size,
+        new Rect(config.position ?? { x: 0, y: 0 }, config.size),
         config.images
     )
 }
