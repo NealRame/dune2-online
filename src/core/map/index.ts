@@ -1,18 +1,14 @@
-import { neighborhood, partition } from "./utils"
+import { Chunk } from "./chunk"
+import { neighborhood, partition, positionToIndexConverter } from "./utils"
 import { generateMap } from "./generator"
 
 import { imageSet } from "@/core/data"
-import { Image, LandMapConfig, Neighborhood, ScaleFactor, Scene, SceneItem, Terrain, TerrainType } from "@/core/types"
+import { Image, LandMapConfig, Neighborhood, ScaleFactor, SceneItem, Terrain, TerrainType } from "@/core/types"
 
 import { Painter } from "@/graphics"
-import { Rect, Size, Vector } from "@/maths"
+import { Rect, Size } from "@/maths"
 
 import { clamp } from "lodash"
-
-type MapState = {
-    map: Array<Terrain & { image: Image }>,
-    parent: Scene | SceneItem | null,
-}
 
 function selectTile(
     terrain: Terrain,
@@ -49,14 +45,11 @@ function selectTile(
 }
 
 function terrainTileSelector(size: Size)
-    : (t: Terrain, i: number, m: Terrain[]) => [Terrain, Image] {
+    : (t: Terrain, i: number, m: Terrain[]) => Image {
     const images = imageSet("terrain")
     const neighbors = neighborhood(size)
 
-    return (terrain, index, map) => [
-        terrain,
-        selectTile(terrain, neighbors(terrain, map), images)
-    ]
+    return (terrain, index, map) => selectTile(terrain, neighbors(terrain, map), images)
 }
 
 function checkConfig(config: Partial<LandMapConfig>): LandMapConfig {
@@ -81,16 +74,10 @@ function checkConfig(config: Partial<LandMapConfig>): LandMapConfig {
 
 export function createMap(size: Size, config: Partial<LandMapConfig>): SceneItem {
     const map = generateMap(size, checkConfig(config))
-        .map(terrainTileSelector(size))
-        .map(([terrain, image]) => Object.assign(terrain, { image }))
-
-    const state: MapState = {
-        map,
-        parent: null,
-    }
-
-    console.log(size)
-    console.log(partition(size, { width: 32, height: 32 }))
+    const images = map.map(terrainTileSelector(size))
+    const chunks = partition(size, { width: 32, height: 32 }).map(chunkRect => {
+        return new Chunk(chunkRect, images, positionToIndexConverter(size))
+    })
 
     return {
         get position() {
@@ -111,14 +98,9 @@ export function createMap(size: Size, config: Partial<LandMapConfig>): SceneItem
             scale: ScaleFactor,
             viewport: Rect
         ): SceneItem {
-            for (const terrain of state.map) {
-                const { x, y } = terrain.position
-                const bitmapPos = new Vector(x, y)
-                const bitmap = terrain.image[scale]
-
-                if (viewport.contains(bitmapPos)) {
-                    bitmapPos.sub(viewport.topLeft()).mul(gridSpacing)
-                    painter.drawImageBitmap(bitmap, bitmapPos)
+            for (const chunk of chunks) {
+                if (viewport.intersects(chunk.rect)) {
+                    chunk.render(painter, gridSpacing, scale, viewport)
                 }
             }
             return this
