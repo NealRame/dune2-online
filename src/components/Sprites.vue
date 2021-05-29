@@ -57,7 +57,6 @@ function makeSprite(tiles: number[]) {
     const tileDescriptors = GameData.tiles()
     const frameCount = 30
     let frame = 0
-
     const sprite = createSprite({
         onUpdate() {
             frame = (frame + 1) % frameCount
