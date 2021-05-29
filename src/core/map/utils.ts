@@ -33,13 +33,13 @@ export function neighborhood<T extends Terrain>(size: Size)
     }
 }
 
-export function partition(size: Size, chunkSize: Size): Rect[] {
+export function partition(mapSize: Size, chunkSize: Size): Rect[] {
     const chunks: Rect[] = []
 
-    for (let y = 0; y < chunkSize.height; y += chunkSize.height) {
-        for (let x = 0; x < chunkSize.width; x += chunkSize.width) {
-            const width = Math.min(chunkSize.width, size.width - chunkSize.width)
-            const height = Math.min(chunkSize.height, size.height - chunkSize.height)
+    for (let y = 0; y < mapSize.height; y += chunkSize.height) {
+        for (let x = 0; x < mapSize.width; x += chunkSize.width) {
+            const width = Math.min(chunkSize.width, mapSize.width - x)
+            const height = Math.min(chunkSize.height, mapSize.height - y)
             chunks.push(new Rect({ x, y }, { width, height }))
         }
     }
