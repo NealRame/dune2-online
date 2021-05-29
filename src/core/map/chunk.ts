@@ -7,7 +7,7 @@ function ChunkImageDataCreator(
     chunkRect: Rect,
     images: Image[],
     positionToIndex: (p: RectangularCoordinates) => number,
-): (scale: ScaleFactor) => Partial<Record<ScaleFactor, ImageData>> {
+): (scale: ScaleFactor) => Partial<Image> {
     return (scale: ScaleFactor) => {
         const { width, height } = chunkRect
         const canvas = new OffscreenCanvas(16*scale*width, 16*scale*height)
@@ -29,12 +29,12 @@ function ChunkImageDataCreator(
             }
         }
 
-        return { [scale]: context.getImageData(0, 0, canvas.width, canvas.height) }
+        return { [scale]: canvas.transferToImageBitmap() }
     }
 }
 
 export class Chunk extends AbstractSceneItem {
-    private image_: Record<ScaleFactor, ImageData>
+    private image_: Image
 
     constructor(
         chunkRect: Rect,
@@ -49,7 +49,7 @@ export class Chunk extends AbstractSceneItem {
 
     render(painter: Painter, gridSpacing: number, scale: ScaleFactor, viewport: Rect): Chunk {
         const pos = this.position.sub(viewport.topLeft()).mul(gridSpacing)
-        painter.drawImageData(this.image_[scale], pos)
+        painter.drawImageBitmap(this.image_[scale], pos)
         return this
     }
 }
