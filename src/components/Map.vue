@@ -248,8 +248,8 @@ export default defineComponent({
         const screenToSceneCoordinates = (position: RectangularCoordinates) => {
             const gridSpacing = scene.gridSpacing
             return new Vector(
-                Math.floor(position.x/gridSpacing), // x
-                Math.floor(position.y/gridSpacing), // y
+                position.x/gridSpacing, // x
+                position.y/gridSpacing, // y
             )
         }
 
