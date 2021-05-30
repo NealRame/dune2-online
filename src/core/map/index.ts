@@ -1,56 +1,13 @@
-import { Chunk } from "./chunk"
-import { neighborhood, partition, positionToIndexConverter } from "./utils"
+import { Chunk, createChunk } from "./chunk"
 import { generateMap } from "./generator"
+import { partition } from "./utils"
 
-import { imageSet } from "@/core/data"
-import { Image, MapConfig, Neighborhood, ScaleFactor, SceneItem, Terrain, TerrainType } from "@/core/types"
+import { Image, MapConfig, ScaleFactor, SceneItem, Terrain } from "@/core/types"
 
 import { Painter } from "@/graphics"
 import { Rect, Size, Vector } from "@/maths"
 
-import { clamp } from "lodash"
-
-function selectTile(
-    terrain: Terrain,
-    neighbors: Neighborhood<Terrain>,
-    images: readonly Image[],
-): Image {
-    const typeMask = neighbors
-        .map((neighbor): number => {
-            const type = (neighbor ?? terrain).type
-            if (terrain.type === TerrainType.Rock) {
-                return (type === TerrainType.Rock || type === TerrainType.Mountain) ? 1 : 0
-            }
-            if (terrain.type === TerrainType.SpiceField) {
-                return (type === TerrainType.SpiceField || type === TerrainType.SaturatedSpiceField) ? 1 : 0
-            }
-            return type === terrain.type ? 1 : 0
-        })
-        .reduce((prev, cur, index) => prev + (cur << index), 0)
-
-    switch (terrain.type) {
-    case TerrainType.Rock:
-        return images[128 + typeMask]
-    case TerrainType.Dunes:
-        return images[144 + typeMask]
-    case TerrainType.Mountain:
-        return images[160 + typeMask]
-    case TerrainType.SpiceField:
-        return images[176 + typeMask]
-    case TerrainType.SaturatedSpiceField:
-        return images[192 + typeMask]
-    }
-
-    return images[127]
-}
-
-function terrainTileSelector(size: Size)
-    : (t: Terrain, i: number, m: Terrain[]) => Image {
-    const images = imageSet("terrain")
-    const neighbors = neighborhood(size)
-
-    return (terrain, index, map) => selectTile(terrain, neighbors(terrain, map), images)
-}
+import { clamp, unzip } from "lodash"
 
 function checkConfig(config: Partial<MapConfig>): MapConfig {
     const spiceThreshold = clamp(config.spiceThreshold ?? 0.6, 0, 1)
@@ -72,14 +29,14 @@ function checkConfig(config: Partial<MapConfig>): MapConfig {
     }
 }
 
-export function createMap(size: Size, config: Partial<MapConfig>): SceneItem {
-    const map = generateMap(size, checkConfig(config))
-    const images = map.map(terrainTileSelector(size))
-    const chunks = partition(size, { width: 32, height: 32 }).map(chunkRect => {
-        return new Chunk(chunkRect, images, positionToIndexConverter(size))
-    })
-
-    return {
+export async function createMap(size: Size, config: Partial<MapConfig>)
+    : Promise<SceneItem> {
+    const [map, images] = unzip(generateMap(size, checkConfig(config))) as [Terrain[], Image[]]
+    return Promise.all(
+        partition(size, { width: 32, height: 32 }).map(chunkRect => {
+            return createChunk(chunkRect, size, images)
+        })
+    ).then(chunks => ({
         get position() {
             return Vector.Null()
         },
@@ -87,10 +44,10 @@ export function createMap(size: Size, config: Partial<MapConfig>): SceneItem {
             return size
         },
         get rect(): Rect {
-            return new Rect(this.position, this.size)
+            return new Rect({ x: 0, y: 0 }, size)
         },
         update(): SceneItem {
-            return this
+            return this as SceneItem
         },
         render(
             painter: Painter,
@@ -103,7 +60,7 @@ export function createMap(size: Size, config: Partial<MapConfig>): SceneItem {
                     chunk.render(painter, gridSpacing, scale, viewport)
                 }
             }
-            return this
+            return this as SceneItem
         }
-    }
+    }))
 }

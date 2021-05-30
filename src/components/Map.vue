@@ -202,24 +202,23 @@ export default defineComponent({
             })
         }, 60)
 
-        const update = () => {
-            scene
-                .clear()
-                .addItem(createMap({
-                    width: unref(width),
-                    height: unref(height),
-                }, {
-                    seed,
-                    terrainScale: unref(terrainScale),
-                    terrainDetails: unref(terrainDetails),
-                    terrainSandThreshold: unref(terrainSandThreshold),
-                    terrainRockThreshold: unref(terrainRockThreshold),
-                    terrainMountainsThreshold: unref(terrainMountainsThreshold),
-                    spiceScale: unref(spiceScale),
-                    spiceDetails: unref(spiceDetails),
-                    spiceThreshold: unref(spiceThreshold),
-                    spiceSaturationThreshold: unref(spiceSaturationThreshold),
-                }))
+        const update = async () => {
+            scene.clear()
+            scene.addItem(await createMap({
+                width: unref(width),
+                height: unref(height),
+            }, {
+                seed,
+                terrainScale: unref(terrainScale),
+                terrainDetails: unref(terrainDetails),
+                terrainSandThreshold: unref(terrainSandThreshold),
+                terrainRockThreshold: unref(terrainRockThreshold),
+                terrainMountainsThreshold: unref(terrainMountainsThreshold),
+                spiceScale: unref(spiceScale),
+                spiceDetails: unref(spiceDetails),
+                spiceThreshold: unref(spiceThreshold),
+                spiceSaturationThreshold: unref(spiceSaturationThreshold),
+            }))
         }
 
         const updateViewport = ({ x: xOffset, y: yOffset }: RectangularCoordinates) => {

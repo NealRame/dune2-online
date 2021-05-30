@@ -1,55 +1,56 @@
+import { createChunkImage } from "./workers"
+
 import { AbstractSceneItem } from "@/core/scene-item"
-import { Image, ScaleFactor, ScaleFactors } from "@/core/types"
+import { Image, ScaleFactor } from "@/core/types"
 import { Painter } from "@/graphics"
-import { Rect, RectangularCoordinates } from "@/maths"
+import { Rect, Size } from "@/maths"
 
-function ChunkImageDataCreator(
-    chunkRect: Rect,
-    images: Image[],
-    positionToIndex: (p: RectangularCoordinates) => number,
-): (scale: ScaleFactor) => Partial<Image> {
-    return (scale: ScaleFactor) => {
-        const { width, height } = chunkRect
-        const canvas = new OffscreenCanvas(16*scale*width, 16*scale*height)
-        const context = canvas.getContext("2d") as OffscreenCanvasRenderingContext2D
+import { isNil } from "lodash"
 
-        for (let y = 0; y < height; ++y) {
-            for (let x = 0; x < width; ++x) {
-                const index = positionToIndex({
-                    x: x + chunkRect.x,
-                    y: y + chunkRect.y,
-                })
-                const image = images[index]
-                const bitmap = image[scale]
-                context.drawImage(
-                    bitmap,
-                    x*bitmap.width,
-                    y*bitmap.height,
-                )
-            }
+export class Chunk extends AbstractSceneItem {
+    private image_: Image|null = null
+
+    constructor(chunkRect: Rect, image: Image) {
+        super(chunkRect)
+        this.image_ = image
+    }
+
+    set image(image: Image) {
+        this.image_ = image
+    }
+
+    render(
+        painter: Painter,
+        gridSpacing: number,
+        scale: ScaleFactor,
+        viewport: Rect
+    ): Chunk {
+        if (!isNil(this.image_)) {
+            painter.drawImageBitmap(
+                this.image_[scale],
+                this.position.sub(viewport.topLeft()).mul(gridSpacing),
+            )
         }
-
-        return { [scale]: canvas.transferToImageBitmap() }
+        return this
     }
 }
 
-export class Chunk extends AbstractSceneItem {
-    private image_: Image
-
-    constructor(
-        chunkRect: Rect,
-        images: Image[],
-        positionToIndex: (p: RectangularCoordinates) => number,
-    ) {
-        super(chunkRect)
-        this.image_ = Object.assign({}, ...ScaleFactors.map(
-            ChunkImageDataCreator(chunkRect, images, positionToIndex)
-        ))
-    }
-
-    render(painter: Painter, gridSpacing: number, scale: ScaleFactor, viewport: Rect): Chunk {
-        const pos = this.position.sub(viewport.topLeft()).mul(gridSpacing)
-        painter.drawImageBitmap(this.image_[scale], pos)
-        return this
-    }
+export async function createChunk(
+    chunkRect: Rect,
+    mapSize: Size,
+    images: Image[]
+): Promise<Chunk> {
+    const image = await createChunkImage({
+        chunkPosition: {
+            x: chunkRect.x,
+            y: chunkRect.y,
+        },
+        chunkSize: {
+            width: chunkRect.width,
+            height: chunkRect.height,
+        },
+        mapSize,
+        images
+    })
+    return new Chunk(chunkRect, image)
 }

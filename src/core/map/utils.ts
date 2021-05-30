@@ -6,9 +6,13 @@ export function indexToPositionConverter({ width }: Size)
     return n => ({ x: n%width, y: Math.floor(n/width) })
 }
 
-export function positionToIndexConverter({ width, height }: Size)
-    : (p: RectangularCoordinates) => number {
+export function positionToIndexConverter(
+    { width, height }: Size,
+    origin?: RectangularCoordinates
+): (p: RectangularCoordinates) => number {
     return ({ x, y }) => {
+        x += origin?.x ?? 0
+        y += origin?.y ?? 0
         return x >= 0 && x < width && y >= 0 && y < height
             ? y*width + x
             : -1
