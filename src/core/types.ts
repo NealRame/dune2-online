@@ -53,7 +53,7 @@ export interface SceneItem {
     render(painter: Painter, gridSpacing: number, scale: ScaleFactor, viewport: Rect): SceneItem,
 }
 
-export type LandMapConfig = {
+export type MapConfig = {
     // Noise seed
     seed: number,
     // Terrain values

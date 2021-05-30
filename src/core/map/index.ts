@@ -3,7 +3,7 @@ import { neighborhood, partition, positionToIndexConverter } from "./utils"
 import { generateMap } from "./generator"
 
 import { imageSet } from "@/core/data"
-import { Image, LandMapConfig, Neighborhood, ScaleFactor, SceneItem, Terrain, TerrainType } from "@/core/types"
+import { Image, MapConfig, Neighborhood, ScaleFactor, SceneItem, Terrain, TerrainType } from "@/core/types"
 
 import { Painter } from "@/graphics"
 import { Rect, Size, Vector } from "@/maths"
@@ -52,7 +52,7 @@ function terrainTileSelector(size: Size)
     return (terrain, index, map) => selectTile(terrain, neighbors(terrain, map), images)
 }
 
-function checkConfig(config: Partial<LandMapConfig>): LandMapConfig {
+function checkConfig(config: Partial<MapConfig>): MapConfig {
     const spiceThreshold = clamp(config.spiceThreshold ?? 0.6, 0, 1)
     const spiceSaturationThreshold = clamp(config.spiceSaturationThreshold ?? (1 + spiceThreshold)/2, spiceThreshold, 1)
     return {
@@ -72,7 +72,7 @@ function checkConfig(config: Partial<LandMapConfig>): LandMapConfig {
     }
 }
 
-export function createMap(size: Size, config: Partial<LandMapConfig>): SceneItem {
+export function createMap(size: Size, config: Partial<MapConfig>): SceneItem {
     const map = generateMap(size, checkConfig(config))
     const images = map.map(terrainTileSelector(size))
     const chunks = partition(size, { width: 32, height: 32 }).map(chunkRect => {
