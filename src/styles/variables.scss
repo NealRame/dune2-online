@@ -8,17 +8,21 @@ $font-family: Avenir, Helvetica, Arial, sans-serif;
 $palette-width: 256px;
 
 //////////////////////////////////////////////////////////////////////////////
-// Progress bar style
-$progress-bar-border-width: 1px;
-$progress-bar-border-type: solid;
+// Progress bar
+
 $progress-bar-border-color: white;
+$progress-bar-border-type: solid;
+$progress-bar-border-width: 1px;
+
 $progress-bar-color: white;
-$progress-bar-height: 1rem;
+$progress-bar-height: 0.75rem;
 $progress-bar-padding: 1px;
 
 $progress-bar-label-color: white;
 $progress-bar-label-font-family: sans-serif;
 $progress-bar-label-font-size: 1rem;
+
+$progress-bar-undetermined-value-size: 20%;
 
 //////////////////////////////////////////////////////////////////////////////
 // Palette

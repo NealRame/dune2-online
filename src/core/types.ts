@@ -7,7 +7,7 @@ export type ScaleFactor = typeof ScaleFactors[number]
 export interface DataProgressNotifier {
     begin(): void,
     setLabel(label: string): void,
-    setValue(value: number): void,
+    setValue(value: number|null): void,
     end(): void,
 }
 

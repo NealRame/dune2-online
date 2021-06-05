@@ -30,6 +30,7 @@ async function fetchGameData(progress: DataProgressNotifier) {
         )
 
         progress.setLabel(`Decoding ${set} images ...`)
+        progress.setValue(null)
         return {
             [set]: await Workers.decodeImages(data, palette)
         }
