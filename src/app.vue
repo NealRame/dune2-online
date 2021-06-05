@@ -1,10 +1,11 @@
 <template>
-    <progress-bar
-        v-if="gameDataLoading"
-        :current="gameDataProgress"
-        :label="gameDataProgressLabel"
-    />
-    <router-view v-if="!gameDataLoading"></router-view>
+    <modal :show="gameDataLoading">
+        <progress-bar
+            :current="gameDataProgress"
+            :label="gameDataProgressLabel"
+        />
+    </modal>
+    <router-view></router-view>
 </template>
 
 <style lang="scss" scoped>
@@ -17,6 +18,7 @@ ul {
 <script lang="ts">
 import "@/styles/global.scss"
 
+import Modal from "@/components/Modal.vue"
 import ProgressBar from "@/components/ProgressBar.vue"
 import { GameData } from "@/core"
 
@@ -24,6 +26,7 @@ import { defineComponent, onMounted, ref } from "vue"
 
 export default defineComponent({
     components: {
+        Modal,
         ProgressBar
     },
     setup() {
