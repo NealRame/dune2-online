@@ -2,14 +2,13 @@
     <div class="progress-bar">
         <label>
             <progress v-if="current != null" :value="current" max=1></progress>
-            <progress v-else></progress>
+            <div v-else class="progress" ></div>
             {{label}}
         </label>
     </div>
 </template>
 
 <style lang="scss" scoped>
-@use "sass:math";
 
 .progress-bar {
     label {
@@ -29,29 +28,57 @@
             $progress-bar-border-width
             $progress-bar-border-type
             $progress-bar-border-color;
+
+        box-sizing: border-box;
+
         height: $progress-bar-height;
         width: 100%;
+
         padding: $progress-bar-padding;
+
         &::-webkit-progress-bar {
             background: transparent;
         }
         &::-webkit-progress-value {
             background: $progress-bar-color;
         }
-        &:not([value])::-webkit-progress-value {
-            transform: translateZ(0);
-            width: $progress-bar-undetermined-value-size;
+    }
+
+    .progress {
+        display: block;
+        border:
+            $progress-bar-border-width
+            $progress-bar-border-type
+            $progress-bar-border-color;
+
+        box-sizing: border-box;
+
+        height: $progress-bar-height;
+        width: 100%;
+
+        padding: $progress-bar-padding;
+
+        &:before {
+            display: block;
+            background-color: white;
+            content: '';
+
+            width: $progress-bar-undeterminate-value-width;
+            height: 100%;
+
             animation: 1s ease-in-out infinite alternate progress-value-animation;
+            -webkit-animation: 1s ease-in-out infinite alternate progress-value-animation;
         }
     }
+
     @keyframes progress-value-animation {
         to {
-            transform: translateX(100% * (100/$progress-bar-undetermined-value-size - 1));
+            transform: translateX(100%*(100%/$progress-bar-undeterminate-value-width - 1));
         }
     }
     @-webkit-keyframes progress-value-animation {
         to {
-            transform: translateX(100% * (100/$progress-bar-undetermined-value-size - 1));
+            transform: translateX(100%*(100%/$progress-bar-undeterminate-value-width - 1));
         }
     }
 }
