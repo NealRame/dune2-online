@@ -54,7 +54,10 @@ export async function createMap(size: Size, config: Partial<MapConfig>)
     const getChunkImages = ChunkImagesGetter(size, images)
     return Promise.all(
         partition(size, { width: 32, height: 32 }).map(chunkRect => {
-            return createChunk(chunkRect, getChunkImages(chunkRect))
+            return createChunk({
+                chunkRect,
+                images: getChunkImages(chunkRect)
+            })
         })
     ).then(chunks => ({
         get position() {

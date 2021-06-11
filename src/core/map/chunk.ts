@@ -35,7 +35,15 @@ export class Chunk extends AbstractSceneItem {
     }
 }
 
-export async function createChunk(chunkRect: Rect, images: Image[])
+export type ChunkConfig = {
+    chunkRect: Rect,
+    images: Image[]
+}
+
+export async function createChunk({
+    chunkRect,
+    images,
+}: ChunkConfig)
     : Promise<Chunk> {
     const image = await createChunkImage({
         chunkSize: chunkRect.size,
