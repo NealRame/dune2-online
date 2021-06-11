@@ -1,6 +1,6 @@
-import { Chunk, createChunk } from "./chunk"
+import { createChunk } from "./chunk"
 import { generateMap } from "./generator"
-import { partition } from "./utils"
+import { partition, positionToIndexConverter } from "./utils"
 
 import { Image, MapConfig, ScaleFactor, SceneItem, Terrain } from "@/core/types"
 
@@ -29,12 +29,32 @@ function checkConfig(config: Partial<MapConfig>): MapConfig {
     }
 }
 
+function ChunkImagesGetter(mapSize: Size, images: Image[]) {
+    const positionToIndex = positionToIndexConverter(mapSize)
+
+    return (chunkRect: Rect) => {
+        const xMin = chunkRect.x
+        const xMax = xMin + chunkRect.width
+        const yMin = chunkRect.y
+        const yMax = yMin + chunkRect.height
+        const chunkImages = []
+        for (let y = yMin; y < yMax; ++y) {
+            for (let x = xMin; x < xMax; ++x) {
+                const index = positionToIndex({ x, y })
+                chunkImages.push(images[index])
+            }
+        }
+        return chunkImages
+    }
+}
+
 export async function createMap(size: Size, config: Partial<MapConfig>)
     : Promise<SceneItem> {
     const [map, images] = unzip(generateMap(size, checkConfig(config))) as [Terrain[], Image[]]
+    const getChunkImages = ChunkImagesGetter(size, images)
     return Promise.all(
         partition(size, { width: 32, height: 32 }).map(chunkRect => {
-            return createChunk(chunkRect, size, images)
+            return createChunk(chunkRect, getChunkImages(chunkRect))
         })
     ).then(chunks => ({
         get position() {
