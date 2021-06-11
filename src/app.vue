@@ -5,7 +5,7 @@
             :label="gameDataProgressLabel"
         />
     </modal>
-    <router-view></router-view>
+    <router-view v-if="!gameDataLoading"></router-view>
 </template>
 
 <style lang="scss" scoped>
