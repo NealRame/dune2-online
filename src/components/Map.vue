@@ -1,4 +1,7 @@
 <template>
+    <modal :show="showModal">
+        <progress-bar label="Generating map ..." />
+    </modal>
     <screen
         ref="screen"
         @mouseMotion="onMouseMoved"
@@ -139,6 +142,8 @@ canvas {
 </style>
 
 <script lang="ts">
+import Modal from "@/components/Modal.vue"
+import ProgressBar from "@/components/ProgressBar.vue"
 import Screen, { ScreenMouseMotionEvent } from "@/components/Screen.vue"
 
 import { createScene, createMap } from "@/core"
@@ -150,6 +155,8 @@ import { computed, defineComponent, onMounted, ref, unref } from "vue"
 
 export default defineComponent({
     components: {
+        Modal,
+        ProgressBar,
         Screen,
     },
     emits: [
@@ -168,6 +175,8 @@ export default defineComponent({
     setup(props, { emit }) {
         const showInspector = ref<boolean>(false)
         const screen = ref<PaintDevice | null>(null)
+
+        const showModal = ref<boolean>(true)
 
         const screenWidth = ref<number>(0)
         const screenHeight = ref<number>(0)
@@ -203,8 +212,8 @@ export default defineComponent({
         }, 60)
 
         const update = async () => {
-            scene.clear()
-            scene.addItem(await createMap({
+            showModal.value = true
+            const map = await createMap({
                 width: unref(width),
                 height: unref(height),
             }, {
@@ -218,7 +227,10 @@ export default defineComponent({
                 spiceDetails: unref(spiceDetails),
                 spiceThreshold: unref(spiceThreshold),
                 spiceSaturationThreshold: unref(spiceSaturationThreshold),
-            }))
+            })
+            scene.clear()
+            scene.addItem(map)
+            showModal.value = false
         }
 
         const updateViewport = ({ x: xOffset, y: yOffset }: RectangularCoordinates) => {
@@ -380,6 +392,7 @@ export default defineComponent({
                     update()
                 },
             }),
+            showModal,
             showInspector,
             onSeedClicked,
             onMouseMoved,
