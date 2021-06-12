@@ -151,7 +151,7 @@ import { PaintDevice } from "@/graphics"
 import { Rect, RectangularCoordinates, Vector } from "@/maths"
 
 import { clamp, debounce } from "lodash"
-import { computed, defineComponent, onMounted, ref, unref } from "vue"
+import { defineComponent, onMounted, ref, unref, watch } from "vue"
 
 export default defineComponent({
     components: {
@@ -159,20 +159,7 @@ export default defineComponent({
         ProgressBar,
         Screen,
     },
-    emits: [
-        "update:width",
-        "update:height",
-        "update:terrainScale",
-        "update:terrainDetails",
-        "update:terrainSandThreshold",
-        "update:terrainRockThreshold",
-        "update:terrainMountainsThreshold",
-        "update:spiceScale",
-        "update:spiceDetails",
-        "update:spiceThreshold",
-        "update:spiceSaturationThreshold",
-    ],
-    setup(props, { emit }) {
+    setup() {
         const showInspector = ref<boolean>(false)
         const screen = ref<PaintDevice | null>(null)
 
@@ -300,98 +287,33 @@ export default defineComponent({
             update()
         })
 
+        watch(width, update)
+        watch(height, update)
+        watch(terrainScale, update)
+        watch(terrainDetails, update)
+        watch(terrainSandThreshold, update)
+        watch(terrainRockThreshold, update)
+        watch(terrainMountainsThreshold, update)
+        watch(spiceScale, update)
+        watch(spiceDetails, update)
+        watch(spiceThreshold, update)
+        watch(spiceSaturationThreshold, update)
+
         return {
             screen,
             screenWidth,
             screenHeight,
-            width: computed({
-                get: () => width.value,
-                set: value => {
-                    width.value = value
-                    update()
-                    emit("update:width", value)
-                }
-            }),
-            height: computed({
-                get: () => height.value,
-                set: value => {
-                    height.value = value
-                    update()
-                    emit("update:height", value)
-                }
-            }),
-            terrainScale: computed({
-                get: () => terrainScale.value,
-                set: value => {
-                    terrainScale.value = value
-                    update()
-                    emit("update:terrainScale", value)
-                },
-            }),
-            terrainDetails: computed({
-                get: () => terrainDetails.value,
-                set: value => {
-                    terrainDetails.value = value
-                    emit("update:terrainDetails", value)
-                    update()
-                },
-            }),
-            terrainSandThreshold: computed({
-                get: () => terrainSandThreshold.value,
-                set: value => {
-                    terrainSandThreshold.value = value
-                    emit("update:terrainSandThreshold", value)
-                    update()
-                },
-            }),
-            terrainRockThreshold: computed({
-                get: () => terrainRockThreshold.value,
-                set: value => {
-                    terrainRockThreshold.value = value
-                    emit("update:terrainRockThreshold", value)
-                    update()
-                },
-            }),
-            terrainMountainsThreshold: computed({
-                get: () => terrainMountainsThreshold.value,
-                set: value => {
-                    terrainMountainsThreshold.value = value
-                    emit("update:terrainMountainsThreshold", value)
-                    update()
-                },
-            }),
-            spiceScale: computed({
-                get: () => spiceScale.value,
-                set: value => {
-                    spiceScale.value = value
-                    emit("update:spiceScale", value)
-                    update()
-                },
-            }),
-            spiceDetails: computed({
-                get: () => spiceDetails.value,
-                set: value => {
-                    spiceDetails.value = value
-                    emit("update:spiceDetails", value)
-                    update()
-                },
-            }),
-            spiceThreshold: computed({
-                get: () => spiceThreshold.value,
-                set: value => {
-                    spiceThreshold.value = value
-                    emit("update:spiceThreshold", value)
-                    update()
-                },
-            }),
-            spiceSaturationThreshold: computed({
-                get: () => spiceSaturationThreshold.value,
-                set: value => {
-                    spiceSaturationThreshold.value = value
-                    emit("update:spiceSaturationThreshold", value)
-                    update()
-                },
-            }),
+            width,
+            height,
+            terrainScale,
+            terrainDetails,
+            terrainSandThreshold,
+            terrainRockThreshold,
+            terrainMountainsThreshold,
+            spiceScale,
+            spiceDetails,
+            spiceThreshold,
+            spiceSaturationThreshold,
             showModal,
             showInspector,
             onSeedClicked,
