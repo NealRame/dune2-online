@@ -5,10 +5,8 @@ import { Image, ScaleFactor } from "@/core/types"
 import { Painter } from "@/graphics"
 import { Rect } from "@/maths"
 
-import { isNil } from "lodash"
-
 export class Chunk extends AbstractSceneItem {
-    private image_: Image|null = null
+    private image_: Image
 
     constructor(chunkRect: Rect, image: Image) {
         super(chunkRect)
@@ -25,12 +23,10 @@ export class Chunk extends AbstractSceneItem {
         scale: ScaleFactor,
         viewport: Rect
     ): Chunk {
-        if (!isNil(this.image_)) {
-            painter.drawImageBitmap(
-                this.image_[scale],
-                this.position.sub(viewport.topLeft()).mul(gridSpacing),
-            )
-        }
+        painter.drawImageBitmap(
+            this.image_[scale],
+            this.position.sub(viewport.topLeft()).mul(gridSpacing),
+        )
         return this
     }
 }
