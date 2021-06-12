@@ -67,6 +67,9 @@ export type MapConfig = {
     spiceDetails: number,               // clamped to [ 1, 6 ]
     spiceThreshold: number,             // clamped to [ 0, 1 ]
     spiceSaturationThreshold: number    // clamped to [ spiceThreshold, 1 ]
+    // Chunk
+    chunk: boolean,
+    chunkSize: number,
 }
 
 export enum TerrainType {

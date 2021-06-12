@@ -4,7 +4,7 @@ import { imageSet } from "@/core/data"
 import { Image, MapConfig, Neighborhood, Terrain, TerrainType } from "@/core/types"
 import { createNoise2DGenerator, createRangeMapper, RectangularCoordinates, Size } from "@/maths"
 
-import { chain, flow, isNil, times } from "lodash"
+import { chain, flow, isNil, times, unzip } from "lodash"
 
 function terrainTypeGenerator(config: MapConfig)
     : (t: Partial<Terrain>) => Partial<Terrain> {
@@ -134,9 +134,10 @@ function terrainImageSelector(size: Size)
 }
 
 export function generateMap(size: Size, config: MapConfig)
-    :  [Terrain, Image][] {
+    : [Terrain[], Image[]] {
     const indexToPosition = indexToPositionConverter(size)
-    return times(size.width*size.height, indexToPosition)
+    return unzip(times(size.width*size.height, indexToPosition)
         .map(terrainGenerator(size, config))
         .map(terrainImageSelector(size))
+    ) as [Terrain[], Image[]]
 }
