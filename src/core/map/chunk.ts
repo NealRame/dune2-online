@@ -87,15 +87,15 @@ function terrainImageSelector(size: Size)
     }
 }
 
-export function ChunkCreator(map: Terrain[], mapSize: Size, config: MapConfig)
+export function ChunkCreator(map: Terrain[], config: Required<MapConfig>)
     : (r: Rect) => Promise<SceneItem> {
-    const selectImage = terrainImageSelector(mapSize)
+    const selectImage = terrainImageSelector(config.size)
     const factory = config.chunk ? createChunk : createTiledChunk
 
     return (chunkRect) => {
         const position = chunkRect.topLeft()
         const size = chunkRect.size
-        const positionToIndex = positionToIndexConverter(mapSize, position)
+        const positionToIndex = positionToIndexConverter(config.size, position)
         const images = []
 
         for (let y = 0; y < size.height; ++y) {
@@ -108,12 +108,7 @@ export function ChunkCreator(map: Terrain[], mapSize: Size, config: MapConfig)
     }
 }
 
-export function generateChunks(map: Terrain[], mapSize: Size, config: MapConfig)
+export function generateChunks(map: Terrain[], config: Required<MapConfig>)
     : Promise<SceneItem[]> {
-    const chunkSize = {
-        width: config.chunkSize,
-        height: config.chunkSize
-    }
-
-    return Promise.all(partition(mapSize, chunkSize).map(ChunkCreator(map, mapSize, config)))
+    return Promise.all(partition(config.size, config.chunkSize).map(ChunkCreator(map, config)))
 }

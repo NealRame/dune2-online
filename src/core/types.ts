@@ -54,22 +54,23 @@ export interface SceneItem {
 }
 
 export type MapConfig = {
-    // Noise seed
-    seed: number,
-    // Terrain values
-    terrainScale: number,               // clamped to [16, 64]
-    terrainDetails: number,             // clamped to [ 1, 6 ]
-    terrainSandThreshold: number,       // clamped to [ 0, 1 ]
-    terrainRockThreshold: number,       // clamped to [ 0, 1 ]
-    terrainMountainsThreshold: number,  // clamped to [ 0, 1 ]
-    // Spice field values
-    spiceScale: number,                 // clamped to [16, 64]
-    spiceDetails: number,               // clamped to [ 1, 6 ]
-    spiceThreshold: number,             // clamped to [ 0, 1 ]
-    spiceSaturationThreshold: number    // clamped to [ spiceThreshold, 1 ]
+    size: Size,
     // Chunk
-    chunk: boolean,
-    chunkSize: number,
+    chunk?: boolean,
+    chunkSize?: Size,
+    // Noise seed
+    seed?: number,
+    // Terrain values
+    terrainScale?: number,               // clamped to [16, 64]
+    terrainDetails?: number,             // clamped to [ 1, 6 ]
+    terrainSandThreshold?: number,       // clamped to [ 0, 1 ]
+    terrainRockThreshold?: number,       // clamped to [ 0, 1 ]
+    terrainMountainsThreshold?: number,  // clamped to [ 0, 1 ]
+    // Spice field values
+    spiceScale?: number,                 // clamped to [16, 64]
+    spiceDetails?: number,               // clamped to [ 1, 6 ]
+    spiceThreshold?: number,             // clamped to [ 0, 1 ]
+    spiceSaturationThreshold?: number    // clamped to [ spiceThreshold, 1 ]
 }
 
 export enum TerrainType {

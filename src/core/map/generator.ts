@@ -1,11 +1,11 @@
 import { indexToPositionConverter } from "./utils"
 
 import { MapConfig, Terrain, TerrainType } from "@/core/types"
-import { createNoise2DGenerator, createRangeMapper, RectangularCoordinates, Size } from "@/maths"
+import { createNoise2DGenerator, createRangeMapper, RectangularCoordinates } from "@/maths"
 
 import { chain, flow, isNil, times } from "lodash"
 
-function terrainTypeGenerator(config: MapConfig)
+function terrainTypeGenerator(config: Required<MapConfig>)
     : (t: Partial<Terrain>) => Partial<Terrain> {
     const terrainNoise = flow(
         createNoise2DGenerator({
@@ -38,7 +38,7 @@ function terrainTypeGenerator(config: MapConfig)
     }
 }
 
-function spiceFieldGenerator(config: MapConfig)
+function spiceFieldGenerator(config: Required<MapConfig>)
     : (t: Partial<Terrain>) => Partial<Terrain> {
     const spiceNoise = flow(
         createNoise2DGenerator({
@@ -76,7 +76,7 @@ function spiceFieldGenerator(config: MapConfig)
     }
 }
 
-function terrainGenerator(size: Size, config: MapConfig)
+function terrainGenerator(config: Required<MapConfig>)
     : (p: RectangularCoordinates) => Terrain {
     const generateTerrainType = terrainTypeGenerator(config)
     const generateSpiceField = spiceFieldGenerator(config)
@@ -88,11 +88,11 @@ function terrainGenerator(size: Size, config: MapConfig)
     }
 }
 
-export function generateMap(size: Size, config: MapConfig)
+export function generateMap(config: Required<MapConfig>)
     : Promise<Terrain[]> {
-    const indexToPosition = indexToPositionConverter(size)
+    const indexToPosition = indexToPositionConverter(config.size)
     return Promise.resolve(
-        times(size.width*size.height, indexToPosition)
-            .map(terrainGenerator(size, config))
+        times(config.size.width*config.size.height, indexToPosition)
+            .map(terrainGenerator(config))
     )
 }

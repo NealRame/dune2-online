@@ -201,10 +201,11 @@ export default defineComponent({
         const update = async () => {
             showModal.value = true
             const map = await createMap({
-                width: unref(width),
-                height: unref(height),
-            }, {
                 seed,
+                size: {
+                    width: unref(width),
+                    height: unref(height),
+                },
                 terrainScale: unref(terrainScale),
                 terrainDetails: unref(terrainDetails),
                 terrainSandThreshold: unref(terrainSandThreshold),
