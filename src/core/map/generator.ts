@@ -90,8 +90,6 @@ function terrainGenerator(config: Required<MapConfig>)
 }
 
 export function generateMap(config: Required<MapConfig>)
-    : Promise<Terrain[]> {
-    return Promise.resolve(
-        times(config.size.width*config.size.height, terrainGenerator(config))
-    )
+    : Terrain[] {
+    return times(config.size.width*config.size.height, terrainGenerator(config))
 }
