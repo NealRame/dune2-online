@@ -3,11 +3,11 @@ import { createChunkImage } from "./workers"
 
 import { imageSet } from "@/core/data"
 import { AbstractSceneItem } from "@/core/scene-item"
-import { createTile } from "@/core/tile"
+import { createTile, TileConfig } from "@/core/tile"
 import { Image, MapConfig, Neighborhood, ScaleFactor, SceneItem, Terrain, TerrainType } from "@/core/types"
 
 import { Painter } from "@/graphics"
-import { Rect, Size } from "@/maths"
+import { Rect, RectangularCoordinates, Size } from "@/maths"
 
 export class Chunk extends AbstractSceneItem {
     private image_: Image
@@ -38,14 +38,13 @@ export class Chunk extends AbstractSceneItem {
 function ChunkImagesGetter(mapSize: Size, images: Image[]) {
     const positionToIndex = positionToIndexConverter(mapSize)
 
-    return (chunkRect: Rect) => {
-        const xMin = chunkRect.x
-        const xMax = xMin + chunkRect.width
-        const yMin = chunkRect.y
-        const yMax = yMin + chunkRect.height
+    return ({ x, y }: RectangularCoordinates, { width, height }: Size) => {
+        const xMin = x
+        const xMax = x + width
+        const yMax = y + height
         const chunkImages = []
-        for (let y = yMin; y < yMax; ++y) {
-            for (let x = xMin; x < xMax; ++x) {
+        for (; y < yMax; ++y) {
+            for (x = xMin; x < xMax; ++x) {
                 const index = positionToIndex({ x, y })
                 chunkImages.push(images[index])
             }
@@ -54,39 +53,35 @@ function ChunkImagesGetter(mapSize: Size, images: Image[]) {
     }
 }
 
-type ChunkConfig = {
-    chunkRect: Rect,
-    images: Image[]
+async function createChunk(config: TileConfig): Promise<SceneItem> {
+    const image = await createChunkImage({
+        chunkSize: config.size,
+        images: config.images,
+    })
+    return new Chunk(
+        new Rect(config.position ?? { x: 0, y: 0 }, config.size),
+        image
+    )
 }
 
-async function createChunk({ chunkRect, images }: ChunkConfig)
-    : Promise<Chunk> {
-    const image = await createChunkImage({
-        chunkSize: chunkRect.size,
-        images
-    })
-    return new Chunk(chunkRect, image)
+async function createTiledChunk(config:TileConfig): Promise<SceneItem> {
+    return Promise.resolve(createTile(config))
 }
 
 function createChunks(images: Image[], mapSize: Size, config: MapConfig) {
     const getChunkImages = ChunkImagesGetter(mapSize, images)
+    const factory = config.chunk ? createChunk : createTiledChunk
     const chunkSize = {
         width: config.chunkSize,
         height: config.chunkSize
     }
-    return Promise.all(partition(mapSize, chunkSize).map(chunkRect => {
-        const chunkImages = getChunkImages(chunkRect)
-        return Promise.resolve(config.chunk
-            ? createChunk({
-                chunkRect,
-                images: chunkImages,
-            })  as Promise<SceneItem>
-            : createTile({
-                position: chunkRect.topLeft(),
-                size: chunkRect.size,
-                images: chunkImages,
-            }) as SceneItem
-        )
+
+    return Promise.all(partition(mapSize, chunkSize).map(([position, size]) => {
+        return factory({
+            position,
+            size,
+            images: getChunkImages(position, size)
+        })
     }))
 }
 
