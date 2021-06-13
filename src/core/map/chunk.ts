@@ -4,7 +4,7 @@ import { createChunkImage } from "./workers"
 import { imageSet } from "@/core/data"
 import { AbstractSceneItem } from "@/core/scene-item"
 import { createTile, TileConfig } from "@/core/tile"
-import { Image, MapConfig, Neighborhood, ScaleFactor, SceneItem, Terrain, TerrainType } from "@/core/types"
+import { Image, MapConfig, ScaleFactor, SceneItem, Terrain, TerrainType } from "@/core/types"
 
 import { Painter } from "@/graphics"
 import { Rect, Size } from "@/maths"
