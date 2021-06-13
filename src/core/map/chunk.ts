@@ -7,7 +7,7 @@ import { createTile, TileConfig } from "@/core/tile"
 import { Image, MapConfig, Neighborhood, ScaleFactor, SceneItem, Terrain, TerrainType } from "@/core/types"
 
 import { Painter } from "@/graphics"
-import { Rect, RectangularCoordinates, Size } from "@/maths"
+import { Rect, Size } from "@/maths"
 
 export class Chunk extends AbstractSceneItem {
     private image_: Image
@@ -35,24 +35,6 @@ export class Chunk extends AbstractSceneItem {
     }
 }
 
-function ChunkImagesGetter(mapSize: Size, images: Image[]) {
-    const positionToIndex = positionToIndexConverter(mapSize)
-
-    return ({ x, y }: RectangularCoordinates, { width, height }: Size) => {
-        const xMin = x
-        const xMax = x + width
-        const yMax = y + height
-        const chunkImages = []
-        for (; y < yMax; ++y) {
-            for (x = xMin; x < xMax; ++x) {
-                const index = positionToIndex({ x, y })
-                chunkImages.push(images[index])
-            }
-        }
-        return chunkImages
-    }
-}
-
 async function createChunk(config: TileConfig): Promise<SceneItem> {
     const image = await createChunkImage({
         chunkSize: config.size,
@@ -68,70 +50,70 @@ async function createTiledChunk(config:TileConfig): Promise<SceneItem> {
     return Promise.resolve(createTile(config))
 }
 
-function createChunks(images: Image[], mapSize: Size, config: MapConfig) {
-    const getChunkImages = ChunkImagesGetter(mapSize, images)
+function terrainImageSelector(size: Size)
+    : (m: Terrain[], index: number) => Image {
+    const images = imageSet("terrain")
+    const neighbors = neighborhood(size)
+    return (map, index) => {
+        const terrain = map[index]
+        const typeMask =
+            neighbors(terrain, map)
+                .map((neighbor): number => {
+                    const type = (neighbor ?? terrain).type
+                    if (terrain.type === TerrainType.Rock) {
+                        return (type === TerrainType.Rock || type === TerrainType.Mountain) ? 1 : 0
+                    }
+                    if (terrain.type === TerrainType.SpiceField) {
+                        return (type === TerrainType.SpiceField || type === TerrainType.SaturatedSpiceField) ? 1 : 0
+                    }
+                    return type === terrain.type ? 1 : 0
+                })
+                .reduce((prev, cur, index) => prev + (cur << index), 0)
+
+        switch (terrain.type) {
+        case TerrainType.Rock:
+            return images[128 + typeMask]
+        case TerrainType.Dunes:
+            return images[144 + typeMask]
+        case TerrainType.Mountain:
+            return images[160 + typeMask]
+        case TerrainType.SpiceField:
+            return images[176 + typeMask]
+        case TerrainType.SaturatedSpiceField:
+            return images[192 + typeMask]
+        }
+
+        return images[127]
+    }
+}
+
+export function ChunkCreator(map: Terrain[], mapSize: Size, config: MapConfig)
+    : (r: Rect) => Promise<SceneItem> {
+    const selectImage = terrainImageSelector(mapSize)
     const factory = config.chunk ? createChunk : createTiledChunk
+
+    return (chunkRect) => {
+        const position = chunkRect.topLeft()
+        const size = chunkRect.size
+        const positionToIndex = positionToIndexConverter(mapSize, position)
+        const images = []
+
+        for (let y = 0; y < size.height; ++y) {
+            for (let x = 0; x < size.width; ++x) {
+                images.push(selectImage(map, positionToIndex({ x, y })))
+            }
+        }
+
+        return factory({ position, size, images })
+    }
+}
+
+export function generateChunks(map: Terrain[], mapSize: Size, config: MapConfig)
+    : Promise<SceneItem[]> {
     const chunkSize = {
         width: config.chunkSize,
         height: config.chunkSize
     }
 
-    return Promise.all(partition(mapSize, chunkSize).map(([position, size]) => {
-        return factory({
-            position,
-            size,
-            images: getChunkImages(position, size)
-        })
-    }))
-}
-
-function selectTile(
-    terrain: Terrain,
-    neighbors: Neighborhood<Terrain>,
-    images: readonly Image[],
-): Image {
-    const typeMask = neighbors
-        .map((neighbor): number => {
-            const type = (neighbor ?? terrain).type
-            if (terrain.type === TerrainType.Rock) {
-                return (type === TerrainType.Rock || type === TerrainType.Mountain) ? 1 : 0
-            }
-            if (terrain.type === TerrainType.SpiceField) {
-                return (type === TerrainType.SpiceField || type === TerrainType.SaturatedSpiceField) ? 1 : 0
-            }
-            return type === terrain.type ? 1 : 0
-        })
-        .reduce((prev, cur, index) => prev + (cur << index), 0)
-
-    switch (terrain.type) {
-    case TerrainType.Rock:
-        return images[128 + typeMask]
-    case TerrainType.Dunes:
-        return images[144 + typeMask]
-    case TerrainType.Mountain:
-        return images[160 + typeMask]
-    case TerrainType.SpiceField:
-        return images[176 + typeMask]
-    case TerrainType.SaturatedSpiceField:
-        return images[192 + typeMask]
-    }
-
-    return images[127]
-}
-
-function terrainImageSelector(size: Size)
-    : (t: Terrain, i: number, m: Terrain[]) => Image {
-    const images = imageSet("terrain")
-    const neighbors = neighborhood(size)
-    return (terrain, index, map) => selectTile(
-        terrain,
-        neighbors(terrain, map),
-        images
-    )
-}
-
-export function generateChunks(land: Terrain[], mapSize: Size, config: MapConfig)
-    : Promise<SceneItem[]> {
-    const images = land.map(terrainImageSelector(mapSize))
-    return createChunks(images, mapSize, config)
+    return Promise.all(partition(mapSize, chunkSize).map(ChunkCreator(map, mapSize, config)))
 }
