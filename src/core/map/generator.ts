@@ -1,7 +1,7 @@
 import { indexToPositionConverter } from "./utils"
 
 import { MapConfig, Terrain, TerrainType } from "@/core/types"
-import { createNoise2DGenerator, createRangeMapper, RectangularCoordinates } from "@/maths"
+import { createNoise2DGenerator, createRangeMapper } from "@/maths"
 
 import { chain, flow, isNil, times } from "lodash"
 
@@ -77,11 +77,12 @@ function spiceFieldGenerator(config: Required<MapConfig>)
 }
 
 function terrainGenerator(config: Required<MapConfig>)
-    : (p: RectangularCoordinates) => Terrain {
+    : (index: number) => Terrain {
+    const indexToPosition = indexToPositionConverter(config.size)
     const generateTerrainType = terrainTypeGenerator(config)
     const generateSpiceField = spiceFieldGenerator(config)
-    return position => {
-        return chain({ position })
+    return index => {
+        return chain({ position: indexToPosition(index) })
             .tap(generateTerrainType)
             .tap(generateSpiceField)
             .value() as Terrain
@@ -90,9 +91,7 @@ function terrainGenerator(config: Required<MapConfig>)
 
 export function generateMap(config: Required<MapConfig>)
     : Promise<Terrain[]> {
-    const indexToPosition = indexToPositionConverter(config.size)
     return Promise.resolve(
-        times(config.size.width*config.size.height, indexToPosition)
-            .map(terrainGenerator(config))
+        times(config.size.width*config.size.height, terrainGenerator(config))
     )
 }
