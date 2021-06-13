@@ -1,9 +1,7 @@
-import { createChunk } from "./chunk"
+import { generateChunks } from "./chunk"
 import { generateMap } from "./generator"
-import { partition, positionToIndexConverter } from "./utils"
 
-import { createTile } from "@/core/tile"
-import { Image, MapConfig, ScaleFactor, SceneItem } from "@/core/types"
+import { MapConfig, ScaleFactor, SceneItem } from "@/core/types"
 
 import { Painter } from "@/graphics"
 import { Rect, Size, Vector } from "@/maths"
@@ -33,51 +31,12 @@ function checkConfig(config: Partial<MapConfig>): MapConfig {
     }
 }
 
-function ChunkImagesGetter(mapSize: Size, images: Image[]) {
-    const positionToIndex = positionToIndexConverter(mapSize)
-
-    return (chunkRect: Rect) => {
-        const xMin = chunkRect.x
-        const xMax = xMin + chunkRect.width
-        const yMin = chunkRect.y
-        const yMax = yMin + chunkRect.height
-        const chunkImages = []
-        for (let y = yMin; y < yMax; ++y) {
-            for (let x = xMin; x < xMax; ++x) {
-                const index = positionToIndex({ x, y })
-                chunkImages.push(images[index])
-            }
-        }
-        return chunkImages
-    }
-}
-
-function createChunks(mapSize: Size, config: MapConfig, images: Image[]) {
-    const getChunkImages = ChunkImagesGetter(mapSize, images)
-    const chunkSize = {
-        width: config.chunkSize,
-        height: config.chunkSize
-    }
-    return Promise.all(partition(mapSize, chunkSize).map(chunkRect => {
-        const chunkImages = getChunkImages(chunkRect)
-        return Promise.resolve(config.chunk
-            ? createChunk({
-                chunkRect,
-                images: chunkImages,
-            })  as Promise<SceneItem>
-            : createTile({
-                position: chunkRect.topLeft(),
-                size: chunkRect.size,
-                images: chunkImages,
-            }) as SceneItem
-        )
-    }))
-}
-
 export async function createMap(size: Size, config: Partial<MapConfig>)
     : Promise<SceneItem> {
-    const [map, images] = generateMap(size, checkConfig(config))
-    return createChunks(size, checkConfig(config), images).then(chunks => ({
+    const map = await generateMap(size, checkConfig(config))
+    const chunks = await generateChunks(map, size, checkConfig(config))
+
+    return {
         get position() {
             return Vector.Null()
         },
@@ -103,5 +62,5 @@ export async function createMap(size: Size, config: Partial<MapConfig>)
             }
             return this as SceneItem
         }
-    }))
+    }
 }

@@ -42,7 +42,12 @@ export class Tile extends AbstractSceneItem {
         this.images_ = images
     }
 
-    render(painter: Painter, gridSpacing: number, scaleFactor: ScaleFactor, viewport: Rect): Tile {
+    render(
+        painter: Painter,
+        gridSpacing: number,
+        scaleFactor: ScaleFactor,
+        viewport: Rect
+    ): Tile {
         for (let y = 0; y < this.height; ++y) {
             for (let x = 0; x < this.width; ++x) {
                 const p = this.position.add({ x, y })

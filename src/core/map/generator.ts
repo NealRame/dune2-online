@@ -1,10 +1,9 @@
-import { indexToPositionConverter, neighborhood } from "./utils"
+import { indexToPositionConverter } from "./utils"
 
-import { imageSet } from "@/core/data"
-import { Image, MapConfig, Neighborhood, Terrain, TerrainType } from "@/core/types"
+import { MapConfig, Terrain, TerrainType } from "@/core/types"
 import { createNoise2DGenerator, createRangeMapper, RectangularCoordinates, Size } from "@/maths"
 
-import { chain, flow, isNil, times, unzip } from "lodash"
+import { chain, flow, isNil, times } from "lodash"
 
 function terrainTypeGenerator(config: MapConfig)
     : (t: Partial<Terrain>) => Partial<Terrain> {
@@ -89,55 +88,11 @@ function terrainGenerator(size: Size, config: MapConfig)
     }
 }
 
-function selectTile(
-    terrain: Terrain,
-    neighbors: Neighborhood<Terrain>,
-    images: readonly Image[],
-): Image {
-    const typeMask = neighbors
-        .map((neighbor): number => {
-            const type = (neighbor ?? terrain).type
-            if (terrain.type === TerrainType.Rock) {
-                return (type === TerrainType.Rock || type === TerrainType.Mountain) ? 1 : 0
-            }
-            if (terrain.type === TerrainType.SpiceField) {
-                return (type === TerrainType.SpiceField || type === TerrainType.SaturatedSpiceField) ? 1 : 0
-            }
-            return type === terrain.type ? 1 : 0
-        })
-        .reduce((prev, cur, index) => prev + (cur << index), 0)
-
-    switch (terrain.type) {
-    case TerrainType.Rock:
-        return images[128 + typeMask]
-    case TerrainType.Dunes:
-        return images[144 + typeMask]
-    case TerrainType.Mountain:
-        return images[160 + typeMask]
-    case TerrainType.SpiceField:
-        return images[176 + typeMask]
-    case TerrainType.SaturatedSpiceField:
-        return images[192 + typeMask]
-    }
-
-    return images[127]
-}
-
-function terrainImageSelector(size: Size)
-    : (t: Terrain, i: number, m: Terrain[]) => [Terrain, Image] {
-    const images = imageSet("terrain")
-    const neighbors = neighborhood(size)
-    return (terrain, index, map) => [
-        terrain,
-        selectTile(terrain, neighbors(terrain, map), images)
-    ]
-}
-
 export function generateMap(size: Size, config: MapConfig)
-    : [Terrain[], Image[]] {
+    : Promise<Terrain[]> {
     const indexToPosition = indexToPositionConverter(size)
-    return unzip(times(size.width*size.height, indexToPosition)
-        .map(terrainGenerator(size, config))
-        .map(terrainImageSelector(size))
-    ) as [Terrain[], Image[]]
+    return Promise.resolve(
+        times(size.width*size.height, indexToPosition)
+            .map(terrainGenerator(size, config))
+    )
 }
