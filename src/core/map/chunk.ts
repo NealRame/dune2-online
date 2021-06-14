@@ -1,4 +1,4 @@
-import { partition, neighborhood, positionToIndexConverter } from "./utils"
+import { neighborhood, positionToIndexConverter } from "./utils"
 import { createChunkImage } from "./workers"
 
 import { imageSet } from "@/core/data"
@@ -108,7 +108,20 @@ export function ChunkCreator(map: Terrain[], config: Required<MapConfig>)
     }
 }
 
-export function generateChunks(map: Terrain[], config: Required<MapConfig>)
-    : Promise<SceneItem[]> {
-    return Promise.all(partition(config.size, config.chunkSize).map(ChunkCreator(map, config)))
+export function generateChunks(
+    config: Required<MapConfig>,
+    chunkCallback: (r: Rect) => Promise<SceneItem>
+): Promise<SceneItem[]> {
+    const { size: mapSize, chunkSize } = config
+    const chunks: Promise<SceneItem>[] = []
+
+    for (let y = 0; y < mapSize.height; y += chunkSize.height) {
+        for (let x = 0; x < mapSize.width; x += chunkSize.width) {
+            const width = Math.min(chunkSize.width, mapSize.width - x)
+            const height = Math.min(chunkSize.height, mapSize.height - y)
+            chunks.push(chunkCallback(new Rect({ x, y }, { width, height })))
+        }
+    }
+
+    return Promise.all(chunks)
 }

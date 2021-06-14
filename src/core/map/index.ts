@@ -1,4 +1,4 @@
-import { generateChunks } from "./chunk"
+import { ChunkCreator, generateChunks } from "./chunk"
 import { generateMap } from "./generator"
 
 import { MapConfig, ScaleFactor, SceneItem } from "@/core/types"
@@ -35,8 +35,11 @@ function checkConfig(config: MapConfig): Required<MapConfig> {
 
 export async function createMap(config: MapConfig)
     : Promise<SceneItem> {
-    const map = await generateMap(checkConfig(config))
-    const chunks = await generateChunks(map, checkConfig(config))
+    const checkedConfig = checkConfig(config)
+
+    const map = generateMap(checkedConfig)
+    const createChunk = ChunkCreator(map, checkedConfig)
+    const chunks = await generateChunks(checkedConfig, createChunk)
 
     return {
         get position() {

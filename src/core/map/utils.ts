@@ -1,5 +1,5 @@
 import { Neighborhood, Terrain } from "@/core/types"
-import { Rect, RectangularCoordinates, Size } from "@/maths"
+import { RectangularCoordinates, Size } from "@/maths"
 
 export function indexToPositionConverter({ width }: Size)
     : (n: number) => RectangularCoordinates {
@@ -35,18 +35,4 @@ export function neighborhood<T extends Terrain>(size: Size)
             west  >= 0 ? map[west]  : null,
         ]
     }
-}
-
-export function partition(mapSize: Size, chunkSize: Size)
-    : Rect[] {
-    const chunks: Rect[] = []
-    for (let y = 0; y < mapSize.height; y += chunkSize.height) {
-        for (let x = 0; x < mapSize.width; x += chunkSize.width) {
-            const width = Math.min(chunkSize.width, mapSize.width - x)
-            const height = Math.min(chunkSize.height, mapSize.height - y)
-            chunks.push(new Rect({ x, y }, { width, height }))
-        }
-    }
-
-    return chunks
 }
