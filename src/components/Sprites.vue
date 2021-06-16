@@ -122,7 +122,7 @@ export default defineComponent({
             scene.gridEnabled = true
             scene.scale = unref(scale)
 
-            tiles.value = GameData.tiles().map(makeTile)
+            tiles.value = Object.freeze(GameData.tiles().map(makeTile))
 
             const repairFacility = makeSprite([277, 278, 279, 280, 281, 282, 283, 284])
             const radar = makeSprite([311, 312, 313, 314])
