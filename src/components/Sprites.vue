@@ -39,7 +39,6 @@ import { debounce, isNil, range } from "lodash"
 // 3x2 => 219
 // 3x3 => 209
 
-//
 function makeSprite(tiles: number[]) {
     const tileDescriptors = GameData.tiles()
     const frameCount = 30
