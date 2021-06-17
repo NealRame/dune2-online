@@ -16,14 +16,10 @@ async function fetchGameData(progress: DataProgressNotifier) {
     const paletteData = await fetchData("/assets/palette.json.gz", fetchProgress)
     const palette = await Workers.decodePalette(paletteData)
 
-    // Fetch tiles mapping
-    progress.setLabel("Fetching tiles mapping data ...")
-    const tilesDescriptorsData = await fetchData("/assets/tiles.json.gz", fetchProgress)
-    const tiles = await Workers.decodeTileDescriptors(tilesDescriptorsData)
-
     // Fetch image set
-    const images = await Promise.all(ImageSet.map(async set => {
+    const fetchGameImageData = async (set: typeof ImageSet[number]) => {
         progress.setLabel(`Fetching ${set} data ...`)
+
         const data = await fetchData(
             `/assets/images.${set}.json.gz`,
             fetchProgress
@@ -31,15 +27,26 @@ async function fetchGameData(progress: DataProgressNotifier) {
 
         progress.setLabel(`Decoding ${set} images ...`)
         progress.setValue(null)
-        return {
-            [set]: await Workers.decodeImages(data, palette)
-        }
-    }))
+
+        return await Workers.decodeImages(data, palette)
+    }
+    const miscImages = await fetchGameImageData("misc")
+    const terrainImages = await fetchGameImageData("terrain")
+    const unitsImages = await fetchGameImageData("units")
+
+    // Fetch tiles mapping
+    progress.setLabel("Fetching tiles mapping data ...")
+    const tilesDescriptorsData = await fetchData("/assets/tiles.json.gz", fetchProgress)
+    const tiles = await Workers.decodeTileDescriptors(tilesDescriptorsData, terrainImages)
 
     return {
         palette,
         tiles,
-        images: Object.assign({}, ...images) as ImageLib,
+        images: {
+            misc: miscImages,
+            terrain: terrainImages,
+            units: unitsImages,
+        },
     }
 }
 

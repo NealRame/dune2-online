@@ -9,17 +9,32 @@ import { Palette } from "@/core"
 
 import PromiseWorker from "promise-worker"
 
-const promiseDecodePaletteWorker = new PromiseWorker(new DecodePaletteWorker())
-export function decodePalette(data: Uint8Array): Promise<Palette> {
-    return promiseDecodePaletteWorker.postMessage(data)
+type TileData = {
+    size: {
+        width: number,
+        height: number,
+    },
+    indexes: number[],
 }
 
-const promiseDecodeTileDescriptorsWorker = new PromiseWorker(new DecodeTileDescriptors())
-export function decodeTileDescriptors(data: Uint8Array): Promise<TileDescriptor[]> {
-    return promiseDecodeTileDescriptorsWorker.postMessage(data)
+const decodePaletteWorker = new PromiseWorker(new DecodePaletteWorker())
+export function decodePalette(data: Uint8Array)
+    : Promise<Palette> {
+    return decodePaletteWorker.postMessage(data)
 }
 
-const promiseDecodeImagesWorker = new PromiseWorker(new DecodeImagesWorker())
-export function decodeImages(data: Uint8Array, palette: Palette): Promise<Image[]> {
-    return promiseDecodeImagesWorker.postMessage({ data, palette })
+const decodeImagesWorker = new PromiseWorker(new DecodeImagesWorker())
+export function decodeImages(data: Uint8Array, palette: Palette)
+    : Promise<Image[]> {
+    return decodeImagesWorker.postMessage({ data, palette })
+}
+
+const decodeTileDescriptorsWorker = new PromiseWorker(new DecodeTileDescriptors())
+export async function decodeTileDescriptors(data: Uint8Array, images: readonly Image[])
+    : Promise<TileDescriptor[]> {
+    const tileDescriptors = await decodeTileDescriptorsWorker.postMessage(data)
+    return (tileDescriptors as TileData[]).map(({ indexes, size }) => ({
+        size,
+        images: indexes.map(index => images[index])
+    }))
 }

@@ -23,24 +23,11 @@ import Screen, { ScreenMouseClickEvent } from "@/components/Screen.vue"
 import TilePalette from "@/components/TilePalette.vue"
 
 import { createScene, createSprite, createTile, GameData, ScaleFactor, Tile } from "@/core"
-import { RectangularCoordinates, Size, Vector } from "@/maths"
+import { RectangularCoordinates, Vector } from "@/maths"
 import { PaintDevice } from "@/graphics"
 
 import { defineComponent, onMounted, ref, unref } from "vue"
 import { debounce, isNil, range } from "lodash"
-
-function makeTile({ position, size, images }: {
-    position?: RectangularCoordinates,
-    size: Size,
-    images: number[],
-}): Tile {
-    const terrains = GameData.imageSet("terrain")
-    return createTile({
-        position,
-        size,
-        images: images.map((index: number) => terrains[index])
-    })
-}
 
 // rubbles:
 // 2x2 => 28
@@ -67,7 +54,7 @@ function makeSprite(tiles: number[]) {
     })
 
     tiles.forEach(index => {
-        sprite.addFrame(makeTile(tileDescriptors[index]))
+        sprite.addFrame(createTile(tileDescriptors[index]))
     })
 
     return sprite
@@ -112,7 +99,7 @@ export default defineComponent({
 
             console.log(tileConf)
 
-            scene.addItem(makeTile({
+            scene.addItem(createTile({
                 position: screenToSceneCoordinates(ev.position),
                 ...tileConf
             }))
@@ -122,7 +109,7 @@ export default defineComponent({
             scene.gridEnabled = true
             scene.scale = unref(scale)
 
-            tiles.value = Object.freeze(GameData.tiles().map(makeTile))
+            tiles.value = Object.freeze(GameData.tiles().map(createTile))
 
             const repairFacility = makeSprite([277, 278, 279, 280, 281, 282, 283, 284])
             const radar = makeSprite([311, 312, 313, 314])
