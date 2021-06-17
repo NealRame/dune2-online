@@ -50,13 +50,15 @@ export class Tile extends AbstractSceneItem {
     ): Tile {
         for (let y = 0; y < this.height; ++y) {
             for (let x = 0; x < this.width; ++x) {
-                const p = this.position.add({ x, y })
-                const r = new Rect(p, { width: 1, height: 1 })
+                const scenePos = this.position.add({ x, y })
+                const r = new Rect(scenePos, { width: 1, height: 1 })
 
                 if (viewport.intersects(r)) {
                     const index = this.width*y + x
                     const bitmap = this.images_[index][scaleFactor]
-                    painter.drawImageBitmap(bitmap, p.sub(viewport).mul(gridSpacing))
+                    const screenPos = scenePos.sub(viewport).mul(gridSpacing)
+
+                    painter.drawImageBitmap(bitmap, screenPos)
                 }
             }
         }
