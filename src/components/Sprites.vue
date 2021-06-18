@@ -110,8 +110,8 @@ export default defineComponent({
 
             tiles.value = Object.freeze(GameData.tiles().map(createTile))
 
-            const repairFacility = makeSprite([277, 278, 279, 280, 281, 282, 283, 284])
             const radar = makeSprite([311, 312, 313, 314])
+            const repairFacility = makeSprite([277, 278, 279, 280, 281, 282, 283, 284])
             const liteFactory = makeSprite([215, 216, 217, 218])
             const palace =makeSprite([211, 212])
             const spaceport = makeSprite([257, 258, 259, 260, 261, 262])
