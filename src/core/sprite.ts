@@ -54,15 +54,16 @@ export class Sprite extends AbstractSceneItem {
     }
 
     render(painter: Painter, gridSpacing: number, scale: ScaleFactor, viewport: Rect): Sprite {
-        const pos = new Vector(this.x, this.y)
-
-        viewport = viewport.translated(pos.opposite)
-
         painter.save()
-        painter.translate(pos.mul(gridSpacing))
+        painter.translate(this.position.sub(viewport.topLeft()).mul(gridSpacing))
 
         if (this.frameIndex_ <= this.frames_.length) {
-            this.frames_[this.frameIndex_].render(painter, gridSpacing, scale, viewport)
+            this.frames_[this.frameIndex_].render(
+                painter,
+                gridSpacing,
+                scale,
+                new Rect(Vector.Null(), this.size)
+            )
         }
 
         painter.restore()
