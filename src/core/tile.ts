@@ -29,8 +29,7 @@ function checkSizeOfImages(images: Image[]) {
 
 export class Tile extends AbstractSceneItem {
     private images_: Image[]
-    private flipX_ = false
-    private flipY_ = false
+    private flipAxes_: number
 
     constructor(
         rect: Rect,
@@ -42,16 +41,7 @@ export class Tile extends AbstractSceneItem {
         checkSizeOfImages(images)
 
         this.images_ = images
-    }
-
-    flipX(): Tile {
-        this.flipX_ = true
-        return this
-    }
-
-    flipY(): Tile {
-        this.flipY_ = true
-        return this
+        this.flipAxes_ = 0
     }
 
     render(
@@ -71,12 +61,7 @@ export class Tile extends AbstractSceneItem {
                     const screenPos = scenePos.sub(viewport).mul(gridSpacing)
 
                     painter.save()
-                    if (this.flipX_) {
-                        painter.flipX()
-                    }
-                    if (this.flipY_) {
-                        painter.flipY()
-                    }
+
                     painter.drawImageBitmap(bitmap, screenPos)
                     painter.restore()
                 }

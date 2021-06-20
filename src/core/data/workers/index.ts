@@ -5,7 +5,7 @@ import DecodePaletteWorker from "worker-loader!./decode-palette"
 import DecodeTileDescriptors from "worker-loader!./decode-tile-descriptors"
 import DecodeImagesWorker from "worker-loader!./decode-images"
 
-import { Palette } from "@/core"
+import { ImageSet, Palette } from "@/core"
 
 import PromiseWorker from "promise-worker"
 
@@ -24,9 +24,9 @@ export function decodePalette(data: Uint8Array)
 }
 
 const decodeImagesWorker = new PromiseWorker(new DecodeImagesWorker())
-export function decodeImages(data: Uint8Array, palette: Palette)
+export function decodeImages(data: Uint8Array, set: ImageSet, palette: Palette)
     : Promise<Image[]> {
-    return decodeImagesWorker.postMessage({ data, palette })
+    return decodeImagesWorker.postMessage({ data, set, palette })
 }
 
 const decodeTileDescriptorsWorker = new PromiseWorker(new DecodeTileDescriptors())

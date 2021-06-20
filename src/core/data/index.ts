@@ -28,7 +28,7 @@ async function fetchGameData(progress: DataProgressNotifier) {
         progress.setLabel(`Decoding ${set} images ...`)
         progress.setValue(null)
 
-        return await Workers.decodeImages(data, palette)
+        return await Workers.decodeImages(data, set, palette)
     }
     const miscImages = await fetchGameImageData("misc")
     const terrainImages = await fetchGameImageData("terrain")
