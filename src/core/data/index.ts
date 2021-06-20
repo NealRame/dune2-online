@@ -17,7 +17,7 @@ async function fetchGameData(progress: DataProgressNotifier) {
     const palette = await Workers.decodePalette(paletteData)
 
     // Fetch image set
-    const fetchGameImageData = async (set: typeof ImageSet[number]) => {
+    const fetchGameImageData = async (set: ImageSet) => {
         progress.setLabel(`Fetching ${set} data ...`)
 
         const data = await fetchData(

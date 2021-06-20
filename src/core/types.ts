@@ -15,9 +15,10 @@ export interface DataProgressNotifier {
 export type Palette = readonly Color.RGBA[]
 
 // Image set
-export const ImageSet = ["misc", "terrain", "units"] as const
+export const ImageSets = ["misc", "terrain", "units"] as const
 export type Image = Record<ScaleFactor, ImageBitmap>
-export type ImageLib = Record<typeof ImageSet[number], readonly Image[]>
+export type ImageSet = typeof ImageSets[number]
+export type ImageLib = Record<ImageSet, readonly Image[]>
 
 // Tile descriptor
 export type TileDescriptor = {
