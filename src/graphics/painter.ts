@@ -144,7 +144,7 @@ export class Painter {
     drawImageBitmap(
         imageBitmap: ImageBitmap,
         { x, y }: RectangularCoordinates,
-        srcRect?: Rect
+        srcRect?: Rect,
     ): Painter {
         if (isNil(srcRect)) {
             this.context_.drawImage(imageBitmap, x, y)
