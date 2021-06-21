@@ -6,18 +6,21 @@ import { positionToIndexConverter } from "@/core/map/utils"
 import registerPromiseWorker from "promise-worker/register"
 
 function chunkImageBitmapCreator({
-    chunkSize,
+    shape,
     images,
 }: ChunkMessage)
     : (scale: ScaleFactor) => Partial<Image> {
-    const { width, height } = chunkSize
-    const positionToIndex = positionToIndexConverter(chunkSize)
+    const { columns, rows } = shape
+    const positionToIndex = positionToIndexConverter({
+        width: columns,
+        height: rows,
+    })
     return scale => {
-        const canvas = new OffscreenCanvas(16*scale*width, 16*scale*height)
+        const canvas = new OffscreenCanvas(16*scale*columns, 16*scale*rows)
         const context = canvas.getContext("2d") as OffscreenCanvasRenderingContext2D
 
-        for (let y = 0; y < height; ++y) {
-            for (let x = 0; x < width; ++x) {
+        for (let y = 0; y < rows; ++y) {
+            for (let x = 0; x < columns; ++x) {
                 const index = positionToIndex({ x, y })
                 const bitmap = images[index][scale]
                 context.drawImage(

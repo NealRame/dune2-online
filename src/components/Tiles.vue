@@ -55,8 +55,8 @@ export default defineComponent({
         onMounted(async () => {
             tiles.value = GameData
                 .imageSet(props.set as keyof ImageLib)
-                .map(image => createTile({
-                    size: { width: 1, height: 1 },
+                .map(image => createTile(scene, {
+                    shape: { columns: 1, rows: 1 },
                     images: [image]
                 }))
 
@@ -80,9 +80,9 @@ export default defineComponent({
 
             if (isNil(image)) return
 
-            scene.addItem(createTile({
+            scene.addItem(createTile(scene, {
                 position: screenToSceneCoordinates(ev.position),
-                size: { width: 1, height: 1 },
+                shape: { columns: 1, rows: 1 },
                 images: [GameData.imageSet(props.set as keyof ImageLib)[image]]
             }))
         }

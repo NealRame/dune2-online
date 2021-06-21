@@ -4,6 +4,11 @@ import { Rect, RectangularCoordinates, Size, Vector } from "@/maths"
 export const ScaleFactors = [1, 2, 3, 4] as const
 export type ScaleFactor = typeof ScaleFactors[number]
 
+export type Shape = {
+    columns: number,
+    rows: number,
+}
+
 export interface DataProgressNotifier {
     begin(): void,
     setLabel(label: string): void,
@@ -36,8 +41,9 @@ export type GameData = {
 export interface Scene {
     scale: ScaleFactor,
     viewport: Rect | null,
-    gridEnabled: boolean,
+    readonly gridUnit: number,
     readonly gridSpacing: number,
+    gridEnabled: boolean,
     readonly rect: Rect,
     addItem(item: SceneItem): Scene, // eslint-disable-line no-use-before-define
     clear(): Scene,
@@ -47,9 +53,10 @@ export interface Scene {
 }
 
 export interface SceneItem {
+    readonly scene: Scene,
     position: Vector,
-    size: Size,
-    rect: Rect,
+    readonly size: Size,
+    readonly rect: Rect,
     update(): SceneItem,
     render(painter: Painter, gridSpacing: number, scale: ScaleFactor, viewport: Rect): SceneItem,
 }

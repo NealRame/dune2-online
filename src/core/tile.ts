@@ -1,47 +1,57 @@
 import { AbstractSceneItem } from "./scene-item"
-import { Image, ScaleFactor } from "./types"
+import { Image, ScaleFactor, Scene, Shape } from "./types"
 
 import { Painter } from "@/graphics"
 import { Rect, RectangularCoordinates, Size } from "@/maths"
 
 import { isMatch } from "lodash"
 
-function imageSize(image: Image, scale: ScaleFactor): Size {
-    const { width, height } = image[scale]
-    return { width, height }
-}
-
-function checkShape({ width, height }: Size, images: Image[]) {
-    if (width*height > images.length) {
-        throw new Error("Inconsistent number of images for the shape of the sprite")
+function getImageSize(scene: Scene, image: Image): Size {
+    const { width: w, height: h } = image[1]
+    return {
+        width: w/scene.gridUnit,
+        height: h/scene.gridUnit,
     }
 }
 
-function checkSizeOfImages(images: Image[]) {
+function checkImages(scene: Scene, images: Image[]) {
     const [head, ...tail] = images
-    const size = imageSize(head, 1)
+    const size = getImageSize(scene, head)
     for (const image of tail) {
-        if (!isMatch(imageSize(image, 1), size)) {
+        if (!isMatch(getImageSize(scene, image), size)) {
             throw new Error("All image must have the same size")
         }
     }
 }
 
+function checkShape({ columns, rows }: Shape, images: Image[]) {
+    if (columns*rows > images.length) {
+        throw new Error("Inconsistent number of images for the shape of the sprite")
+    }
+}
+
 export class Tile extends AbstractSceneItem {
+    private imageSize_: Size
     private images_: Image[]
-    private flipAxes_: number
+    private shape_: Shape
 
     constructor(
-        rect: Rect,
+        scene: Scene,
+        position: RectangularCoordinates,
+        shape: Shape,
         images: Image[],
     ) {
-        super(rect)
+        super(scene)
 
-        checkShape(this.size, images)
-        checkSizeOfImages(images)
+        checkImages(scene, images)
+        checkShape(shape, images)
 
+        this.imageSize_ = getImageSize(scene, images[0])
         this.images_ = images
-        this.flipAxes_ = 0
+        this.shape_ = shape
+        this.position = position
+        this.width_ = shape.columns*this.imageSize_.width
+        this.height_ = shape.rows*this.imageSize_.height
     }
 
     render(
@@ -50,37 +60,34 @@ export class Tile extends AbstractSceneItem {
         scaleFactor: ScaleFactor,
         viewport: Rect
     ): Tile {
-        for (let y = 0; y < this.height; ++y) {
-            for (let x = 0; x < this.width; ++x) {
-                const scenePos = this.position.add({ x, y })
-                const r = new Rect(scenePos, { width: 1, height: 1 })
+        for (let i = 0; i < this.images_.length; ++i) {
+            const scenePos = this.position.add({
+                x: Math.floor(i%this.shape_.columns),
+                y: Math.floor(i/this.shape_.columns),
+            })
+            const sceneRect = new Rect(scenePos, this.imageSize_)
 
-                if (viewport.intersects(r)) {
-                    const index = this.width*y + x
-                    const bitmap = this.images_[index][scaleFactor]
-                    const screenPos = scenePos.sub(viewport).mul(gridSpacing)
-
-                    painter.save()
-
-                    painter.drawImageBitmap(bitmap, screenPos)
-                    painter.restore()
-                }
+            if (viewport.intersects(sceneRect)) {
+                const bitmap = this.images_[i][scaleFactor]
+                const screenPos = scenePos.sub(viewport).mul(gridSpacing)
+                painter.drawImageBitmap(bitmap, screenPos)
             }
         }
-
         return this
     }
 }
 
 export type TileConfig = {
     position?: RectangularCoordinates,
-    size: Size,
+    shape: Shape,
     images: Image[]
 }
 
-export function createTile(config: TileConfig): Tile {
+export function createTile(scene: Scene, config: TileConfig): Tile {
     return new Tile(
-        new Rect(config.position ?? { x: 0, y: 0 }, config.size),
-        config.images
+        scene,
+        config.position ?? { x: 0, y: 0 },
+        config.shape,
+        config.images,
     )
 }

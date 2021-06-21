@@ -23,6 +23,10 @@ import Screen, { ScreenMouseClickEvent } from "@/components/Screen.vue"
 import TilePalette from "@/components/TilePalette.vue"
 
 import { createScene, createSprite, createTile, GameData, ScaleFactor, Tile } from "@/core"
+import { Harvester } from "@/core/units/harvester"
+import { Quad } from "@/core/units/quad"
+import { Trike } from "@/core/units/trike"
+
 import { RectangularCoordinates, Vector } from "@/maths"
 import { PaintDevice } from "@/graphics"
 
@@ -39,25 +43,25 @@ import { debounce, isNil, range } from "lodash"
 // 3x2 => 219
 // 3x3 => 209
 
-function makeSprite(tiles: number[]) {
-    const tileDescriptors = GameData.tiles()
-    const frameCount = 30
-    let frame = 0
-    const sprite = createSprite({
-        onUpdate() {
-            frame = (frame + 1) % frameCount
-            if (frame === 0) {
-                sprite.frameIndex = (sprite.frameIndex + 1) % sprite.frameCount
-            }
-        }
-    })
+// function makeSprite(tiles: number[]) {
+//     const tileDescriptors = GameData.tiles()
+//     const frameCount = 30
+//     let frame = 0
+//     const sprite = createSprite({
+//         onUpdate() {
+//             frame = (frame + 1) % frameCount
+//             if (frame === 0) {
+//                 sprite.frameIndex = (sprite.frameIndex + 1) % sprite.frameCount
+//             }
+//         }
+//     })
 
-    tiles.forEach(index => {
-        sprite.addFrame(createTile(tileDescriptors[index]))
-    })
+//     tiles.forEach(index => {
+//         sprite.addFrame(createTile(tileDescriptors[index]))
+//     })
 
-    return sprite
-}
+//     return sprite
+// }
 
 export default defineComponent({
     components: {
@@ -89,57 +93,70 @@ export default defineComponent({
         }
 
         const onMouseClick = (ev: ScreenMouseClickEvent) => {
-            const tileDescriptors = GameData.tiles()
-            const index = unref(currentItem)
+            // const tileDescriptors = GameData.tiles()
+            // const index = unref(currentItem)
 
-            if (isNil(index)) return
+            // if (isNil(index)) return
 
-            const tileConf = tileDescriptors[index]
+            // const tileConf = tileDescriptors[index]
 
-            console.log(tileConf)
+            // console.log(tileConf)
 
-            scene.addItem(createTile({
-                position: screenToSceneCoordinates(ev.position),
-                ...tileConf
-            }))
+            // scene.addItem(createTile({
+            //     position: screenToSceneCoordinates(ev.position),
+            //     ...tileConf
+            // }))
         }
 
         onMounted(async () => {
             scene.gridEnabled = true
             scene.scale = unref(scale)
 
-            tiles.value = Object.freeze(GameData.tiles().map(createTile))
+            // tiles.value = Object.freeze(GameData.tiles().map(createTile))
 
-            const radar = makeSprite([311, 312, 313, 314])
-            const repairFacility = makeSprite([277, 278, 279, 280, 281, 282, 283, 284])
-            const liteFactory = makeSprite([215, 216, 217, 218])
-            const palace =makeSprite([211, 212])
-            const spaceport = makeSprite([257, 258, 259, 260, 261, 262])
-            const refinery = makeSprite([267, 268, 269, 270, 271, 272])
-            const heavyFactory = makeSprite([221, 222, 223, 224, 225, 226])
-            const turret = makeSprite(range(287, 295))
-            const rocketTurret = makeSprite(range(297, 305))
+            // const radar = makeSprite([311, 312, 313, 314])
+            // const repairFacility = makeSprite([277, 278, 279, 280, 281, 282, 283, 284])
+            // const liteFactory = makeSprite([215, 216, 217, 218])
+            // const palace =makeSprite([211, 212])
+            // const spaceport = makeSprite([257, 258, 259, 260, 261, 262])
+            // const refinery = makeSprite([267, 268, 269, 270, 271, 272])
+            // const heavyFactory = makeSprite([221, 222, 223, 224, 225, 226])
+            // const turret = makeSprite(range(287, 295))
+            // const rocketTurret = makeSprite(range(297, 305))
 
-            radar.position = new Vector(1, 1)
-            liteFactory.position = new Vector(1, 4)
-            heavyFactory.position = new Vector(4, 1)
-            repairFacility.position = new Vector(4, 4)
-            refinery.position = new Vector(4, 7)
-            palace.position = new Vector(8, 1)
-            spaceport.position = new Vector(12, 1)
-            turret.position = new Vector(8, 5)
-            rocketTurret.position = new Vector(10, 5)
+            const harvester = new Harvester(scene, { x: 8, y: 5 })
+            const quad = new Quad(scene, { x: 8, y: 7 })
+            const trike = new Trike(scene, { x: 10, y: 7 })
+
+            setInterval(() => {
+                harvester.frameIndex = (harvester.frameIndex + 1) % harvester.frameCount
+                quad.frameIndex = (quad.frameIndex + 1) % quad.frameCount
+                trike.frameIndex = (trike.frameIndex + 1) % trike.frameCount
+            }, 512)
+
+            // radar.position = new Vector(1, 1)
+            // liteFactory.position = new Vector(1, 4)
+            // heavyFactory.position = new Vector(4, 1)
+            // repairFacility.position = new Vector(4, 4)
+            // refinery.position = new Vector(4, 7)
+            // palace.position = new Vector(8, 1)
+            // spaceport.position = new Vector(12, 1)
+            // turret.position = new Vector(8, 5)
+            // rocketTurret.position = new Vector(10, 5)
 
             scene
-                .addItem(radar)
-                .addItem(liteFactory)
-                .addItem(heavyFactory)
-                .addItem(repairFacility)
-                .addItem(refinery)
-                .addItem(spaceport)
-                .addItem(palace)
-                .addItem(turret)
-                .addItem(rocketTurret)
+                // .addItem(radar)
+                // .addItem(liteFactory)
+                // .addItem(heavyFactory)
+                // .addItem(repairFacility)
+                // .addItem(refinery)
+                // .addItem(spaceport)
+                // .addItem(palace)
+                // .addItem(turret)
+                // .addItem(rocketTurret)
+                .addItem(harvester)
+                .addItem(quad)
+                .addItem(trike)
                 .run((unref(screen) as PaintDevice).painter)
 
             window.addEventListener("resize", resize)

@@ -200,7 +200,7 @@ export default defineComponent({
 
         const update = async () => {
             showModal.value = true
-            const map = await createMap({
+            const map = await createMap(scene, {
                 seed,
                 size: {
                     width: unref(width),

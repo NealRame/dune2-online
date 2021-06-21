@@ -1,7 +1,7 @@
 import { ChunkCreator, generateChunks } from "./chunk"
 import { generateMap } from "./generator"
 
-import { MapConfig, ScaleFactor, SceneItem } from "@/core/types"
+import { MapConfig, ScaleFactor, Scene, SceneItem } from "@/core/types"
 
 import { Painter } from "@/graphics"
 import { Rect, Size, Vector } from "@/maths"
@@ -33,15 +33,18 @@ function checkConfig(config: MapConfig): Required<MapConfig> {
     }
 }
 
-export async function createMap(config: MapConfig)
+export async function createMap(scene: Scene, config: MapConfig)
     : Promise<SceneItem> {
     const checkedConfig = checkConfig(config)
 
     const map = generateMap(checkedConfig)
-    const createChunk = ChunkCreator(map, checkedConfig)
+    const createChunk = ChunkCreator(scene, map, checkedConfig)
     const chunks = await generateChunks(checkedConfig, createChunk)
 
     return {
+        get scene(): Scene {
+            return scene
+        },
         get position() {
             return Vector.Null()
         },

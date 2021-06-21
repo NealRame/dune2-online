@@ -1,7 +1,6 @@
-import { Image } from "@/core/types"
-import { Size } from "@/maths"
+import { Image, Shape } from "@/core/types"
 
 export type ChunkMessage = {
-    chunkSize: Size,
+    shape: Shape,
     images: Image[],
 }

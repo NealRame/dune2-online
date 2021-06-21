@@ -2,53 +2,12 @@ import { neighborhood, positionToIndexConverter } from "./utils"
 import { createChunkImage } from "./workers"
 
 import { imageSet } from "@/core/data"
-import { AbstractSceneItem } from "@/core/scene-item"
-import { createTile, TileConfig } from "@/core/tile"
-import { Image, MapConfig, ScaleFactor, SceneItem, Terrain, TerrainType } from "@/core/types"
+import { Tile } from "@/core/tile"
+import { Image, MapConfig, Scene, SceneItem, Shape, Terrain, TerrainType } from "@/core/types"
 
-import { Painter } from "@/graphics"
-import { Rect, Size } from "@/maths"
+import { RectangularCoordinates, Size } from "@/maths"
 
-export class Chunk extends AbstractSceneItem {
-    private image_: Image
-
-    constructor(chunkRect: Rect, image: Image) {
-        super(chunkRect)
-        this.image_ = image
-    }
-
-    set image(image: Image) {
-        this.image_ = image
-    }
-
-    render(
-        painter: Painter,
-        gridSpacing: number,
-        scale: ScaleFactor,
-        viewport: Rect
-    ): Chunk {
-        painter.drawImageBitmap(
-            this.image_[scale],
-            this.position.sub(viewport.topLeft()).mul(gridSpacing),
-        )
-        return this
-    }
-}
-
-async function createChunk(config: TileConfig): Promise<SceneItem> {
-    const image = await createChunkImage({
-        chunkSize: config.size,
-        images: config.images,
-    })
-    return new Chunk(
-        new Rect(config.position ?? { x: 0, y: 0 }, config.size),
-        image
-    )
-}
-
-async function createTiledChunk(config:TileConfig): Promise<SceneItem> {
-    return Promise.resolve(createTile(config))
-}
+export type ChunkCallback = (p: RectangularCoordinates, s: Shape) => Promise<SceneItem>
 
 function terrainImageSelector(size: Size)
     : (m: Terrain[], index: number) => Image {
@@ -87,41 +46,45 @@ function terrainImageSelector(size: Size)
     }
 }
 
-export function ChunkCreator(map: Terrain[], config: Required<MapConfig>)
-    : (r: Rect) => Promise<SceneItem> {
+export function ChunkCreator(scene: Scene, map: Terrain[], config: Required<MapConfig>)
+    : ChunkCallback {
     const selectImage = terrainImageSelector(config.size)
-    const factory = config.chunk ? createChunk : createTiledChunk
 
-    return (chunkRect) => {
-        const position = chunkRect.topLeft()
-        const size = chunkRect.size
+    return async (position, shape) => {
         const positionToIndex = positionToIndexConverter(config.size, position)
         const images = []
 
-        for (let y = 0; y < size.height; ++y) {
-            for (let x = 0; x < size.width; ++x) {
+        for (let y = 0; y < shape.rows; ++y) {
+            for (let x = 0; x < shape.columns; ++x) {
                 images.push(selectImage(map, positionToIndex({ x, y })))
             }
         }
 
-        return factory({ position, size, images })
+        if (config.chunk) {
+            const image = await createChunkImage({
+                shape,
+                images: images,
+            })
+            return new Tile(scene, position, { columns: 1, rows: 1 }, [image]) as SceneItem
+        }
+
+        return new Tile(scene, position, shape, images) as SceneItem
     }
 }
 
 export function generateChunks(
     config: Required<MapConfig>,
-    chunkCallback: (r: Rect) => Promise<SceneItem>
+    chunkCallback: ChunkCallback,
 ): Promise<SceneItem[]> {
     const { size: mapSize, chunkSize } = config
     const chunks: Promise<SceneItem>[] = []
 
     for (let y = 0; y < mapSize.height; y += chunkSize.height) {
         for (let x = 0; x < mapSize.width; x += chunkSize.width) {
-            const width = Math.min(chunkSize.width, mapSize.width - x)
-            const height = Math.min(chunkSize.height, mapSize.height - y)
-            chunks.push(chunkCallback(new Rect({ x, y }, { width, height })))
+            const columns = Math.min(chunkSize.width, mapSize.width - x)
+            const rows = Math.min(chunkSize.height, mapSize.height - y)
+            chunks.push(chunkCallback({ x, y }, { columns, rows }))
         }
     }
-
     return Promise.all(chunks)
 }

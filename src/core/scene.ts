@@ -7,6 +7,7 @@ import { Rect, RectangularCoordinates } from "@/maths"
 type SceneState = {
     backgroundColor: Brush
     gridEnabled: boolean
+    gridUnit: 16,
     scaleFactor: ScaleFactor
     viewport: Rect | null
     items: SceneItem[]
@@ -51,12 +52,13 @@ export function createScene(): Scene {
     const state: SceneState = {
         backgroundColor: cssHex([0, 0, 0]),
         gridEnabled: false,
+        gridUnit: 16,
         items: [],
         scaleFactor: 1,
         viewport: null,
     }
 
-    const getGridSpacing = () => state.scaleFactor*16
+    const getGridSpacing = () => state.scaleFactor*state.gridUnit
 
     return {
         get scale(): ScaleFactor {
@@ -64,6 +66,9 @@ export function createScene(): Scene {
         },
         set scale(f: ScaleFactor) {
             state.scaleFactor = f
+        },
+        get gridUnit(): number {
+            return state.gridUnit
         },
         get gridSpacing(): number {
             return getGridSpacing()
