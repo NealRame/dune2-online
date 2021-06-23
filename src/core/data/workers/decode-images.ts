@@ -1,7 +1,7 @@
-import { ImageSet, ScaleFactors } from "../../types"
-
 import { base64ToByteArray } from "@/utils"
-import { Palette, Image } from "@/core"
+import { Palette, ImageSet } from "@/core"
+
+import { Image, ScaleFactors } from "@/engine"
 
 import { isNil } from "lodash"
 import { ungzip } from "pako"

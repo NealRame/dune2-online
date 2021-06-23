@@ -7,6 +7,11 @@ export interface Size {
     height: number
 }
 
+export interface Shape {
+    columns: number,
+    rows: number,
+}
+
 export interface Transform2DMatrix {
     m11: number,
     m12: number,

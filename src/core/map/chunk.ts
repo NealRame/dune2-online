@@ -2,10 +2,11 @@ import { neighborhood, positionToIndexConverter } from "./utils"
 import { createChunkImage } from "./workers"
 
 import { imageSet } from "@/core/data"
-import { Tile } from "@/core/tile"
-import { Image, MapConfig, Scene, SceneItem, Shape, Terrain, TerrainType } from "@/core/types"
+import { MapConfig, Terrain, TerrainType } from "@/core/types"
 
-import { RectangularCoordinates, Size } from "@/maths"
+import { Image, Scene, SceneItem, Tile } from "@/engine"
+
+import { RectangularCoordinates, Shape, Size } from "@/maths"
 
 export type ChunkCallback = (p: RectangularCoordinates, s: Shape) => Promise<SceneItem>
 

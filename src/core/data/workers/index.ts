@@ -1,19 +1,19 @@
 /* eslint-disable import/no-webpack-loader-syntax */
-import { Image, TileDescriptor } from "../../types"
 
 import DecodePaletteWorker from "worker-loader!./decode-palette"
 import DecodeTileDescriptors from "worker-loader!./decode-tile-descriptors"
 import DecodeImagesWorker from "worker-loader!./decode-images"
 
-import { ImageSet, Palette } from "@/core"
+import { ImageSet, Palette, TileDescriptor } from "@/core"
+
+import { Image } from "@/engine"
+
+import { Shape } from "@/maths"
 
 import PromiseWorker from "promise-worker"
 
 type TileData = {
-    size: {
-        width: number,
-        height: number,
-    },
+    shape: Shape,
     indexes: number[],
 }
 
@@ -33,8 +33,8 @@ const decodeTileDescriptorsWorker = new PromiseWorker(new DecodeTileDescriptors(
 export async function decodeTileDescriptors(data: Uint8Array, images: readonly Image[])
     : Promise<TileDescriptor[]> {
     const tileDescriptors = await decodeTileDescriptorsWorker.postMessage(data)
-    return (tileDescriptors as TileData[]).map(({ indexes, size }) => ({
-        size,
+    return (tileDescriptors as TileData[]).map(({ indexes, shape }) => ({
+        shape,
         images: indexes.map(index => images[index])
     }))
 }

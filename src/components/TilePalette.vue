@@ -57,7 +57,7 @@ form {
 </style>
 
 <script lang="ts">
-import { ScaleFactor, Tile } from "@/core"
+import { ScaleFactor, Tile } from "@/engine"
 import { Painter } from "@/graphics"
 
 import { computed, defineComponent } from "vue"
@@ -80,7 +80,7 @@ export default defineComponent({
 
                 canvas.width = gridSpacing*rect.width
                 canvas.height = gridSpacing*rect.height
-                tile.render(new Painter(canvas), gridSpacing, scale, rect)
+                tile.render(new Painter(canvas), rect)
 
                 return canvas.toDataURL()
             },

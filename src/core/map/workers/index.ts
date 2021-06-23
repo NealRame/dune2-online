@@ -1,5 +1,5 @@
 /* eslint-disable import/no-webpack-loader-syntax */
-import { Image } from "@/core/types"
+import { Image } from "@/engine"
 import { ChunkMessage } from "./types"
 
 import CreateChunkImage from "worker-loader!./create-chunk-image"

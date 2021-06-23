@@ -1,9 +1,9 @@
-import { AbstractSceneItem } from "./scene-item"
+import { AbstractSceneItem } from "./scene"
 import { Tile } from "./tile"
-import { Image, ScaleFactor, Scene, Shape } from "./types"
+import { Image, Scene } from "./types"
 
 import { Painter } from "@/graphics"
-import { Rect, RectangularCoordinates, Size, Vector } from "@/maths"
+import { Rect, RectangularCoordinates, Size, Shape, Vector } from "@/maths"
 
 import { isNil } from "lodash"
 
@@ -52,25 +52,25 @@ export class Sprite extends AbstractSceneItem {
         return this
     }
 
-    update(): Sprite {
-        return this
-    }
+    render(painter: Painter, viewport: Rect): Sprite {
+        const { gridSpacing } = this.scene
 
-    render(painter: Painter, gridSpacing: number, scale: ScaleFactor, viewport: Rect): Sprite {
         painter.save()
         painter.translate(this.position.sub(viewport.topLeft()).mul(gridSpacing))
 
         if (this.frameIndex_ <= this.frames_.length) {
             this.frames_[this.frameIndex_].render(
                 painter,
-                gridSpacing,
-                scale,
                 new Rect(Vector.Null(), this.size)
             )
         }
 
         painter.restore()
 
+        return this
+    }
+
+    update(): Sprite {
         return this
     }
 }

@@ -22,7 +22,8 @@ canvas {
 import Screen, { ScreenMouseClickEvent } from "@/components/Screen.vue"
 import TilePalette from "@/components/TilePalette.vue"
 
-import { createScene, createTile, GameData, ImageLib, ScaleFactor, Tile } from "@/core"
+import { GameData, ImageLib } from "@/core"
+import { createScene, createTile, ScaleFactor, Tile } from "@/engine"
 import { PaintDevice } from "@/graphics"
 
 import { defineComponent, onMounted, ref, unref } from "vue"

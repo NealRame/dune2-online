@@ -1,7 +1,10 @@
-import { DataProgressNotifier, GameData, Image, ImageLib, ImageSet, Palette, TileDescriptor } from "../types"
+import { DataProgressNotifier, GameData, ImageLib, ImageSet, Palette, TileDescriptor } from "../types"
 import * as Workers from "./workers"
 
+import { Image } from "@/engine"
+
 import { fetchData } from "@/utils"
+
 import { isNil } from "lodash"
 
 let gameData: GameData | null = null

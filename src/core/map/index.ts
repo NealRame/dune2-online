@@ -1,7 +1,8 @@
 import { ChunkCreator, generateChunks } from "./chunk"
 import { generateMap } from "./generator"
 
-import { MapConfig, ScaleFactor, Scene, SceneItem } from "@/core/types"
+import { MapConfig } from "@/core/types"
+import { ScaleFactor, Scene, SceneItem } from "@/engine"
 
 import { Painter } from "@/graphics"
 import { Rect, Size, Vector } from "@/maths"
@@ -48,6 +49,12 @@ export async function createMap(scene: Scene, config: MapConfig)
         get position() {
             return Vector.Null()
         },
+        get width(): number {
+            return config.size.width
+        },
+        get height(): number {
+            return config.size.height
+        },
         get size(): Size {
             return {
                 width: config.size.width,
@@ -62,13 +69,11 @@ export async function createMap(scene: Scene, config: MapConfig)
         },
         render(
             painter: Painter,
-            gridSpacing: number,
-            scale: ScaleFactor,
             viewport: Rect
         ): SceneItem {
             for (const chunk of chunks) {
                 if (viewport.intersects(chunk.rect)) {
-                    chunk.render(painter, gridSpacing, scale, viewport)
+                    chunk.render(painter, viewport)
                 }
             }
             return this as SceneItem

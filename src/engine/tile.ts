@@ -1,8 +1,8 @@
-import { AbstractSceneItem } from "./scene-item"
-import { Image, ScaleFactor, Scene, Shape } from "./types"
+import { AbstractSceneItem } from "./scene"
+import { Image, Scene } from "./types"
 
 import { Painter } from "@/graphics"
-import { Rect, RectangularCoordinates, Size } from "@/maths"
+import { Rect, RectangularCoordinates, Shape, Size } from "@/maths"
 
 import { isMatch } from "lodash"
 
@@ -54,12 +54,8 @@ export class Tile extends AbstractSceneItem {
         this.height_ = shape.rows*this.imageSize_.height
     }
 
-    render(
-        painter: Painter,
-        gridSpacing: number,
-        scaleFactor: ScaleFactor,
-        viewport: Rect
-    ): Tile {
+    render(painter: Painter, viewport: Rect): Tile {
+        const { gridSpacing, scale } = this.scene
         for (let i = 0; i < this.images_.length; ++i) {
             const scenePos = this.position.add({
                 x: Math.floor(i%this.shape_.columns),
@@ -68,7 +64,7 @@ export class Tile extends AbstractSceneItem {
             const sceneRect = new Rect(scenePos, this.imageSize_)
 
             if (viewport.intersects(sceneRect)) {
-                const bitmap = this.images_[i][scaleFactor]
+                const bitmap = this.images_[i][scale]
                 const screenPos = scenePos.sub(viewport).mul(gridSpacing)
                 painter.drawImageBitmap(bitmap, screenPos)
             }

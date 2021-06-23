@@ -1,7 +1,7 @@
 import { ChunkMessage } from "./types"
 
-import { Image, ScaleFactor, ScaleFactors } from "@/core/types"
 import { positionToIndexConverter } from "@/core/map/utils"
+import { Image, ScaleFactor, ScaleFactors } from "@/engine"
 
 import registerPromiseWorker from "promise-worker/register"
 
