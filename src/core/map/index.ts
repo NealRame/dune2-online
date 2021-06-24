@@ -2,7 +2,7 @@ import { ChunkCreator, generateChunks } from "./chunk"
 import { generateMap } from "./generator"
 
 import { MapConfig } from "@/core/types"
-import { ScaleFactor, Scene, SceneItem } from "@/engine"
+import { Scene, SceneItem } from "@/engine"
 
 import { Painter } from "@/graphics"
 import { Rect, Size, Vector } from "@/maths"
