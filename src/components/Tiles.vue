@@ -6,7 +6,7 @@
     />
     <tile-palette
         v-model="currentItem"
-        :items="tiles"
+        :images="images"
     />
 </template>
 
@@ -22,8 +22,8 @@ canvas {
 import Screen, { ScreenMouseClickEvent } from "@/components/Screen.vue"
 import TilePalette from "@/components/TilePalette.vue"
 
-import { GameData, ImageLib } from "@/core"
-import { createScene, createTile, ScaleFactor, Tile } from "@/engine"
+import { GameData, ImageLib, ImageSet } from "@/core"
+import { createScene, createTile, Image, ScaleFactor } from "@/engine"
 import { PaintDevice } from "@/graphics"
 
 import { defineComponent, onMounted, ref, unref } from "vue"
@@ -41,7 +41,7 @@ export default defineComponent({
         const screenWidth = ref(0)
         const screenHeight = ref(0)
         const scale = ref<ScaleFactor>(4)
-        const tiles = ref<readonly Tile[] | null>(null)
+        const images = ref<readonly Image[] | null>(null)
         const currentItem = ref<number | null>(null)
 
         const scene = createScene()
@@ -54,12 +54,7 @@ export default defineComponent({
         }, 60)
 
         onMounted(async () => {
-            tiles.value = GameData
-                .imageSet(props.set as keyof ImageLib)
-                .map(image => createTile(scene, {
-                    shape: { columns: 1, rows: 1 },
-                    images: [image]
-                }))
+            images.value = GameData.imageSet(props.set as ImageSet)
 
             scene.scale = unref(scale)
             scene.gridEnabled = true
@@ -93,7 +88,7 @@ export default defineComponent({
             screenWidth,
             screenHeight,
             currentItem,
-            tiles,
+            images,
             onMouseClick,
         }
     }

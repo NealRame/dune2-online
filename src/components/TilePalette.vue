@@ -1,7 +1,6 @@
 <template>
     <form>
-        <ol>
-            <li v-for="(item, index) in items" :key="index">
+            <li v-for="(item, index) in images" :key="index">
                 <label>
                     <input type="radio" name="palette-item" :value="index" @change="onChange"/>
                     <img :src="dataURI(item)" :title="index">
@@ -57,13 +56,12 @@ form {
 </style>
 
 <script lang="ts">
-import { ScaleFactor, Tile } from "@/engine"
-import { Painter } from "@/graphics"
+import { Image } from "@/engine"
 
 import { computed, defineComponent } from "vue"
 
 export default defineComponent({
-    props: ["items", "modelValue"],
+    props: ["images", "modelValue"],
     emits: ["update:modelValue"],
     setup(props, { emit }) {
         const currentItem = computed({
@@ -72,15 +70,15 @@ export default defineComponent({
         })
         return {
             currentItem,
-            dataURI(tile: Tile) {
-                const scale: ScaleFactor = 2
+            dataURI(image: Image) {
+                const bitmap = image[2]
                 const canvas = document.createElement("canvas")
-                const gridSpacing = 16*scale
-                const rect = tile.rect
+                const context = canvas.getContext("2d") as CanvasRenderingContext2D
+                const { width, height } = bitmap
 
-                canvas.width = gridSpacing*rect.width
-                canvas.height = gridSpacing*rect.height
-                tile.render(new Painter(canvas), rect)
+                canvas.width = width
+                canvas.height = height
+                context.drawImage(bitmap, 0, 0)
 
                 return canvas.toDataURL()
             },
