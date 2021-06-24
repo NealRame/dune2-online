@@ -1,6 +1,6 @@
 import * as Workers from "./workers"
 
-import { GameData, ImageLib, ImageSet, Palette, TileDescriptor } from "@/dune2/types"
+import { ImageLib, ImageSet, Palette, TileDescriptor } from "@/dune2/types"
 
 import { Image } from "@/engine"
 
@@ -15,7 +15,21 @@ interface DataProgressNotifier {
     end(): void,
 }
 
-let gameData: GameData | null = null
+// Game data
+type Data = {
+    palette: Palette,
+    images: ImageLib,
+    tiles: TileDescriptor[],
+}
+
+let gameData: Data | null = null
+
+function checkGameData(): Data {
+    if (isNil(gameData)) {
+        throw new Error("GameData must be fetched and decoded first")
+    }
+    return gameData
+}
 
 async function fetchGameData(progress: DataProgressNotifier) {
     const fetchProgress = (current: number, total: number) => {
@@ -59,13 +73,6 @@ async function fetchGameData(progress: DataProgressNotifier) {
             units: unitsImages,
         },
     }
-}
-
-function checkGameData(): GameData {
-    if (isNil(gameData)) {
-        throw new Error("GameData must be fetched and decoded first")
-    }
-    return gameData
 }
 
 export async function load(progress: DataProgressNotifier): Promise<void> {

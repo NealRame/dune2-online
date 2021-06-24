@@ -16,13 +16,6 @@ export type TileDescriptor = {
     images: Image[],
 }
 
-// Game data
-export type GameData = {
-    palette: Palette,
-    images: ImageLib,
-    tiles: TileDescriptor[],
-}
-
 export type MapConfig = {
     size: Size,
     // Chunk
