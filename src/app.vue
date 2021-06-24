@@ -20,7 +20,7 @@ import "@/styles/global.scss"
 
 import Modal from "@/components/Modal.vue"
 import ProgressBar from "@/components/ProgressBar.vue"
-import { GameData } from "@/core"
+import { Data } from "@/dune2"
 
 import { defineComponent, onMounted, ref } from "vue"
 
@@ -34,7 +34,7 @@ export default defineComponent({
         const gameDataProgressLabel = ref("")
         const gameDataProgress = ref(0)
 
-        onMounted(async () => await GameData.load({
+        onMounted(async () => await Data.load({
             begin() {
                 gameDataLoading.value = true
             },

@@ -23,7 +23,7 @@ canvas {
 import Screen, { ScreenMouseClickEvent } from "@/components/Screen.vue"
 import TilePalette from "@/components/TilePalette.vue"
 
-import { GameData, ImageLib, ImageSet } from "@/core"
+import { Data, ImageLib, ImageSet } from "@/dune2"
 import { createScene, createTile, Image, ScaleFactor } from "@/engine"
 import { PaintDevice } from "@/graphics"
 
@@ -55,7 +55,7 @@ export default defineComponent({
         }, 60)
 
         onMounted(async () => {
-            images.value = GameData.imageSet(props.set as ImageSet)
+            images.value = Data.imageSet(props.set as ImageSet)
 
             scene.scale = unref(scale)
             scene.gridEnabled = true
@@ -80,7 +80,7 @@ export default defineComponent({
             scene.addItem(createTile(scene, {
                 position: screenToSceneCoordinates(ev.position),
                 shape: { columns: 1, rows: 1 },
-                images: [GameData.imageSet(props.set as keyof ImageLib)[image]]
+                images: [Data.imageSet(props.set as keyof ImageLib)[image]]
             }))
         }
 
