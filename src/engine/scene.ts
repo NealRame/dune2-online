@@ -91,7 +91,7 @@ export function createScene(): Scene {
             for (const item of state.items) {
                 r.union(item.rect)
             }
-            return r.scale(this.scale)
+            return r
         },
         addItem(item: SceneItem): Scene {
             state.items.push(item)
