@@ -1,4 +1,4 @@
-import { Neighborhood, Terrain } from "@/core/types"
+import { Neighborhood, Terrain } from "@/dune2/types"
 import { RectangularCoordinates, Size } from "@/maths"
 
 export function indexToPositionConverter({ width }: Size)

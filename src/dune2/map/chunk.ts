@@ -1,8 +1,8 @@
 import { neighborhood, positionToIndexConverter } from "./utils"
 import { createChunkImage } from "./workers"
 
-import { imageSet } from "@/core/data"
-import { MapConfig, Terrain, TerrainType } from "@/core/types"
+import { imageSet } from "@/dune2/data"
+import { MapConfig, Terrain, TerrainType } from "@/dune2/types"
 
 import { Image, Scene, SceneItem, Tile } from "@/engine"
 

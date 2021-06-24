@@ -1,6 +1,6 @@
 import { ChunkMessage } from "./types"
 
-import { positionToIndexConverter } from "@/core/map/utils"
+import { positionToIndexConverter } from "@/dune2/map/utils"
 import { Image, ScaleFactor, ScaleFactors } from "@/engine"
 
 import registerPromiseWorker from "promise-worker/register"

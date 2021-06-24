@@ -4,7 +4,7 @@ import DecodePaletteWorker from "worker-loader!./decode-palette"
 import DecodeTileDescriptors from "worker-loader!./decode-tile-descriptors"
 import DecodeImagesWorker from "worker-loader!./decode-images"
 
-import { ImageSet, Palette, TileDescriptor } from "@/core"
+import { ImageSet, Palette, TileDescriptor } from "@/dune2"
 
 import { Image } from "@/engine"
 

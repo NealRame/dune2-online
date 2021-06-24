@@ -1,5 +1,5 @@
 import { base64ToByteArray } from "@/utils"
-import { Palette, ImageSet } from "@/core"
+import { Palette, ImageSet } from "@/dune2"
 
 import { Image, ScaleFactors } from "@/engine"
 

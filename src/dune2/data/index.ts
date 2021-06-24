@@ -1,6 +1,6 @@
 import * as Workers from "./workers"
 
-import { GameData, ImageLib, ImageSet, Palette, TileDescriptor } from "@/core/types"
+import { GameData, ImageLib, ImageSet, Palette, TileDescriptor } from "@/dune2/types"
 
 import { Image } from "@/engine"
 

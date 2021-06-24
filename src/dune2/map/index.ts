@@ -1,7 +1,7 @@
 import { ChunkCreator, generateChunks } from "./chunk"
 import { generateMap } from "./generator"
 
-import { MapConfig } from "@/core/types"
+import { MapConfig } from "@/dune2/types"
 import { Scene, SceneItem } from "@/engine"
 
 import { Painter } from "@/graphics"

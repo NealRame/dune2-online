@@ -1,6 +1,6 @@
 import { indexToPositionConverter } from "./utils"
 
-import { MapConfig, Terrain, TerrainType } from "@/core/types"
+import { MapConfig, Terrain, TerrainType } from "@/dune2/types"
 import { createNoise2DGenerator, createRangeMapper } from "@/maths"
 
 import { chain, flow, isNil, times } from "lodash"
