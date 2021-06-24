@@ -5,6 +5,7 @@
         @mouseClick="onMouseClick"
     />
     <tile-palette
+        v-if="images"
         v-model="currentItem"
         :images="images"
     />

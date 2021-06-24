@@ -1,5 +1,6 @@
 <template>
     <form>
+        <ol v-once>
             <li v-for="(item, index) in images" :key="index">
                 <label>
                     <input type="radio" name="palette-item" :value="index" @change="onChange"/>
