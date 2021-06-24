@@ -2,13 +2,6 @@ import { Image } from "@/engine"
 import { Color } from "@/graphics"
 import { RectangularCoordinates, Shape, Size } from "@/maths"
 
-export interface DataProgressNotifier {
-    begin(): void,
-    setLabel(label: string): void,
-    setValue(value: number|null): void,
-    end(): void,
-}
-
 // Palette
 export type Palette = readonly Color.RGBA[]
 

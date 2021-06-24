@@ -1,11 +1,19 @@
-import { DataProgressNotifier, GameData, ImageLib, ImageSet, Palette, TileDescriptor } from "../types"
 import * as Workers from "./workers"
+
+import { GameData, ImageLib, ImageSet, Palette, TileDescriptor } from "@/core/types"
 
 import { Image } from "@/engine"
 
 import { fetchData } from "@/utils"
 
 import { isNil } from "lodash"
+
+interface DataProgressNotifier {
+    begin(): void,
+    setLabel(label: string): void,
+    setValue(value: number|null): void,
+    end(): void,
+}
 
 let gameData: GameData | null = null
 
