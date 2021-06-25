@@ -17,34 +17,13 @@ canvas {
 <script lang="ts">
 import Screen, { ScreenMouseClickEvent } from "@/components/Screen.vue"
 
-import { Data } from "@/dune2"
-import { createScene, createSprite, ScaleFactor, Scene, screenToSceneCoordinate } from "@/engine"
+import { createScene, ScaleFactor, screenToSceneCoordinate } from "@/engine"
+import { Units } from "@/dune2"
 
 import { PaintDevice } from "@/graphics"
 
 import { defineComponent, onMounted, ref, unref } from "vue"
 import { debounce } from "lodash"
-
-function makeSprite(scene: Scene, tiles: number[]) {
-    const tileDescriptors = Data.tiles()
-    const frameCount = 30
-    let frame = 0
-    const sprite = createSprite(scene, {
-        onUpdate() {
-            frame = (frame + 1) % frameCount
-            if (frame === 0) {
-                sprite.frameIndex = (sprite.frameIndex + 1) % sprite.frameCount
-            }
-        }
-    })
-
-    tiles.forEach(index => {
-        const tileDescriptor = tileDescriptors[index]
-        sprite.addFrame(tileDescriptor.shape, tileDescriptor.images)
-    })
-
-    return sprite
-}
 
 export default defineComponent({
     components: { Screen },
@@ -67,13 +46,18 @@ export default defineComponent({
         }
 
         onMounted(async () => {
+            const quad = new Units.Quad(scene, { x: 8, y: 8 })
             scene.gridEnabled = true
             scene.scale = unref(scale)
-
             scene
+                .addItem(quad)
                 .run((unref(screen) as PaintDevice).painter)
 
             window.addEventListener("resize", resize)
+
+            setTimeout(() => {
+                quad.move({ x: 0, y: -1 })
+            }, 1000)
 
             resize()
         })
