@@ -1,4 +1,5 @@
 export * from "./types"
+export * from "./linspace"
 export * from "./noise"
 export * from "./range"
 export { Rect } from "./rect"
