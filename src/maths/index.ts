@@ -1,9 +1,10 @@
-export * from "./types"
+export * as Easing from "./easing"
+
 export * from "./linspace"
 export * from "./noise"
 export * from "./range"
-
-export * as Easing from "./easing"
+export * from "./sequence"
+export * from "./types"
 
 export { Rect } from "./rect"
 export { Vector } from "./vector"
