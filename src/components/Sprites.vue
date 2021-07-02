@@ -2,7 +2,6 @@
     <screen ref="screen"
         :width="screenWidth"
         :height="screenHeight"
-        @mouseClick="onMouseClick"
     />
 </template>
 
@@ -17,7 +16,7 @@ canvas {
 <script lang="ts">
 import Screen, { ScreenMouseClickEvent } from "@/components/Screen.vue"
 
-import { createScene, ScaleFactor, screenToSceneCoordinate } from "@/engine"
+import { createScene, Direction, ScaleFactor, screenToSceneCoordinate } from "@/engine"
 import { Units } from "@/dune2"
 
 import { PaintDevice } from "@/graphics"
@@ -40,10 +39,10 @@ export default defineComponent({
             screenHeight.value = window.innerHeight
         }, 60)
 
-        const onMouseClick = (ev: ScreenMouseClickEvent) => {
-            const scenePos = screenToSceneCoordinate(scene, ev.position)
-            console.log(scenePos, scene.rect)
-        }
+        // const onMouseClick = (ev: ScreenMouseClickEvent) => {
+        //     const scenePos = screenToSceneCoordinate(scene, ev.position)
+        //     console.log(scenePos, scene.rect)
+        // }
 
         onMounted(async () => {
             const quad = new Units.Quad(scene, { x: 8, y: 8 })
@@ -56,7 +55,7 @@ export default defineComponent({
             window.addEventListener("resize", resize)
 
             setTimeout(() => {
-                quad.move({ x: 0, y: -1 })
+                quad.move(Direction.Northwest)
             }, 1000)
 
             resize()
@@ -66,7 +65,7 @@ export default defineComponent({
             screen,
             screenWidth,
             screenHeight,
-            onMouseClick
+            // onMouseClick
         }
     }
 })

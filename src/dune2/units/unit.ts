@@ -46,21 +46,25 @@ function move(position: Vector, direction: Vector, frameCount: number) {
 export class Unit extends Sprite {
     protected hitPoints_: number
     private destination_: Iterator<Vector> | null
+    private direction_: Direction
 
     constructor(scene: Scene, position: RectangularCoordinates) {
         super(scene, position)
         this.hitPoints_ = 1
         this.destination_ = null
+        this.direction_ = Direction.North
     }
 
     move(d: Direction): Unit {
         if (isNil(this.destination_)) {
+            this.direction_ = d
             this.destination_ = move(this.position, direction(d), 60)
         }
         return this
     }
 
     update(): Unit {
+        this.frameIndex = this.direction_
         if (!isNil(this.destination_)) {
             const it = this.destination_.next()
             if (it.done) {
