@@ -8,6 +8,7 @@ module.exports = {
     css: {
         loaderOptions: {
             sass: {
+                implementation: require("sass"),
                 prependData: `
                     @import "@/styles/variables.scss";
                 `
