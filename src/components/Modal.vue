@@ -39,19 +39,30 @@
 
 <script lang="ts">
 import { defineComponent } from "vue"
-import gsap from "gsap"
+
+import { Easing, sequence } from "@/maths"
+
+function fadeOutAnimation(frameCount: number) {
+    return (el: HTMLElement, animationDone: () => void) => {
+        const it = sequence(frameCount, Easing.Quadratic.easeIn)
+        const animationCallback = () => {
+            const { done, value } = it.next()
+            el.style.opacity = String(1 - (value ?? 1))
+            if (done) {
+                animationDone()
+            } else {
+                requestAnimationFrame(animationCallback)
+            }
+        }
+        animationCallback()
+    }
+}
 
 export default defineComponent({
     props: ["show"],
     setup() {
         return {
-            fadeOut(el: HTMLElement, done: () => void) {
-                gsap.to(el, {
-                    duration: 0.25,
-                    opacity: 0,
-                    onComplete: done
-                })
-            },
+            fadeOut: fadeOutAnimation(15),
         }
     }
 })
