@@ -54,8 +54,29 @@ export default defineComponent({
 
             window.addEventListener("resize", resize)
 
+            const directions = [
+                Direction.North,
+                Direction.Northeast,
+                Direction.East,
+                Direction.Southeast,
+                Direction.South,
+                Direction.Southwest,
+                Direction.West,
+                Direction.Northwest,
+                // Direction.East,
+                // Direction.East,
+                // Direction.West,
+                // Direction.West,
+            ]
+
+            let directionIndex = 0
+            quad.onDestinationReached(() => {
+                directionIndex = (directionIndex + 1)%directions.length
+                quad.move(directions[directionIndex])
+            })
+
             setTimeout(() => {
-                quad.move(Direction.Northwest)
+                quad.move(directions[directionIndex])
             }, 1000)
 
             resize()
