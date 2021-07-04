@@ -17,6 +17,8 @@ export enum Direction {
     West,
     Northwest,
 }
+export const DirectionCount = Direction.Northwest + 1
+
 export interface Scene {
     scale: ScaleFactor,
     viewport: Rect | null,
