@@ -1,4 +1,4 @@
-export type EasingFunction<T> = (t: number) => T
+export type EasingFunction = (t: number) => number
 
 export function linear(t: number): number {
     return t
