@@ -12,6 +12,7 @@ export class Harvester extends Unit {
         const images = imageSet("units")
         const shape = { columns: 1, rows: 1 }
 
+        this.speed_ = 0.5
         this.addFrame(shape, [images[16]])
             .addFrame(shape, [images[17]])
             .addFrame(shape, [images[19]])
