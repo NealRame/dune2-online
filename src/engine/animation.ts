@@ -3,7 +3,7 @@ import { Easing, linspace } from "@/maths"
 import { isNil } from "lodash"
 
 export interface Animation {
-    finished(): boolean,
+    finished: boolean,
     next(): void,
 }
 
@@ -22,7 +22,9 @@ export function createTransitionAnimation(config: AnimationTransitionConfig): An
     let t = it.next()
     const finished = () => t?.done ?? false
     return {
-        finished,
+        get finished() {
+            return finished()
+        },
         next(): void {
             if (!finished()) {
                 config.set(config.easing(t.value))
@@ -42,13 +44,13 @@ export interface AnimationSequenceConfig extends AnimationConfig {
 export function createSequenceAnimation(config: AnimationSequenceConfig): Animation {
     let current = config.animations.shift()
     return {
-        finished(): boolean {
+        get finished(): boolean {
             return isNil(current)
         },
         next(): void {
             if (!isNil(current)) {
                 current.next()
-                if (current.finished()) {
+                if (current.finished) {
                     current = config.animations.shift()
                     if (isNil(current) && !isNil(config.done)) {
                         config.done()

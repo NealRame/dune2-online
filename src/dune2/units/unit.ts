@@ -110,7 +110,7 @@ export class Unit extends Sprite {
 
     update(): Unit {
         if (!isNil(this.animation_)) {
-            if (this.animation_.finished()) {
+            if (this.animation_.finished) {
                 this.animation_ = null
             } else {
                 this.animation_.next()
