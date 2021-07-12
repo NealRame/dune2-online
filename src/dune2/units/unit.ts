@@ -12,7 +12,7 @@ import { createObserver, EventCallback, Observer } from "@/utils"
 
 import { clamp, isNil, times } from "lodash"
 
-function direction(d: Direction): Vector {
+function directionToVector(d: Direction): Vector {
     switch (d) {
     case Direction.North:
         return Vector.Up()
@@ -54,6 +54,7 @@ function directionRotationSequence(from: Direction, to: Direction) {
 
 export class Unit extends Sprite {
     protected hitPoints_: number
+    protected speed_: number
 
     private moveObserver_: Observer<void>
     private animation_: Animation|null
@@ -61,6 +62,7 @@ export class Unit extends Sprite {
     constructor(scene: Scene, position: RectangularCoordinates) {
         super(scene, position)
         this.hitPoints_ = 1
+        this.speed_ = 1
         this.animation_ = null
         this.moveObserver_ = createObserver()
     }
@@ -75,29 +77,29 @@ export class Unit extends Sprite {
 
     move(moveDirection: Direction): Unit {
         const directions = directionRotationSequence(this.direction, moveDirection)
-        const p = this.position
-        const d = direction(moveDirection)
+        const position = this.position
+        const direction = directionToVector(moveDirection)
         this.animation_ = createSequenceAnimation({
             animations: [
                 createTransitionAnimation({
                     frames: 30*directions.length,
                     easing: Easing.step(directions.length),
-                    set: (t: number) => {
+                    set: t => {
                         this.direction = directions[clamp(Math.floor(t*directions.length), 0, directions.length - 1)]
                     }
                 }),
                 createTransitionAnimation({
                     frames: 60,
                     easing: Easing.Cubic.easeInOut,
-                    set: (t: number) => {
-                        this.position = p.copy().add({
-                            x: t*d.x,
-                            y: t*d.y,
+                    set: t => {
+                        this.position = position.copy().add({
+                            x: t*direction.x,
+                            y: t*direction.y,
                         })
                     }
                 })
             ],
-            done: () => this.moveObserver_.publish()
+            done: this.moveObserver_.publish
         })
         return this
     }
