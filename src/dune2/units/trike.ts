@@ -12,6 +12,7 @@ export class Trike extends Unit {
         const images = imageSet("units")
         const shape = { columns: 1, rows: 1 }
 
+        this.speed_ = 1.5
         this.addFrame(shape, [images[8]] )
             .addFrame(shape, [images[9]] )
             .addFrame(shape, [images[11]])
