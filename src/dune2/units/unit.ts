@@ -82,14 +82,14 @@ export class Unit extends Sprite {
         this.animation_ = createSequenceAnimation({
             animations: [
                 createTransitionAnimation({
-                    frames: 30*directions.length,
+                    frames: Math.floor(30/this.speed_)*directions.length,
                     easing: Easing.step(directions.length),
                     set: t => {
                         this.direction = directions[clamp(Math.floor(t*directions.length), 0, directions.length - 1)]
                     }
                 }),
                 createTransitionAnimation({
-                    frames: 60,
+                    frames: Math.floor(60/this.speed_),
                     easing: Easing.Cubic.easeInOut,
                     set: t => {
                         this.position = position.copy().add({
