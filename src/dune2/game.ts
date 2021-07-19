@@ -24,7 +24,6 @@ export function createGame(screen: PaintDevice): Game {
     const scene = createScene()
     return {
         start(): void {
-
             scene.run(screen.painter)
         },
         addUnit(type, position) {
