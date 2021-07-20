@@ -45,11 +45,13 @@ export default defineComponent({
         // }
 
         onMounted(async () => {
-            const quad = new Units.Quad(scene, { x: 8, y: 8 })
+            // const unit = new Units.Quad(scene, { x: 8, y: 8 })
+            // const unit = new Units.Harvester(scene, { x: 8, y: 8 })
+            const unit = new Units.Trike(scene, { x: 8, y: 8 })
             scene.gridEnabled = true
             scene.scale = unref(scale)
             scene
-                .addItem(quad)
+                .addItem(unit)
                 .run((unref(screen) as PaintDevice).painter)
 
             window.addEventListener("resize", resize)
@@ -70,13 +72,13 @@ export default defineComponent({
             ]
 
             let directionIndex = 0
-            quad.onDestinationReached(() => {
+            unit.onDestinationReached(() => {
                 directionIndex = (directionIndex + 1)%directions.length
-                quad.move(directions[directionIndex])
+                unit.move(directions[directionIndex])
             })
 
             setTimeout(() => {
-                quad.move(directions[directionIndex])
+                unit.move(directions[directionIndex])
             }, 1000)
 
             resize()
