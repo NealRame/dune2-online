@@ -1,3 +1,4 @@
+import Game from "@/components/Game.vue"
 import Home from "@/components/Home.vue"
 import LandMap from "@/components/Map.vue"
 import Sprites from "@/components/Sprites.vue"
@@ -10,6 +11,10 @@ const routes: Array<RouteRecordRaw> = [{
     component: Home,
     name: "Home",
     path: "/",
+}, {
+    component: Game,
+    name: "Game",
+    path: "/game",
 }, {
     component: LandMap,
     name: "Map",

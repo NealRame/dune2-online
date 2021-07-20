@@ -3,7 +3,7 @@ import { Harvester } from "./units/harvester"
 import { Quad } from "./units/quad"
 import { Trike } from "./units/trike"
 
-import { createScene } from "@/engine"
+import { createScene, Scene } from "@/engine"
 import { PaintDevice } from "@/graphics"
 import { RectangularCoordinates } from "@/maths"
 
@@ -14,6 +14,7 @@ export const Units = {
 } as const
 
 export interface Game {
+    scene: Scene
     addUnit(type: keyof typeof Units, position: RectangularCoordinates): Unit
     start(): void
 }
@@ -22,7 +23,13 @@ export { Unit } from "./units/unit"
 
 export function createGame(screen: PaintDevice): Game {
     const scene = createScene()
+
+    scene.gridEnabled = false
+
     return {
+        get scene() {
+            return scene
+        },
         start(): void {
             scene.run(screen.painter)
         },
