@@ -1,3 +1,6 @@
+import { createMap } from "./map"
+import { MapConfig } from "./types"
+
 import { Unit } from "./units/unit"
 import { Harvester } from "./units/harvester"
 import { Quad } from "./units/quad"
@@ -37,11 +40,13 @@ export async function createGame(config: GameConfig): Promise<Game> {
         get scene() {
             return scene
         },
+        addUnit(type, position) {
+            const unit = new Units[type](scene, position)
+            scene.addItem(unit)
+            return unit
+        },
         start(): void {
             scene.run(config.screen.painter)
         },
-        addUnit(type, position) {
-            return new Units[type](scene, position)
-        }
     }
 }
