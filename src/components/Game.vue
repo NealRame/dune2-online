@@ -21,7 +21,7 @@ import { screenToSceneCoordinate, ScaleFactor } from "@/engine"
 import { createGame, Game } from "@/dune2/game"
 import { PaintDevice } from "@/graphics"
 
-import { debounce, isNil } from "lodash"
+import { chunk, debounce, isNil } from "lodash"
 import { defineComponent, onMounted, ref, unref } from "vue"
 
 declare global {
@@ -54,7 +54,16 @@ export default defineComponent({
         }
 
         onMounted(async () => {
-            game = createGame(unref(screen) as PaintDevice)
+            game = await createGame({
+                screen: unref(screen) as PaintDevice,
+                map: {
+                    chunk: true,
+                    size: {
+                        width: 64,
+                        height: 64,
+                    },
+                },
+            })
             game.scene.scale = unref(scale)
             game.start()
 
