@@ -3,6 +3,7 @@
         :width="screenWidth"
         :height="screenHeight"
         @mouseClick="onMouseClick"
+        @mouseMotion="onMouseMoved"
     />
 </template>
 
@@ -15,14 +16,15 @@ canvas {
 </style>
 
 <script lang="ts">
-import Screen, { ScreenMouseClickEvent } from "@/components/Screen.vue"
+import Screen, { ScreenMouseClickEvent, ScreenMouseMotionEvent } from "@/components/Screen.vue"
 
-import { screenToSceneCoordinate, ScaleFactor } from "@/engine"
+import { screenToSceneScale, screenToSceneCoordinate, ScaleFactor } from "@/engine"
 import { createGame, Game } from "@/dune2/game"
 import { PaintDevice } from "@/graphics"
 
-import { chunk, debounce, isNil } from "lodash"
+import { clamp, debounce, isNil } from "lodash"
 import { defineComponent, onMounted, ref, unref } from "vue"
+import { Rect, RectangularCoordinates } from "@/maths"
 
 declare global {
     interface Window {
@@ -42,14 +44,45 @@ export default defineComponent({
 
         // handle window resize event
         const resize = debounce(() => {
-            screenWidth.value = window.innerWidth
-            screenHeight.value = window.innerHeight
+            if (!isNil(game)) {
+                const width = window.innerWidth
+                const height = window.innerHeight
+                const scene = game.scene
+
+                const topLeft = scene.viewport?.topLeft() ?? { x: 0, y: 0 }
+
+                screenWidth.value = width
+                screenHeight.value = height
+                scene.viewport = new Rect(topLeft, {
+                    width: width/scene.gridSpacing,
+                    height: height/scene.gridSpacing,
+                })
+            }
         }, 60)
+
+        const updateViewport = ({ x: xOffset, y: yOffset }: RectangularCoordinates) => {
+            if (xOffset !== 0 || yOffset !== 0) {
+                if (!isNil(game)) {
+                    const viewport = game.scene.viewport as Rect
+                    const rect = game.scene.rect
+                    viewport.x = clamp(viewport.x + xOffset, 0, rect.rightX - viewport.width)
+                    viewport.y = clamp(viewport.y + yOffset, 0, rect.bottomY - viewport.height)
+                }
+            }
+        }
 
         const onMouseClick = (ev: ScreenMouseClickEvent) => {
             if (!isNil(game)) {
                 const scenePos = screenToSceneCoordinate(game.scene, ev.position)
                 console.log(scenePos)
+            }
+        }
+
+        const onMouseMoved = (ev: ScreenMouseMotionEvent) => {
+            if (!isNil(game) && ev.button) {
+                const sceneMove = screenToSceneScale(game.scene, ev.movement)
+                console.log(ev.movement, sceneMove)
+                updateViewport(sceneMove.opposite)
             }
         }
 
@@ -77,7 +110,8 @@ export default defineComponent({
             screen,
             screenWidth,
             screenHeight,
-            onMouseClick
+            onMouseClick,
+            onMouseMoved,
         }
     }
 })
