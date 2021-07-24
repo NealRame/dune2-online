@@ -81,7 +81,6 @@ export default defineComponent({
         const onMouseMoved = (ev: ScreenMouseMotionEvent) => {
             if (!isNil(game) && ev.button) {
                 const sceneMove = screenToSceneScale(game.scene, ev.movement)
-                console.log(ev.movement, sceneMove)
                 updateViewport(sceneMove.opposite)
             }
         }
