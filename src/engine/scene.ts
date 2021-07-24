@@ -148,6 +148,14 @@ export function screenToSceneScale(
 ): Vector {
     return (new Vector(x, y)).mul(1/scene.gridSpacing)
 }
+
+export function sceneToScreenScale(
+    scene: Scene,
+    { x, y }: RectangularCoordinates
+): Vector {
+    return (new Vector(x, y)).mul(scene.gridSpacing)
+}
+
 export function sceneToScreenCoordinate(
     scene: Scene,
     { x, y }: RectangularCoordinates
