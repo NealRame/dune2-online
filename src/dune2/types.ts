@@ -44,11 +44,3 @@ export enum TerrainType {
     Rock,
     Mountain,
 }
-
-export type Terrain = {
-    position: RectangularCoordinates,
-    spice: number,
-    type: TerrainType
-}
-
-export type Neighborhood<T extends Terrain> = [T|null, T|null, T|null, T|null]

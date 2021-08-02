@@ -6,7 +6,7 @@ import { Harvester } from "./units/harvester"
 import { Quad } from "./units/quad"
 import { Trike } from "./units/trike"
 
-import { createScene, Scene } from "@/engine"
+import { createScene, Land, Scene } from "@/engine"
 import { PaintDevice } from "@/graphics"
 import { RectangularCoordinates } from "@/maths"
 
@@ -29,12 +29,11 @@ export interface Game {
 
 export { Unit } from "./units/unit"
 
-export async function createGame(config: GameConfig): Promise<Game> {
+export function createGame(config: GameConfig): Game {
     const scene = createScene()
-    const map = await createMap(scene, config.map)
 
     scene.gridEnabled = false
-    scene.addItem(map)
+    scene.addItem(new Land(scene, config.map.size, createMap(config.map)))
 
     return {
         get scene() {

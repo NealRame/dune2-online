@@ -147,7 +147,7 @@ import ProgressBar from "@/components/ProgressBar.vue"
 import Screen, { ScreenMouseMotionEvent } from "@/components/Screen.vue"
 
 import { createMap } from "@/dune2"
-import { createScene } from "@/engine"
+import { createScene, Land } from "@/engine"
 import { PaintDevice } from "@/graphics"
 import { Rect, RectangularCoordinates, Vector } from "@/maths"
 
@@ -201,12 +201,13 @@ export default defineComponent({
 
         const update = async () => {
             showModal.value = true
-            const map = await createMap(scene, {
+            const size = {
+                width: unref(width),
+                height: unref(height),
+            }
+            const map = createMap({
                 seed,
-                size: {
-                    width: unref(width),
-                    height: unref(height),
-                },
+                size,
                 terrainScale: unref(terrainScale),
                 terrainDetails: unref(terrainDetails),
                 terrainSandThreshold: unref(terrainSandThreshold),
@@ -218,7 +219,7 @@ export default defineComponent({
                 spiceSaturationThreshold: unref(spiceSaturationThreshold),
             })
             scene.clear()
-            scene.addItem(map)
+            scene.addItem(new Land(scene, size, map))
             showModal.value = false
         }
 

@@ -174,6 +174,24 @@ export function screenToSceneCoordinate(
     return (new Vector(x, y)).mul(1/gridSpacing).add(topLeft)
 }
 
+export function sceneToScreenSize(scene: Scene, size: Size)
+    : Size {
+    const gridSpacing = scene.gridSpacing
+    return {
+        width: size.width*gridSpacing,
+        height: size.height*gridSpacing,
+    }
+}
+
+export function screenToSceneSize(scene: Scene, size: Size)
+    : Size {
+    const gridSpacing = scene.gridSpacing
+    return {
+        width: size.width/gridSpacing,
+        height: size.height/gridSpacing,
+    }
+}
+
 export function sceneToScreenRect(scene: Scene, rect: Rect)
     : Rect {
     const { viewport, gridSpacing } = scene

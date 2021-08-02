@@ -18,8 +18,8 @@ canvas {
 <script lang="ts">
 import Screen, { ScreenMouseClickEvent, ScreenMouseMotionEvent } from "@/components/Screen.vue"
 
-import { screenToSceneScale, screenToSceneCoordinate, ScaleFactor } from "@/engine"
 import { createGame, Game } from "@/dune2/game"
+import { screenToSceneScale, screenToSceneCoordinate, ScaleFactor } from "@/engine"
 import { PaintDevice } from "@/graphics"
 
 import { clamp, debounce, isNil } from "lodash"
