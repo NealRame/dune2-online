@@ -1,4 +1,4 @@
-import { createMap } from "./map"
+import { generateMap } from "./map"
 import { MapConfig } from "./types"
 
 import { Unit } from "./units/unit"
@@ -6,7 +6,7 @@ import { Harvester } from "./units/harvester"
 import { Quad } from "./units/quad"
 import { Trike } from "./units/trike"
 
-import { createScene, Land, Scene } from "@/engine"
+import { createScene, Scene } from "@/engine"
 import { PaintDevice } from "@/graphics"
 import { RectangularCoordinates } from "@/maths"
 
@@ -33,7 +33,7 @@ export function createGame(config: GameConfig): Game {
     const scene = createScene()
 
     scene.gridEnabled = false
-    scene.addItem(new Land(scene, config.map.size, createMap(config.map)))
+    scene.addItem(generateMap(scene, config.map))
 
     return {
         get scene() {

@@ -1,9 +1,9 @@
 import { positionToIndexConverter } from "./utils"
 
 import { AbstractSceneItem } from "@/engine/scene"
-import { Image, Neighborhood, Scene, SceneItem, Terrain } from "@/engine/types"
+import { Image, Scene, SceneItem } from "@/engine/types"
 
-import { Painter } from "@/graphics"
+import { Color, Painter } from "@/graphics"
 import { Rect, RectangularCoordinates, Size, Vector } from "@/maths"
 
 import { isNil } from "lodash"
@@ -67,31 +67,84 @@ class Chunk extends AbstractSceneItem {
     }
 }
 
+export type Neighborhood<T extends Terrain> = [T|null, T|null, T|null, T|null]
+export type TerrainGenerator = (l: Land, p: RectangularCoordinates) => Terrain
+
+export type LandConfig = {
+    size: Size,
+}
+
+export abstract class Terrain {
+    protected position_: RectangularCoordinates
+    private land_: Land
+    private revealed_ = false
+
+    constructor(land: Land, position: RectangularCoordinates) {
+        this.land_ = land
+        this.position_ = position
+    }
+
+    get position(): RectangularCoordinates {
+        return this.position_
+    }
+
+    get revealed(): boolean {
+        return this.revealed_
+    }
+
+    set revealed(r: boolean) {
+        this.revealed_ = r
+    }
+
+    abstract get color(): Color.RGBA
+    abstract image(neighbors: Neighborhood<Terrain>): Image
+}
+
+function generateLandTerrains(land: Land, generateTerrain: TerrainGenerator)
+    : Terrain[] {
+    const terrains: Terrain[] = []
+    for (const pos of rectIterator(land.rect)) {
+        terrains.push(generateTerrain(land, pos))
+    }
+    return terrains
+}
+
 export class Land implements SceneItem {
-    private chunks_: Chunk[]
     private scene_: Scene
     private size_: Size
+    private chunkSize_: Size = { width: 32, height: 32 }
+    private chunkRowCount_: number
+    private chunkColCount_: number
+    private chunks_: Chunk[]
     private terrains_: Terrain[]
 
-    private positionToIndex_: (p: RectangularCoordinates) => number
+    private positionToTerrainIndex_: (p: RectangularCoordinates) => number
+    private positionToZoneIndex_(p: RectangularCoordinates) {
+        const chunkCol = Math.floor(p.x/this.chunkSize_.width)
+        const chunkRow = Math.floor(p.y/this.chunkSize_.height)
+        return this.chunkColCount_*chunkRow + chunkCol
+    }
 
     constructor(
         scene: Scene,
-        size: Size,
-        terrains: Terrain[]
+        config: LandConfig,
+        generateTerrain: TerrainGenerator,
     ) {
+        const { size } = config
+
         this.scene_ = scene
         this.size_ = size
-        this.terrains_ = terrains
+        this.positionToTerrainIndex_ = positionToIndexConverter(size)
+        this.terrains_ = generateLandTerrains(this, generateTerrain)
         this.chunks_ = []
-        this.positionToIndex_ = positionToIndexConverter(size)
 
-        const chunkSize = { width: 32, height: 32 }
+        this.chunkRowCount_ = Math.ceil(this.size_.height/this.chunkSize_.height)
+        this.chunkColCount_ = Math.ceil(this.size.width/this.chunkSize_.width)
 
-        for (let y = 0; y < size.height; y += chunkSize.height) {
-            for (let x = 0; x < size.width; x += chunkSize.width) {
-                const width = Math.min(chunkSize.width, size.width - x)
-                const height = Math.min(chunkSize.height, size.height - y)
+        for (let y = 0; y < size.height; y += this.chunkSize_.height) {
+            for (let x = 0; x < size.width; x += this.chunkSize_.width) {
+                const width = Math.min(this.chunkSize_.width, size.width - x)
+                const height = Math.min(this.chunkSize_.height, size.height - y)
                 const chunkZone = new Rect({ x, y }, { width, height })
 
                 this.chunks_.push(new Chunk(this, chunkZone))
@@ -145,7 +198,7 @@ export class Land implements SceneItem {
     terrain<T extends Terrain = Terrain>(
         position: RectangularCoordinates
     ): T|null {
-        return this.terrains_[this.positionToIndex_(position)] as T
+        return this.terrains_[this.positionToTerrainIndex_(position)] as T
     }
 
     neighbors<T extends Terrain = Terrain>(

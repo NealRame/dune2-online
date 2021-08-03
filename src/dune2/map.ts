@@ -5,29 +5,19 @@ import { imageSet } from "@/dune2/data"
 
 import { RGBA } from "@/graphics/color"
 
-import { Image, Neighborhood, Terrain } from "@/engine"
-import { indexToPositionConverter } from "@/engine/land/utils"
+import { Image, Land, Neighborhood, Scene, Terrain } from "@/engine"
 
 import { createNoise2DGenerator, createRangeMapper, RectangularCoordinates } from "@/maths"
 
-import { chain, clamp, flow, isNil, times } from "lodash"
+import { chain, clamp, flow, isNil } from "lodash"
 
-class Dune2Terrain implements Terrain {
-    private position_: RectangularCoordinates
-
-    revealed = false
+class Dune2Terrain extends Terrain {
     spice = 0
     type = TerrainType.Dunes
 
-    constructor(position: RectangularCoordinates) {
+    constructor(land: Land, position: RectangularCoordinates) {
+        super(land, position)
         this.position_ = position
-    }
-
-    get position(): RectangularCoordinates {
-        return {
-            x: this.position_.x,
-            y: this.position_.y,
-        }
     }
 
     get color(): RGBA {
@@ -137,27 +127,11 @@ function spiceFieldGenerator(config: Required<MapConfig>)
     }
 }
 
-function terrainGenerator(config: Required<MapConfig>)
-    : (index: number) => Terrain {
-    const indexToPosition = indexToPositionConverter(config.size)
-    const generateTerrainType = terrainTypeGenerator(config)
-    const generateSpiceField = spiceFieldGenerator(config)
-    return index => {
-        return chain(new Dune2Terrain(indexToPosition(index)))
-            .tap(generateTerrainType)
-            .tap(generateSpiceField)
-            .value() as Terrain
-    }
-}
-
 function checkConfig(config: MapConfig): Required<MapConfig> {
     const spiceThreshold = clamp(config.spiceThreshold ?? 0.6, 0, 1)
     const spiceSaturationThreshold = clamp(config.spiceSaturationThreshold ?? (1 + spiceThreshold)/2, spiceThreshold, 1)
     return {
         size: config.size,
-        // Chunk
-        chunkSize: config.chunkSize ?? { width: 32, height: 64 },
-        chunk: config.chunk ?? false,
         // Noise seed
         seed: config.seed ?? Date.now(),
         // Terrain values
@@ -175,10 +149,15 @@ function checkConfig(config: MapConfig): Required<MapConfig> {
     }
 }
 
-export function createMap(config: MapConfig)
-    : Terrain[] {
-    return times(
-        config.size.width*config.size.height,
-        terrainGenerator(checkConfig(config))
-    )
+export function generateMap(scene: Scene, mapConfig: MapConfig)
+    : Land {
+    const config = checkConfig(mapConfig)
+    const generateTerrainType = terrainTypeGenerator(config)
+    const generateSpiceField = spiceFieldGenerator(config)
+    return new Land(scene, config, (land, position) => {
+        return chain(new Dune2Terrain(land, position))
+            .tap(generateTerrainType)
+            .tap(generateSpiceField)
+            .value()
+    })
 }

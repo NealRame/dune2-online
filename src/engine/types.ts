@@ -1,7 +1,6 @@
 import { Painter } from "@/graphics"
-import { RGBA } from "@/graphics/color"
 
-import { Rect, RectangularCoordinates, Size, Vector } from "@/maths"
+import { Rect, Size, Vector } from "@/maths"
 
 export const ScaleFactors = [1, 2, 3, 4] as const
 export type ScaleFactor = typeof ScaleFactors[number]
@@ -42,14 +41,5 @@ export interface SceneItem {
     readonly rect: Rect,
     readonly position: Vector,
     render(painter: Painter, viewport: Rect): SceneItem,
-    update(): SceneItem,
-}
-
-export type Neighborhood<T extends Terrain> = [T|null, T|null, T|null, T|null]
-
-export interface Terrain {
-    readonly revealed: boolean
-    readonly position: RectangularCoordinates
-    readonly color: RGBA
-    image(neighbors: Neighborhood<Terrain>): Image
+    update(...args: unknown[]): SceneItem,
 }
