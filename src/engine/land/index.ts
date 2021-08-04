@@ -6,7 +6,8 @@ import { Image, Scene, SceneItem } from "@/engine/types"
 import { Color, Painter } from "@/graphics"
 import { Rect, RectangularCoordinates, Size, Vector } from "@/maths"
 
-import { isNil } from "lodash"
+import { groupBy, isNil, negate } from "lodash"
+import { createObserver, Observer } from "@/utils"
 
 function * chunkIterator(
     rect: Rect,
@@ -78,6 +79,7 @@ class Chunk extends AbstractSceneItem {
 
 export type Neighborhood<T extends Terrain> = [T|null, T|null, T|null, T|null]
 export type TerrainGenerator = (l: Land, p: RectangularCoordinates) => Terrain
+export type TerrainUpdateCallback = (t: Terrain) => void
 
 export type LandConfig = {
     size: Size,
@@ -101,12 +103,19 @@ export abstract class Terrain {
         return this.revealed_
     }
 
-    set revealed(r: boolean) {
-        this.revealed_ = r
-    }
-
     abstract get color(): Color.RGBA
     abstract image(neighbors: Neighborhood<Terrain>): Image
+
+    reveal(): Terrain {
+        this.revealed_ = true
+        this.update()
+        return this
+    }
+
+    update(): Terrain {
+        this.land_.terrainObserver.publish(this)
+        return this
+    }
 }
 
 function generateLandTerrains(land: Land, generateTerrain: TerrainGenerator)
@@ -130,17 +139,27 @@ function generateChunks(land: Land, chunkSize: Size)
 export class Land implements SceneItem {
     private scene_: Scene
     private size_: Size
+    private terrains_: Terrain[]
+    private terrainObserver_: Observer<Terrain>
     private chunkSize_: Size = { width: 32, height: 32 }
+    private chunks_: Chunk[]
     private chunkRowCount_: number
     private chunkColCount_: number
-    private chunks_: Chunk[]
-    private terrains_: Terrain[]
 
     private positionToTerrainIndex_: (p: RectangularCoordinates) => number
+
     private positionToZoneIndex_(p: RectangularCoordinates) {
         const chunkCol = Math.floor(p.x/this.chunkSize_.width)
         const chunkRow = Math.floor(p.y/this.chunkSize_.height)
         return this.chunkColCount_*chunkRow + chunkCol
+    }
+
+    private onTerrainChanged_(terrain: Terrain) {
+        const chunks = groupBy(
+            [terrain, ...this.neighbors(terrain.position)].filter(negate(isNil)) as Terrain[],
+            (terrain) => this.positionToZoneIndex_(terrain.position)
+        )
+        console.log(chunks)
     }
 
     constructor(
@@ -160,6 +179,10 @@ export class Land implements SceneItem {
         this.chunks_ = generateChunks(this, this.chunkSize_)
 
         this.terrains_ = generateLandTerrains(this, generateTerrain)
+        this.terrainObserver_ = createObserver()
+        this.terrainObserver_.subscribe(terrain => {
+            this.onTerrainChanged_(terrain)
+        })
     }
 
     get scene(): Scene {
@@ -187,6 +210,10 @@ export class Land implements SceneItem {
 
     get rect(): Rect {
         return new Rect({ x: 0, y: 0 }, this.size)
+    }
+
+    get terrainObserver(): Observer<Terrain> {
+        return this.terrainObserver_
     }
 
     update(): Land {
