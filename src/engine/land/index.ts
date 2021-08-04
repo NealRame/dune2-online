@@ -8,10 +8,19 @@ import { Rect, RectangularCoordinates, Size, Vector } from "@/maths"
 
 import { isNil } from "lodash"
 
-function * rectIterator(rect: Rect) {
-    for (let y = rect.y; y < rect.y + rect.height; ++y) {
-        for (let x = rect.x; x < rect.x + rect.width; ++x) {
-            yield { x, y }
+function * chunkIterator(
+    rect: Rect,
+    chunkSize: Size = { width: 1, height: 1 }
+) {
+    for (let y = rect.y; y < rect.y + rect.height; y += chunkSize.height) {
+        for (let x = rect.x; x < rect.x + rect.width; x += chunkSize.width) {
+            const width = Math.min(chunkSize.width, rect.width - x)
+            const height = Math.min(chunkSize.height, rect.height - y)
+
+            yield {
+                position: { x, y },
+                size: { width, height },
+            }
         }
     }
 }
@@ -42,7 +51,7 @@ class Chunk extends AbstractSceneItem {
             const canvas = new OffscreenCanvas(gridSpacing*rect.width, gridSpacing*rect.height)
             const context = canvas.getContext("2d") as OffscreenCanvasRenderingContext2D
 
-            for (const position of rectIterator(rect)) {
+            for (const { position } of chunkIterator(rect)) {
                 const terrain = this.land_.terrain(position)
                 if (!isNil(terrain)) {
                     context.drawImage(
@@ -103,10 +112,19 @@ export abstract class Terrain {
 function generateLandTerrains(land: Land, generateTerrain: TerrainGenerator)
     : Terrain[] {
     const terrains: Terrain[] = []
-    for (const pos of rectIterator(land.rect)) {
-        terrains.push(generateTerrain(land, pos))
+    for (const { position } of chunkIterator(land.rect)) {
+        terrains.push(generateTerrain(land, position))
     }
     return terrains
+}
+
+function generateChunks(land: Land, chunkSize: Size)
+    : Chunk[] {
+    const chunks: Chunk[] = []
+    for (const { position, size } of chunkIterator(land.rect, chunkSize)) {
+        chunks.push(new Chunk(land, new Rect(position, size)))
+    }
+    return chunks
 }
 
 export class Land implements SceneItem {
@@ -134,22 +152,14 @@ export class Land implements SceneItem {
 
         this.scene_ = scene
         this.size_ = size
+
         this.positionToTerrainIndex_ = positionToIndexConverter(size)
-        this.terrains_ = generateLandTerrains(this, generateTerrain)
-        this.chunks_ = []
 
         this.chunkRowCount_ = Math.ceil(this.size_.height/this.chunkSize_.height)
         this.chunkColCount_ = Math.ceil(this.size.width/this.chunkSize_.width)
+        this.chunks_ = generateChunks(this, this.chunkSize_)
 
-        for (let y = 0; y < size.height; y += this.chunkSize_.height) {
-            for (let x = 0; x < size.width; x += this.chunkSize_.width) {
-                const width = Math.min(this.chunkSize_.width, size.width - x)
-                const height = Math.min(this.chunkSize_.height, size.height - y)
-                const chunkZone = new Rect({ x, y }, { width, height })
-
-                this.chunks_.push(new Chunk(this, chunkZone))
-            }
-        }
+        this.terrains_ = generateLandTerrains(this, generateTerrain)
     }
 
     get scene(): Scene {
