@@ -1,5 +1,3 @@
-// import { indexToPositionConverter } from "./utils"
-
 import { MapConfig, TerrainType } from "@/dune2/types"
 import { imageSet } from "@/dune2/data"
 
