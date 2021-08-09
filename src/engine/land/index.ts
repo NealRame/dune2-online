@@ -29,7 +29,7 @@ function * zoneIterator(
 
 class Zone extends AbstractSceneItem {
     private image_: Partial<Image> = {}
-    private redraw_: [RectangularCoordinates, Image][] = []
+    private redraw_: [RectangularCoordinates, Image[]][] = []
 
     constructor(scene: Scene, rect: Rect) {
         super(scene)
@@ -40,12 +40,10 @@ class Zone extends AbstractSceneItem {
     }
 
     refresh(terrain: Terrain): Zone {
-        if (terrain.revealed) {
-            this.redraw_.push([
-                terrain.position,
-                terrain.image(),
-            ])
-        }
+        this.redraw_.push([
+            terrain.position,
+            terrain.image(),
+        ])
         return this
     }
 
@@ -62,12 +60,14 @@ class Zone extends AbstractSceneItem {
                 context.drawImage(this.image_[scale] as ImageBitmap, 0, 0)
             }
 
-            for (const [position, image] of this.redraw_) {
-                context.drawImage(
-                    image[scale],
-                    gridSpacing*(position.x - this.x),
-                    gridSpacing*(position.y - this.y),
-                )
+            for (const [position, images] of this.redraw_) {
+                for (const image of images) {
+                    context.drawImage(
+                        image[scale],
+                        gridSpacing*(position.x - this.x),
+                        gridSpacing*(position.y - this.y),
+                    )
+                }
             }
 
             this.image_[scale] = canvas.transferToImageBitmap()
@@ -136,11 +136,13 @@ export abstract class Terrain {
     }
 
     abstract get color(): Color.RGBA
-    abstract image(): Image
+    abstract image(): Image[]
 
     reveal(): Terrain {
-        this.revealed_ = true
-        this.update()
+        if (!this.revealed) {
+            this.revealed_ = true
+            this.update()
+        }
         return this
     }
 
@@ -193,7 +195,6 @@ export class Land implements SceneItem {
             .forEach(terrain => {
                 if (!isNil(terrain)) {
                     const zone = this.zones_[this.positionToZoneIndex_(terrain.position)]
-                    console.log(`refresh terrain: (${terrain.x}, ${terrain.y}) zone: (${zone.x}, ${zone.y})`)
                     zone.refresh(terrain)
                     zones.add(zone)
                 }
@@ -201,7 +202,6 @@ export class Land implements SceneItem {
             .value()
 
         for (const zone of zones) {
-            console.log(`refresh zone: (${zone.x}, ${zone.y})`)
             zone.update()
         }
     }

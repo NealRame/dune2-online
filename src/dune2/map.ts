@@ -22,9 +22,8 @@ class Dune2Terrain extends Terrain {
         return [0, 0, 0, 0]
     }
 
-    image(): Image {
-        const images = imageSet("terrain")
-        const typeMask = (this.neighbors as Neighborhood<Dune2Terrain>)
+    private topoMask_(): number {
+        return (this.neighbors as Neighborhood<Dune2Terrain>)
             .map(neighbor => {
                 const type = (neighbor ?? this).type
                 if (this.type === TerrainType.Rock) {
@@ -36,21 +35,55 @@ class Dune2Terrain extends Terrain {
                 return type === this.type
             })
             .reduce((prev, cur, index) => cur ? prev + (1 << index) : prev, 0)
+    }
 
-        switch (this.type) {
-        case TerrainType.Rock:
-            return images[128 + typeMask]
-        case TerrainType.Dunes:
-            return images[144 + typeMask]
-        case TerrainType.Mountain:
-            return images[160 + typeMask]
-        case TerrainType.SpiceField:
-            return images[176 + typeMask]
-        case TerrainType.SaturatedSpiceField:
-            return images[192 + typeMask]
+    private revealMask_(): number {
+        if (this.revealed) return 0
+        return (this.neighbors as Neighborhood<Dune2Terrain>)
+            .map(neighbor => neighbor?.revealed ?? false)
+            .reduce((prev, cur, index) => cur ? prev + (1 << index) : prev, 0)
+    }
+
+    image(): Image[] {
+        const lib = imageSet("terrain")
+        const topoImageOffset = this.topoMask_()
+        const revealMaskImageOffset = this.revealMask_()
+
+        const images: Image[] = []
+
+        if (this.revealed || revealMaskImageOffset > 0) {
+            switch (this.type) {
+            case TerrainType.Rock:
+                images.push(lib[128 + topoImageOffset])
+                break
+
+            case TerrainType.Dunes:
+                images.push(lib[144 + topoImageOffset])
+                break
+
+            case TerrainType.Mountain:
+                images.push(lib[160 + topoImageOffset])
+                break
+
+            case TerrainType.SpiceField:
+                images.push(lib[176 + topoImageOffset])
+                break
+
+            case TerrainType.SaturatedSpiceField:
+                images.push(lib[192 + topoImageOffset])
+                break
+
+            default:
+                images.push(lib[127])
+                break
+            }
         }
 
-        return images[127]
+        if (!this.revealed && revealMaskImageOffset > 0) {
+            images.push(lib[123 - revealMaskImageOffset])
+        }
+
+        return images
     }
 }
 
