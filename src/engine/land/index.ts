@@ -28,7 +28,6 @@ function * zoneIterator(
 }
 
 class Zone extends AbstractSceneItem {
-    private land_: Land
     private image_: Partial<Image> = {}
     private redraw_: [RectangularCoordinates, Image][] = []
 
@@ -38,7 +37,6 @@ class Zone extends AbstractSceneItem {
         this.y = zone.y
         this.width_ = zone.width
         this.height_ = zone.height
-        this.land_ = land
         for (const terrain of land.terrains(zone)) {
             this.refresh(terrain)
         }
