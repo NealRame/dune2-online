@@ -6,7 +6,7 @@ import { Image, ScaleFactors, Scene, SceneItem } from "@/engine/types"
 import { Color, Painter } from "@/graphics"
 import { Rect, RectangularCoordinates, Size, Vector } from "@/maths"
 
-import { chain, groupBy, isNil, negate } from "lodash"
+import { chain, isNil } from "lodash"
 import { createObserver, Observer } from "@/utils"
 
 function * zoneIterator(
@@ -187,12 +187,6 @@ export class Land implements SceneItem {
                 }
             })
             .value()
-
-        const chunks = groupBy(
-            [terrain, ...this.neighbors(terrain.position)].filter(negate(isNil)) as Terrain[],
-            (terrain) => this.positionToZoneIndex_(terrain.position)
-        )
-        console.log(chunks)
     }
 
     constructor(
