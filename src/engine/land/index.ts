@@ -113,7 +113,7 @@ export abstract class Terrain {
     }
 
     update(): Terrain {
-        this.land_.terrainObserver.publish(this)
+        this.land_.terrainsObserver.publish(this)
         return this
     }
 }
@@ -139,8 +139,10 @@ function generateChunks(land: Land, chunkSize: Size)
 export class Land implements SceneItem {
     private scene_: Scene
     private size_: Size
+
     private terrains_: Terrain[]
-    private terrainObserver_: Observer<Terrain>
+    private terrainsObserver_: Observer<Terrain>
+
     private zoneSize_: Size = { width: 32, height: 32 }
     private zones_: Zone[]
 
@@ -171,8 +173,8 @@ export class Land implements SceneItem {
         this.zones_ = generateChunks(this, this.zoneSize_)
 
         this.terrains_ = generateLandTerrains(this, generateTerrain)
-        this.terrainObserver_ = createObserver()
-        this.terrainObserver_.subscribe(terrain => {
+        this.terrainsObserver_ = createObserver()
+        this.terrainsObserver_.subscribe(terrain => {
             this.onTerrainChanged_(terrain)
         })
     }
@@ -204,8 +206,8 @@ export class Land implements SceneItem {
         return new Rect({ x: 0, y: 0 }, this.size)
     }
 
-    get terrainObserver(): Observer<Terrain> {
-        return this.terrainObserver_
+    get terrainsObserver(): Observer<Terrain> {
+        return this.terrainsObserver_
     }
 
     update(): Land {
