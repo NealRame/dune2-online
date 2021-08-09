@@ -1,4 +1,4 @@
-import { positionToIndexConverter } from "./utils"
+import { createPositionToZoneConverter } from "./utils"
 
 import { AbstractSceneItem } from "@/engine/scene"
 import { Image, Scene, SceneItem } from "@/engine/types"
@@ -143,16 +143,9 @@ export class Land implements SceneItem {
     private terrainObserver_: Observer<Terrain>
     private chunkSize_: Size = { width: 32, height: 32 }
     private chunks_: Chunk[]
-    private chunkRowCount_: number
-    private chunkColCount_: number
 
     private positionToTerrainIndex_: (p: RectangularCoordinates) => number
-
-    private positionToZoneIndex_(p: RectangularCoordinates) {
-        const chunkCol = Math.floor(p.x/this.chunkSize_.width)
-        const chunkRow = Math.floor(p.y/this.chunkSize_.height)
-        return this.chunkColCount_*chunkRow + chunkCol
-    }
+    private positionToZoneIndex_: (p: RectangularCoordinates) => number
 
     private onTerrainChanged_(terrain: Terrain) {
         const chunks = groupBy(
@@ -172,10 +165,9 @@ export class Land implements SceneItem {
         this.scene_ = scene
         this.size_ = size
 
-        this.positionToTerrainIndex_ = positionToIndexConverter(size)
+        this.positionToTerrainIndex_ = createPositionToZoneConverter(size)
+        this.positionToZoneIndex_ = createPositionToZoneConverter(size, this.chunkSize_)
 
-        this.chunkRowCount_ = Math.ceil(this.size_.height/this.chunkSize_.height)
-        this.chunkColCount_ = Math.ceil(this.size.width/this.chunkSize_.width)
         this.chunks_ = generateChunks(this, this.chunkSize_)
 
         this.terrains_ = generateLandTerrains(this, generateTerrain)
