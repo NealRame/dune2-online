@@ -149,7 +149,7 @@ function generateLandTerrains(land: Land, generateTerrain: TerrainGenerator)
     return terrains
 }
 
-function generateZones(land: Land, chunkSize: Size)
+function generateLandZones(land: Land, chunkSize: Size)
     : Zone[] {
     const zones: Zone[] = []
     for (const { position, size } of zoneIterator(land.rect, chunkSize)) {
@@ -207,7 +207,7 @@ export class Land implements SceneItem {
             this.onTerrainChanged_(terrain)
         })
 
-        this.zones_ = generateZones(this, this.zoneSize_)
+        this.zones_ = generateLandZones(this, this.zoneSize_)
     }
 
     get scene(): Scene {
