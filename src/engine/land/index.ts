@@ -9,14 +9,14 @@ import { Rect, RectangularCoordinates, Size, Vector } from "@/maths"
 import { groupBy, isNil, negate } from "lodash"
 import { createObserver, Observer } from "@/utils"
 
-function * chunkIterator(
+function * zoneIterator(
     rect: Rect,
-    chunkSize: Size = { width: 1, height: 1 }
+    zoneSize: Size = { width: 1, height: 1 },
 ) {
-    for (let y = rect.y; y < rect.y + rect.height; y += chunkSize.height) {
-        for (let x = rect.x; x < rect.x + rect.width; x += chunkSize.width) {
-            const width = Math.min(chunkSize.width, rect.width - x)
-            const height = Math.min(chunkSize.height, rect.height - y)
+    for (let y = rect.y; y < rect.y + rect.height; y += zoneSize.height) {
+        for (let x = rect.x; x < rect.x + rect.width; x += zoneSize.width) {
+            const width = Math.min(zoneSize.width, rect.width - x)
+            const height = Math.min(zoneSize.height, rect.height - y)
 
             yield {
                 position: { x, y },
@@ -52,7 +52,7 @@ class Chunk extends AbstractSceneItem {
             const canvas = new OffscreenCanvas(gridSpacing*rect.width, gridSpacing*rect.height)
             const context = canvas.getContext("2d") as OffscreenCanvasRenderingContext2D
 
-            for (const { position } of chunkIterator(rect)) {
+            for (const { position } of zoneIterator(rect)) {
                 const terrain = this.land_.terrain(position)
                 if (!isNil(terrain)) {
                     context.drawImage(
@@ -121,7 +121,7 @@ export abstract class Terrain {
 function generateLandTerrains(land: Land, generateTerrain: TerrainGenerator)
     : Terrain[] {
     const terrains: Terrain[] = []
-    for (const { position } of chunkIterator(land.rect)) {
+    for (const { position } of zoneIterator(land.rect)) {
         terrains.push(generateTerrain(land, position))
     }
     return terrains
@@ -130,7 +130,7 @@ function generateLandTerrains(land: Land, generateTerrain: TerrainGenerator)
 function generateChunks(land: Land, chunkSize: Size)
     : Chunk[] {
     const chunks: Chunk[] = []
-    for (const { position, size } of chunkIterator(land.rect, chunkSize)) {
+    for (const { position, size } of zoneIterator(land.rect, chunkSize)) {
         chunks.push(new Chunk(land, new Rect(position, size)))
     }
     return chunks
