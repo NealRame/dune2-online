@@ -31,16 +31,12 @@ class Zone extends AbstractSceneItem {
     private image_: Partial<Image> = {}
     private redraw_: [RectangularCoordinates, Image][] = []
 
-    constructor(land: Land, zone: Rect) {
-        super(land.scene)
-        this.x = zone.x
-        this.y = zone.y
-        this.width_ = zone.width
-        this.height_ = zone.height
-        for (const terrain of land.terrains(zone)) {
-            this.refresh(terrain)
-        }
-        this.update()
+    constructor(scene: Scene, rect: Rect) {
+        super(scene)
+        this.x = rect.x
+        this.y = rect.y
+        this.width_ = rect.width
+        this.height_ = rect.height
     }
 
     refresh(terrain: Terrain): Zone {
@@ -157,7 +153,12 @@ function generateZones(land: Land, chunkSize: Size)
     : Zone[] {
     const zones: Zone[] = []
     for (const { position, size } of zoneIterator(land.rect, chunkSize)) {
-        zones.push(new Zone(land, new Rect(position, size)))
+        const zone = new Zone(land.scene, new Rect(position, size))
+        for (const terrain of land.terrains(zone.rect)) {
+            zone.refresh(terrain)
+        }
+        zone.update()
+        zones.push(zone)
     }
     return zones
 }
