@@ -56,7 +56,7 @@ class Zone extends AbstractSceneItem {
                 const terrain = this.land_.terrain(position)
                 if (!isNil(terrain)) {
                     context.drawImage(
-                        terrain.image(this.land_.neighbors(position))[scale],
+                        terrain.image()[scale],
                         gridSpacing*(position.x - this.x),
                         gridSpacing*(position.y - this.y),
                     )
@@ -103,8 +103,12 @@ export abstract class Terrain {
         return this.revealed_
     }
 
+    get neighbors(): Neighborhood<Terrain> {
+        return this.land_.neighbors(this.position)
+    }
+
     abstract get color(): Color.RGBA
-    abstract image(neighbors: Neighborhood<Terrain>): Image
+    abstract image(): Image
 
     reveal(): Terrain {
         this.revealed_ = true

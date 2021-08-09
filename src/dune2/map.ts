@@ -22,9 +22,9 @@ class Dune2Terrain extends Terrain {
         return [0, 0, 0, 0]
     }
 
-    image(neighbors: Neighborhood<Terrain>): Image {
+    image(): Image {
         const images = imageSet("terrain")
-        const typeMask = (neighbors as Neighborhood<Dune2Terrain>)
+        const typeMask = (this.neighbors as Neighborhood<Dune2Terrain>)
             .map(neighbor => {
                 const type = (neighbor ?? this).type
                 if (this.type === TerrainType.Rock) {
