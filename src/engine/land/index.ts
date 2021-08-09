@@ -1,18 +1,19 @@
 import { createPositionToZoneConverter } from "./utils"
 
 import { AbstractSceneItem } from "@/engine/scene"
-import { Image, Scene, SceneItem } from "@/engine/types"
+import { Image, ScaleFactors, Scene, SceneItem } from "@/engine/types"
 
 import { Color, Painter } from "@/graphics"
 import { Rect, RectangularCoordinates, Size, Vector } from "@/maths"
 
-import { groupBy, isNil, negate } from "lodash"
+import { chain, groupBy, isNil, negate } from "lodash"
 import { createObserver, Observer } from "@/utils"
 
 function * zoneIterator(
-    rect: Rect,
+    rect: Rect|null,
     zoneSize: Size = { width: 1, height: 1 },
 ) {
+    if (isNil(rect)) return
     for (let y = rect.y; y < rect.y + rect.height; y += zoneSize.height) {
         for (let x = rect.x; x < rect.x + rect.width; x += zoneSize.width) {
             const width = Math.min(zoneSize.width, rect.width - x)
@@ -28,7 +29,8 @@ function * zoneIterator(
 
 class Zone extends AbstractSceneItem {
     private land_: Land
-    private image_: Partial<Image>
+    private image_: Partial<Image> = {}
+    private redraw_: [RectangularCoordinates, Image][] = []
 
     constructor(land: Land, zone: Rect) {
         super(land.scene)
@@ -37,7 +39,45 @@ class Zone extends AbstractSceneItem {
         this.width_ = zone.width
         this.height_ = zone.height
         this.land_ = land
-        this.image_ = {}
+        for (const terrain of land.terrains(zone)) {
+            this.refresh(terrain)
+        }
+        this.update()
+    }
+
+    refresh(terrain: Terrain): Zone {
+        this.redraw_.push([
+            terrain.position,
+            terrain.image(),
+        ])
+        return this
+    }
+
+    update(): Zone {
+        const { gridUnit } = this.scene
+        const { width, height } = this.rect
+
+        for (const scale of ScaleFactors) {
+            const gridSpacing = gridUnit*scale
+            const canvas = new OffscreenCanvas(gridSpacing*width, gridSpacing*height)
+            const context = canvas.getContext("2d") as OffscreenCanvasRenderingContext2D
+
+            if (!isNil(this.image_[scale])) {
+                context.drawImage(this.image_[scale] as ImageBitmap, 0, 0)
+            }
+
+            for (const [position, image] of this.redraw_) {
+                context.drawImage(
+                    image[scale],
+                    gridSpacing*(position.x - this.x),
+                    gridSpacing*(position.y - this.y),
+                )
+            }
+
+            this.image_[scale] = canvas.transferToImageBitmap()
+        }
+        this.redraw_ = []
+        return this
     }
 
     render(
@@ -48,29 +88,13 @@ class Zone extends AbstractSceneItem {
         const gridSpacing = this.scene.gridSpacing
         const rect = this.rect
 
-        if (isNil(this.image_[scale])) {
-            const canvas = new OffscreenCanvas(gridSpacing*rect.width, gridSpacing*rect.height)
-            const context = canvas.getContext("2d") as OffscreenCanvasRenderingContext2D
-
-            for (const { position } of zoneIterator(rect)) {
-                const terrain = this.land_.terrain(position)
-                if (!isNil(terrain)) {
-                    context.drawImage(
-                        terrain.image()[scale],
-                        gridSpacing*(position.x - this.x),
-                        gridSpacing*(position.y - this.y),
-                    )
-                }
-            }
-
-            this.image_[scale] = canvas.transferToImageBitmap()
-        }
-
         if (rect.intersects(viewport)) {
-            painter.drawImageBitmap(
-                this.image_[scale] as ImageBitmap,
-                this.position.sub(viewport).mul(gridSpacing)
-            )
+            if (!isNil(this.image_[scale])) {
+                painter.drawImageBitmap(
+                    this.image_[scale] as ImageBitmap,
+                    this.position.sub(viewport).mul(gridSpacing)
+                )
+            }
         }
 
         return this
@@ -154,6 +178,16 @@ export class Land implements SceneItem {
     private positionToZoneIndex_: (p: RectangularCoordinates) => number
 
     private onTerrainChanged_(terrain: Terrain) {
+        chain(terrain.neighbors)
+            .tap(terrains => terrains.push(terrain))
+            .forEach(terrain => {
+                if (!isNil(terrain)) {
+                    const zone = this.zones_[this.positionToZoneIndex_(terrain.position)]
+                    zone.refresh(terrain)
+                }
+            })
+            .value()
+
         const chunks = groupBy(
             [terrain, ...this.neighbors(terrain.position)].filter(negate(isNil)) as Terrain[],
             (terrain) => this.positionToZoneIndex_(terrain.position)
@@ -174,13 +208,13 @@ export class Land implements SceneItem {
         this.positionToTerrainIndex_ = createPositionToZoneConverter(size)
         this.positionToZoneIndex_ = createPositionToZoneConverter(size, this.zoneSize_)
 
-        this.zones_ = generateChunks(this, this.zoneSize_)
-
         this.terrains_ = generateLandTerrains(this, generateTerrain)
         this.terrainsObserver_ = createObserver()
         this.terrainsObserver_.subscribe(terrain => {
             this.onTerrainChanged_(terrain)
         })
+
+        this.zones_ = generateChunks(this, this.zoneSize_)
     }
 
     get scene(): Scene {
@@ -234,6 +268,12 @@ export class Land implements SceneItem {
         position: RectangularCoordinates
     ): T|null {
         return this.terrains_[this.positionToTerrainIndex_(position)] as T
+    }
+
+    * terrains(rect: Rect): Generator<Terrain> {
+        for (const { position } of zoneIterator(this.rect.intersected(rect))) {
+            yield this.terrain(position) as Terrain
+        }
     }
 
     neighbors<T extends Terrain = Terrain>(
