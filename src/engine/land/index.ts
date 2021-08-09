@@ -26,7 +26,7 @@ function * zoneIterator(
     }
 }
 
-class Chunk extends AbstractSceneItem {
+class Zone extends AbstractSceneItem {
     private land_: Land
     private image_: Partial<Image>
 
@@ -43,7 +43,7 @@ class Chunk extends AbstractSceneItem {
     render(
         painter: Painter,
         viewport: Rect,
-    ): Chunk {
+    ): Zone {
         const scale = this.scene.scale
         const gridSpacing = this.scene.gridSpacing
         const rect = this.rect
@@ -128,12 +128,12 @@ function generateLandTerrains(land: Land, generateTerrain: TerrainGenerator)
 }
 
 function generateChunks(land: Land, chunkSize: Size)
-    : Chunk[] {
-    const chunks: Chunk[] = []
+    : Zone[] {
+    const zones: Zone[] = []
     for (const { position, size } of zoneIterator(land.rect, chunkSize)) {
-        chunks.push(new Chunk(land, new Rect(position, size)))
+        zones.push(new Zone(land, new Rect(position, size)))
     }
-    return chunks
+    return zones
 }
 
 export class Land implements SceneItem {
@@ -141,8 +141,8 @@ export class Land implements SceneItem {
     private size_: Size
     private terrains_: Terrain[]
     private terrainObserver_: Observer<Terrain>
-    private chunkSize_: Size = { width: 32, height: 32 }
-    private chunks_: Chunk[]
+    private zoneSize_: Size = { width: 32, height: 32 }
+    private zones_: Zone[]
 
     private positionToTerrainIndex_: (p: RectangularCoordinates) => number
     private positionToZoneIndex_: (p: RectangularCoordinates) => number
@@ -166,9 +166,9 @@ export class Land implements SceneItem {
         this.size_ = size
 
         this.positionToTerrainIndex_ = createPositionToZoneConverter(size)
-        this.positionToZoneIndex_ = createPositionToZoneConverter(size, this.chunkSize_)
+        this.positionToZoneIndex_ = createPositionToZoneConverter(size, this.zoneSize_)
 
-        this.chunks_ = generateChunks(this, this.chunkSize_)
+        this.zones_ = generateChunks(this, this.zoneSize_)
 
         this.terrains_ = generateLandTerrains(this, generateTerrain)
         this.terrainObserver_ = createObserver()
@@ -216,7 +216,7 @@ export class Land implements SceneItem {
         painter: Painter,
         viewport: Rect
     ): Land {
-        for (const chunk of this.chunks_) {
+        for (const chunk of this.zones_) {
             if (viewport.intersects(chunk.rect)) {
                 chunk.render(painter, viewport)
             }
