@@ -40,10 +40,12 @@ class Zone extends AbstractSceneItem {
     }
 
     refresh(terrain: Terrain): Zone {
-        this.redraw_.push([
-            terrain.position,
-            terrain.image(),
-        ])
+        if (terrain.revealed) {
+            this.redraw_.push([
+                terrain.position,
+                terrain.image(),
+            ])
+        }
         return this
     }
 
@@ -113,6 +115,14 @@ export abstract class Terrain {
         this.position_ = position
     }
 
+    get x(): number {
+        return this.position_.x
+    }
+
+    get y(): number {
+        return this.position_.y
+    }
+
     get position(): RectangularCoordinates {
         return this.position_
     }
@@ -177,15 +187,23 @@ export class Land implements SceneItem {
     private positionToZoneIndex_: (p: RectangularCoordinates) => number
 
     private onTerrainChanged_(terrain: Terrain) {
+        const zones = new Set<Zone>()
         chain(terrain.neighbors)
             .tap(terrains => terrains.push(terrain))
             .forEach(terrain => {
                 if (!isNil(terrain)) {
                     const zone = this.zones_[this.positionToZoneIndex_(terrain.position)]
+                    console.log(`refresh terrain: (${terrain.x}, ${terrain.y}) zone: (${zone.x}, ${zone.y})`)
                     zone.refresh(terrain)
+                    zones.add(zone)
                 }
             })
             .value()
+
+        for (const zone of zones) {
+            console.log(`refresh zone: (${zone.x}, ${zone.y})`)
+            zone.update()
+        }
     }
 
     constructor(
