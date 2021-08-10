@@ -263,7 +263,7 @@ export class Land implements SceneItem {
 
     render(
         painter: Painter,
-        viewport: Rect
+        viewport: Rect,
     ): Land {
         for (const chunk of this.zones_) {
             if (viewport.intersects(chunk.rect)) {
@@ -274,19 +274,21 @@ export class Land implements SceneItem {
     }
 
     terrain<T extends Terrain = Terrain>(
-        position: RectangularCoordinates
+        position: RectangularCoordinates,
     ): T|null {
         return this.terrains_[this.positionToTerrainIndex_(position)] as T
     }
 
-    * terrains(rect: Rect): Generator<Terrain> {
+    * terrains(
+        rect: Rect,
+    ): Generator<Terrain> {
         for (const { position } of zoneIterator(this.rect.intersected(rect))) {
             yield this.terrain(position) as Terrain
         }
     }
 
     neighbors<T extends Terrain = Terrain>(
-        { x, y }: RectangularCoordinates
+        { x, y }: RectangularCoordinates,
     ): Neighborhood<T> {
         return [
             this.terrain({ x, y: y - 1 }),
