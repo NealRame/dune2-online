@@ -80,11 +80,9 @@ class Zone extends AbstractSceneItem {
         painter: Painter,
         viewport: Rect,
     ): Zone {
-        const scale = this.scene.scale
-        const gridSpacing = this.scene.gridSpacing
-        const rect = this.rect
+        const { gridSpacing, scale } = this.scene
 
-        if (rect.intersects(viewport)) {
+        if (this.rect.intersects(viewport)) {
             if (!isNil(this.image_[scale])) {
                 painter.drawImageBitmap(
                     this.image_[scale] as ImageBitmap,
