@@ -3,17 +3,18 @@ import { imageSet } from "@/dune2/data"
 
 import { RGBA } from "@/graphics/color"
 
-import { Image, Land, Neighborhood, Scene, Terrain } from "@/engine"
+import { Image } from "@/engine"
+import { AbstractTerrain, Land, Neighborhood, TerrainGenerator } from "@/engine/land"
 
 import { createNoise2DGenerator, createRangeMapper, RectangularCoordinates } from "@/maths"
 
 import { chain, clamp, flow, isNil } from "lodash"
 
-class Dune2Terrain extends Terrain {
+export class Dune2Terrain extends AbstractTerrain {
     spice = 0
     type = TerrainType.Dunes
 
-    constructor(land: Land, position: RectangularCoordinates) {
+    constructor(land: Land<Dune2Terrain>, position: RectangularCoordinates) {
         super(land, position)
         this.position_ = position
     }
@@ -180,15 +181,15 @@ function checkConfig(config: MapConfig): Required<MapConfig> {
     }
 }
 
-export function generateMap(scene: Scene, mapConfig: MapConfig)
-    : Land {
+export function Dune2TerrainGenerator(mapConfig: MapConfig)
+    : TerrainGenerator<Dune2Terrain> {
     const config = checkConfig(mapConfig)
     const generateTerrainType = terrainTypeGenerator(config)
     const generateSpiceField = spiceFieldGenerator(config)
-    return new Land(scene, config, (land, position) => {
+    return (land, position) => {
         return chain(new Dune2Terrain(land, position))
             .tap(generateTerrainType)
             .tap(generateSpiceField)
             .value()
-    })
+    }
 }

@@ -146,8 +146,8 @@ import Modal from "@/components/Modal.vue"
 import ProgressBar from "@/components/ProgressBar.vue"
 import Screen, { ScreenMouseMotionEvent } from "@/components/Screen.vue"
 
-import { generateMap } from "@/dune2"
-import { createScene } from "@/engine"
+import { Dune2TerrainGenerator } from "@/dune2"
+import { createLand, createScene } from "@/engine"
 import { PaintDevice } from "@/graphics"
 import { Rect, RectangularCoordinates, Vector } from "@/maths"
 
@@ -206,8 +206,7 @@ export default defineComponent({
                 height: unref(height),
             }
 
-            scene.clear()
-            scene.addItem(generateMap(scene, {
+            const generateTerrain = Dune2TerrainGenerator({
                 seed,
                 size,
                 terrainScale: unref(terrainScale),
@@ -219,7 +218,10 @@ export default defineComponent({
                 spiceDetails: unref(spiceDetails),
                 spiceThreshold: unref(spiceThreshold),
                 spiceSaturationThreshold: unref(spiceSaturationThreshold),
-            }))
+            })
+
+            scene.clear()
+            scene.addItem(createLand(scene, { size }, generateTerrain))
 
             showModal.value = false
         }

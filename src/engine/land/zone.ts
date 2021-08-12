@@ -1,4 +1,4 @@
-import { Terrain } from "."
+import { Terrain } from "./types"
 import { AbstractSceneItem } from "../scene"
 
 import { Image, ScaleFactors, Scene } from "@/engine"

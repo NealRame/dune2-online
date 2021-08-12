@@ -1,4 +1,4 @@
-import { generateMap } from "./map"
+import { Dune2Terrain, Dune2TerrainGenerator } from "./map"
 import { MapConfig } from "./types"
 
 import { Unit } from "./units/unit"
@@ -6,7 +6,9 @@ import { Harvester } from "./units/harvester"
 import { Quad } from "./units/quad"
 import { Trike } from "./units/trike"
 
-import { createScene, Land, Scene } from "@/engine"
+import { createScene, Scene } from "@/engine"
+import { createLand, Land } from "@/engine/land"
+
 import { PaintDevice } from "@/graphics"
 import { RectangularCoordinates } from "@/maths"
 
@@ -22,8 +24,8 @@ export interface GameConfig {
 }
 
 export interface Game {
-    scene: Scene
-    land: Land,
+    scene: Scene,
+    land: Land<Dune2Terrain>,
     addUnit(type: keyof typeof Units, position: RectangularCoordinates): Unit
     start(): void
 }
@@ -32,7 +34,7 @@ export { Unit } from "./units/unit"
 
 export function createGame(config: GameConfig): Game {
     const scene = createScene()
-    const map = generateMap(scene, config.map)
+    const map = createLand(scene, config.map, Dune2TerrainGenerator(config.map))
 
     scene.addItem(map)
     scene.gridEnabled = false
