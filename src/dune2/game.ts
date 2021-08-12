@@ -1,4 +1,4 @@
-import { Dune2Terrain, Dune2TerrainGenerator } from "./map"
+import { createTerrainGenerator, Terrain } from "./land"
 import { LandConfig } from "./types"
 
 import { Unit } from "./units/unit"
@@ -25,7 +25,7 @@ export interface GameConfig {
 
 export interface Game {
     scene: Scene,
-    land: Land<Dune2Terrain>,
+    land: Land<Terrain>,
     addUnit(type: keyof typeof Units, position: RectangularCoordinates): Unit
     start(): void
 }
@@ -34,7 +34,7 @@ export { Unit } from "./units/unit"
 
 export function createGame(config: GameConfig): Game {
     const scene = createScene()
-    const map = createLand(scene, config.map, Dune2TerrainGenerator(config.map))
+    const map = createLand(scene, config.map, createTerrainGenerator(config.map))
 
     scene.addItem(map)
     scene.gridEnabled = false

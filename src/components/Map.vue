@@ -146,7 +146,7 @@ import Modal from "@/components/Modal.vue"
 import ProgressBar from "@/components/ProgressBar.vue"
 import Screen, { ScreenMouseMotionEvent } from "@/components/Screen.vue"
 
-import { Dune2TerrainGenerator } from "@/dune2"
+import { createTerrainGenerator } from "@/dune2"
 import { createLand, createScene } from "@/engine"
 import { PaintDevice } from "@/graphics"
 import { Rect, RectangularCoordinates, Vector } from "@/maths"
@@ -206,7 +206,7 @@ export default defineComponent({
                 height: unref(height),
             }
 
-            const generateTerrain = Dune2TerrainGenerator({
+            const generateTerrain = createTerrainGenerator({
                 seed,
                 size,
                 terrainScale: unref(terrainScale),

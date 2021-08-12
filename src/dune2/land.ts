@@ -10,11 +10,11 @@ import { createNoise2DGenerator, createRangeMapper, RectangularCoordinates } fro
 
 import { chain, clamp, flow, isNil } from "lodash"
 
-export class Dune2Terrain extends AbstractTerrain {
+export class Terrain extends AbstractTerrain {
     spice = 0
     type = TerrainType.Dunes
 
-    constructor(land: Land<Dune2Terrain>, position: RectangularCoordinates) {
+    constructor(land: Land<Terrain>, position: RectangularCoordinates) {
         super(land, position)
         this.position_ = position
     }
@@ -24,7 +24,7 @@ export class Dune2Terrain extends AbstractTerrain {
     }
 
     private topoMask_(): number {
-        return (this.neighbors as Neighborhood<Dune2Terrain>)
+        return (this.neighbors as Neighborhood<Terrain>)
             .map(neighbor => {
                 const type = (neighbor ?? this).type
                 if (this.type === TerrainType.Rock) {
@@ -40,7 +40,7 @@ export class Dune2Terrain extends AbstractTerrain {
 
     private revealMask_(): number {
         if (this.revealed) return 0
-        return (this.neighbors as Neighborhood<Dune2Terrain>)
+        return (this.neighbors as Neighborhood<Terrain>)
             .map(neighbor => neighbor?.revealed ?? false)
             .reduce((prev, cur, index) => cur ? prev + (1 << index) : prev, 0)
     }
@@ -89,7 +89,7 @@ export class Dune2Terrain extends AbstractTerrain {
 }
 
 function terrainTypeGenerator(config: Required<LandConfig>)
-    : (t: Partial<Dune2Terrain>) => Partial<Dune2Terrain> {
+    : (t: Partial<Terrain>) => Partial<Terrain> {
     const terrainNoise = flow(
         createNoise2DGenerator({
             seed: config.seed,
@@ -122,7 +122,7 @@ function terrainTypeGenerator(config: Required<LandConfig>)
 }
 
 function spiceFieldGenerator(config: Required<LandConfig>)
-    : (t: Partial<Dune2Terrain>) => Partial<Dune2Terrain> {
+    : (t: Partial<Terrain>) => Partial<Terrain> {
     const spiceNoise = flow(
         createNoise2DGenerator({
             seed: config.seed + 1,
@@ -181,13 +181,13 @@ function checkConfig(config: LandConfig): Required<LandConfig> {
     }
 }
 
-export function Dune2TerrainGenerator(LandConfig: LandConfig)
-    : TerrainGenerator<Dune2Terrain> {
+export function createTerrainGenerator(LandConfig: LandConfig)
+    : TerrainGenerator<Terrain> {
     const config = checkConfig(LandConfig)
     const generateTerrainType = terrainTypeGenerator(config)
     const generateSpiceField = spiceFieldGenerator(config)
     return (land, position) => {
-        return chain(new Dune2Terrain(land, position))
+        return chain(new Terrain(land, position))
             .tap(generateTerrainType)
             .tap(generateSpiceField)
             .value()
