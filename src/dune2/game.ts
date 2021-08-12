@@ -1,5 +1,5 @@
 import { Dune2Terrain, Dune2TerrainGenerator } from "./map"
-import { MapConfig } from "./types"
+import { LandConfig } from "./types"
 
 import { Unit } from "./units/unit"
 import { Harvester } from "./units/harvester"
@@ -20,7 +20,7 @@ export const Units = {
 
 export interface GameConfig {
     screen: PaintDevice,
-    map: MapConfig,
+    map: LandConfig,
 }
 
 export interface Game {

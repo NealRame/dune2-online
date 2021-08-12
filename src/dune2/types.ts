@@ -16,7 +16,7 @@ export type TileDescriptor = {
     images: Image[],
 }
 
-export type MapConfig = {
+export interface LandConfig {
     size: Size,
     // Noise seed
     seed?: number,

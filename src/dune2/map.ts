@@ -1,4 +1,4 @@
-import { MapConfig, TerrainType } from "@/dune2/types"
+import { LandConfig, TerrainType } from "@/dune2/types"
 import { imageSet } from "@/dune2/data"
 
 import { RGBA } from "@/graphics/color"
@@ -88,7 +88,7 @@ export class Dune2Terrain extends AbstractTerrain {
     }
 }
 
-function terrainTypeGenerator(config: Required<MapConfig>)
+function terrainTypeGenerator(config: Required<LandConfig>)
     : (t: Partial<Dune2Terrain>) => Partial<Dune2Terrain> {
     const terrainNoise = flow(
         createNoise2DGenerator({
@@ -121,7 +121,7 @@ function terrainTypeGenerator(config: Required<MapConfig>)
     }
 }
 
-function spiceFieldGenerator(config: Required<MapConfig>)
+function spiceFieldGenerator(config: Required<LandConfig>)
     : (t: Partial<Dune2Terrain>) => Partial<Dune2Terrain> {
     const spiceNoise = flow(
         createNoise2DGenerator({
@@ -159,7 +159,7 @@ function spiceFieldGenerator(config: Required<MapConfig>)
     }
 }
 
-function checkConfig(config: MapConfig): Required<MapConfig> {
+function checkConfig(config: LandConfig): Required<LandConfig> {
     const spiceThreshold = clamp(config.spiceThreshold ?? 0.6, 0, 1)
     const spiceSaturationThreshold = clamp(config.spiceSaturationThreshold ?? (1 + spiceThreshold)/2, spiceThreshold, 1)
     return {
@@ -181,9 +181,9 @@ function checkConfig(config: MapConfig): Required<MapConfig> {
     }
 }
 
-export function Dune2TerrainGenerator(mapConfig: MapConfig)
+export function Dune2TerrainGenerator(LandConfig: LandConfig)
     : TerrainGenerator<Dune2Terrain> {
-    const config = checkConfig(mapConfig)
+    const config = checkConfig(LandConfig)
     const generateTerrainType = terrainTypeGenerator(config)
     const generateSpiceField = spiceFieldGenerator(config)
     return (land, position) => {
