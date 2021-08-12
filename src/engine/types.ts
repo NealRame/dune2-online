@@ -7,18 +7,6 @@ export type ScaleFactor = typeof ScaleFactors[number]
 
 export type Image = Record<ScaleFactor, ImageBitmap>
 
-export enum Direction {
-    North,
-    Northeast,
-    East,
-    Southeast,
-    South,
-    Southwest,
-    West,
-    Northwest,
-}
-export const DirectionCount = Direction.Northwest + 1
-
 export interface Scene {
     scale: ScaleFactor,
     viewport: Rect | null,

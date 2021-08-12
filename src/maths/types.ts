@@ -18,3 +18,15 @@ export interface Transform2DMatrix {
     m21: number,
     m22: number,
 }
+
+export enum Direction {
+    North,
+    Northeast,
+    East,
+    Southeast,
+    South,
+    Southwest,
+    West,
+    Northwest,
+}
+export const DirectionCount = Direction.Northwest + 1

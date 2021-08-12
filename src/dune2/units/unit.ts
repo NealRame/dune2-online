@@ -2,46 +2,19 @@ import {
     Animation,
     createSequenceAnimation,
     createTransitionAnimation,
-    Direction,
-    DirectionCount,
     Scene,
     Sprite,
 } from "@/engine"
-import { Easing, RectangularCoordinates, Vector } from "@/maths"
+import {
+    Direction,
+    DirectionCount,
+    Easing,
+    RectangularCoordinates,
+    Vector
+} from "@/maths"
 import { createObserver, EventCallback, Observer } from "@/utils"
 
 import { clamp, isNil, times } from "lodash"
-
-function directionToVector(d: Direction): Vector {
-    switch (d) {
-    case Direction.North:
-        return Vector.Up()
-
-    case Direction.Northeast:
-        return Vector.UpRight()
-
-    case Direction.East:
-        return Vector.Right()
-
-    case Direction.Southeast:
-        return Vector.DownRight()
-
-    case Direction.South:
-        return Vector.Down()
-
-    case Direction.Southwest:
-        return Vector.DownLeft()
-
-    case Direction.West:
-        return Vector.Left()
-
-    case Direction.Northwest:
-        return Vector.UpLeft()
-    }
-
-    const exhaustiveCheck_: never = d
-    return exhaustiveCheck_
-}
 
 function directionRotationSequence(from: Direction, to: Direction) {
     const d = (from <= to ? to : to + DirectionCount) - from
@@ -78,7 +51,7 @@ export class Unit extends Sprite {
     move(moveDirection: Direction): Unit {
         const directions = directionRotationSequence(this.direction, moveDirection)
         const position = this.position
-        const direction = directionToVector(moveDirection)
+        const direction = Vector.FromDirection(moveDirection)
         this.animation_ = createSequenceAnimation({
             animations: [
                 createTransitionAnimation({

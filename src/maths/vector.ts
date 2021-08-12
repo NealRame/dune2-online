@@ -1,4 +1,4 @@
-import { RectangularCoordinates, Transform2DMatrix } from "./types"
+import { Direction, RectangularCoordinates, Transform2DMatrix } from "./types"
 
 export class Vector implements RectangularCoordinates {
     x: number
@@ -116,15 +116,70 @@ export class Vector implements RectangularCoordinates {
         return `(${this.x}, ${this.y})`
     }
 
-    static Null      = (): Vector => new Vector( 0,  0)
+    static Null(): Vector {
+        return new Vector( 0,  0)
+    }
 
-    static Up        = (): Vector => new Vector( 0, -1)
-    static Left      = (): Vector => new Vector(-1,  0)
-    static Down      = (): Vector => new Vector( 0,  1)
-    static Right     = (): Vector => new Vector( 1,  0)
+    static Up(): Vector {
+        return new Vector( 0, -1)
+    }
 
-    static UpLeft    = (): Vector => new Vector(-Math.sqrt(1), -Math.sqrt(1))
-    static UpRight   = (): Vector => new Vector( Math.sqrt(1), -Math.sqrt(1))
-    static DownRight = (): Vector => new Vector( Math.sqrt(1),  Math.sqrt(1))
-    static DownLeft  = (): Vector => new Vector(-Math.sqrt(1),  Math.sqrt(1))
+    static Left(): Vector {
+        return new Vector(-1,  0)
+    }
+
+    static Down(): Vector {
+        return new Vector( 0,  1)
+    }
+
+    static Right(): Vector {
+        return new Vector( 1,  0)
+    }
+
+    static UpLeft(): Vector {
+        return new Vector(-Math.sqrt(1), -Math.sqrt(1))
+    }
+
+    static UpRight(): Vector {
+        return new Vector( Math.sqrt(1), -Math.sqrt(1))
+    }
+
+    static DownRight(): Vector {
+        return new Vector( Math.sqrt(1),  Math.sqrt(1))
+    }
+
+    static DownLeft(): Vector {
+        return new Vector(-Math.sqrt(1),  Math.sqrt(1))
+    }
+
+    static FromDirection(direction: Direction): Vector {
+        switch (direction) {
+        case Direction.North:
+            return Vector.Up()
+
+        case Direction.Northeast:
+            return Vector.UpRight()
+
+        case Direction.East:
+            return Vector.Right()
+
+        case Direction.Southeast:
+            return Vector.DownRight()
+
+        case Direction.South:
+            return Vector.Down()
+
+        case Direction.Southwest:
+            return Vector.DownLeft()
+
+        case Direction.West:
+            return Vector.Left()
+
+        case Direction.Northwest:
+            return Vector.UpLeft()
+        }
+
+        const exhaustiveCheck_: never = direction
+        return exhaustiveCheck_
+    }
 }

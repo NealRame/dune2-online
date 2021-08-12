@@ -14,10 +14,11 @@ canvas {
 </style>
 
 <script lang="ts">
-import Screen, { ScreenMouseClickEvent } from "@/components/Screen.vue"
+import Screen from "@/components/Screen.vue"
 
-import { createScene, Direction, ScaleFactor, screenToSceneCoordinate } from "@/engine"
 import { Units } from "@/dune2"
+import { createScene, ScaleFactor } from "@/engine"
+import { Direction } from "@/maths"
 
 import { PaintDevice } from "@/graphics"
 
