@@ -1,4 +1,4 @@
-import { AbstractSceneItem } from "./scene"
+import { AbstractSceneItem } from "./scene-item"
 import { Tile } from "./tile"
 import { Image, Scene } from "./types"
 

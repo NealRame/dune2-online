@@ -1,4 +1,4 @@
-import { AbstractSceneItem } from "./scene"
+import { AbstractSceneItem } from "./scene-item"
 import { Image, Scene } from "./types"
 
 import { Painter } from "@/graphics"
