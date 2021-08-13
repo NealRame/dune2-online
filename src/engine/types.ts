@@ -22,12 +22,5 @@ export interface Scene {
 }
 
 export interface SceneItem {
-    readonly scene: Scene,
-    readonly width: number,
-    readonly height: number,
-    readonly size: Size,
-    readonly rect: Rect,
-    readonly position: Vector,
-    render(painter: Painter, viewport: Rect): SceneItem,
-    update(...args: unknown[]): SceneItem,
+    update(): SceneItem
 }
