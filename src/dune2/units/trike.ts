@@ -1,8 +1,5 @@
-import { Unit } from "./unit"
-
 import { imageSet } from "@/dune2/data"
-import { Scene } from "@/engine"
-
+import { Unit, Scene } from "@/engine"
 import { RectangularCoordinates } from "@/maths"
 
 export class Trike extends Unit {
