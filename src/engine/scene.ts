@@ -1,17 +1,21 @@
-import { ScaleFactor, Scene, SceneItem } from "./types"
+import { SceneLayerImpl } from "./scene-layer"
+import { ScaleFactor, Scene, SceneItem, SceneLayer } from "./types"
 
 import { cssHex } from "@/graphics/color"
 import { Brush, Painter } from "@/graphics/painter"
 
 import { Rect, RectangularCoordinates, Size, Vector } from "@/maths"
+import { isNil } from "lodash"
 
 type SceneState = {
     backgroundColor: Brush
     gridEnabled: boolean
-    gridUnit: 16,
+    gridUnit: 16
+    layers: SceneLayer[]
+    rect: Rect
     scaleFactor: ScaleFactor
     viewport: Rect | null
-    items: SceneItem[]
+
 }
 
 type GridConfig = {
@@ -49,13 +53,14 @@ function drawGrid(
     }
 }
 
-export function createScene(): Scene {
+export function createScene(size: Size): Scene {
     const state: SceneState = {
         backgroundColor: cssHex([0, 0, 0]),
         gridEnabled: false,
         gridUnit: 16,
-        items: [],
+        layers: [],
         scaleFactor: 1,
+        rect: new Rect({ x: 0, y: 0 }, size),
         viewport: null,
     }
 
@@ -80,25 +85,28 @@ export function createScene(): Scene {
         set gridEnabled(enabled: boolean) {
             state.gridEnabled = enabled
         },
-        get viewport(): Rect | null {
-            return state.viewport
+        get size(): Size {
+            return state.rect.size
+        },
+        set size(size: Size) {
+            state.rect = new Rect({ x: 0, y: 0 }, size)
+        },
+        get rect(): Rect {
+            return state.rect.copy()
+        },
+        get viewport(): Rect {
+            return (state.viewport ?? state.rect).copy()
         },
         set viewport(rect: Rect | null) {
             state.viewport = rect
         },
-        get rect(): Rect {
-            const r = new Rect({ x: 0, y: 0 }, { width: 0, height: 0 })
-            for (const item of state.items) {
-                r.union(item.rect)
-            }
-            return r
-        },
-        addItem(item: SceneItem): Scene {
-            state.items.push(item)
-            return this
+        addLayer(name: string): SceneLayer {
+            const layer = new SceneLayerImpl(this, name)
+            state.layers.push(layer)
+            return layer
         },
         clear(): Scene {
-            state.items = []
+            state.layers = []
             return this
         },
         render(painter: Painter): Scene {
@@ -116,10 +124,8 @@ export function createScene(): Scene {
             }
 
             // draw items
-            for (const item of state.items) {
-                if (viewport.intersects(item.rect)) {
-                    item.render(painter, viewport)
-                }
+            for (const layer of state.layers) {
+                layer.render(painter)
             }
 
             return this
@@ -134,8 +140,8 @@ export function createScene(): Scene {
             return this
         },
         update(): Scene {
-            for (const item of state.items) {
-                item.update()
+            for (const layer of state.layers) {
+                layer.update()
             }
             return this
         },

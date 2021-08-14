@@ -19,7 +19,7 @@ export const Units = {
 
 export interface GameConfig {
     screen: PaintDevice,
-    map: LandConfig,
+    land: LandConfig,
 }
 
 export interface Game {
@@ -30,11 +30,12 @@ export interface Game {
 }
 
 export function createGame(config: GameConfig): Game {
-    const scene = createScene()
-    const map = createLand(scene, config.map, createTerrainGenerator(config.map))
+    const scene = createScene(config.land.size)
+    const landLayer = scene.addLayer("land")
+    const map = createLand(scene, config.land, createTerrainGenerator(config.land))
 
-    scene.addItem(map)
     scene.gridEnabled = false
+    landLayer.addItem(map)
 
     return {
         get scene() {
@@ -45,7 +46,7 @@ export function createGame(config: GameConfig): Game {
         },
         addUnit(type, position) {
             const unit = new Units[type](scene, position)
-            scene.addItem(unit)
+            landLayer.addItem(unit)
             return unit
         },
         start(): void {

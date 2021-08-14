@@ -32,7 +32,11 @@ export default defineComponent({
         const screenWidth = ref(0)
         const screenHeight = ref(0)
         const scale = ref<ScaleFactor>(4)
-        const scene = createScene()
+        const scene = createScene({
+            width: 60,
+            height: 60,
+        })
+        const unitsLayer = scene.addLayer("units")
 
         // handle window resize event
         const resize = debounce(() => {
@@ -48,12 +52,12 @@ export default defineComponent({
         onMounted(async () => {
             // const unit = new Units.Quad(scene, { x: 8, y: 8 })
             // const unit = new Units.Harvester(scene, { x: 8, y: 8 })
-            const unit = new Units.Trike(scene, { x: 8, y: 8 })
             scene.gridEnabled = true
             scene.scale = unref(scale)
-            scene
-                .addItem(unit)
-                .run((unref(screen) as PaintDevice).painter)
+            scene.run((unref(screen) as PaintDevice).painter)
+
+            const unit = new Units.Trike(scene, { x: 8, y: 8 })
+            unitsLayer.addItem(unit)
 
             window.addEventListener("resize", resize)
 

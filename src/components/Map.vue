@@ -183,7 +183,11 @@ export default defineComponent({
         const spiceSaturationThreshold = ref(0.8)
         const spiceDetails = ref(1)
 
-        const scene = createScene()
+        const scene = createScene({
+            width: unref(width),
+            height: unref(height),
+        })
+
         let seed: number = Date.now()
 
         const resize = debounce(() => {
@@ -221,7 +225,10 @@ export default defineComponent({
             })
 
             scene.clear()
-            scene.addItem(createLand(scene, { size }, generateTerrain))
+            scene.size = size
+
+            const land = scene.addLayer("land")
+            land.addItem(createLand(scene, { size }, generateTerrain))
 
             showModal.value = false
         }

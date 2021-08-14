@@ -45,7 +45,12 @@ export default defineComponent({
         const images = ref<readonly Image[] | null>(null)
         const currentItem = ref<number | null>(null)
 
-        const scene = createScene()
+        const scene = createScene({
+            width: 60,
+            height: 60,
+        })
+
+        const tilesLayer = scene.addLayer("tiles")
 
         // handle window resize event
         const resize = debounce(() => {
@@ -77,7 +82,7 @@ export default defineComponent({
 
             if (isNil(image)) return
 
-            scene.addItem(createTile(scene, {
+            tilesLayer.addItem(createTile(scene, {
                 position: screenToSceneCoordinates(ev.position),
                 shape: { columns: 1, rows: 1 },
                 images: [Data.imageSet(props.set as keyof ImageLib)[image]]

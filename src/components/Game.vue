@@ -88,7 +88,7 @@ export default defineComponent({
         onMounted(async () => {
             game = await createGame({
                 screen: unref(screen) as PaintDevice,
-                map: {
+                land: {
                     size: {
                         width: 128,
                         height: 128,
