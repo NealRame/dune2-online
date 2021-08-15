@@ -1,11 +1,10 @@
 import { SceneLayerImpl } from "./scene-layer"
-import { ScaleFactor, Scene, SceneItem, SceneLayer } from "./types"
+import { ScaleFactor, Scene, SceneLayer } from "./types"
 
 import { cssHex } from "@/graphics/color"
 import { Brush, Painter } from "@/graphics/painter"
 
 import { Rect, RectangularCoordinates, Size, Vector } from "@/maths"
-import { isNil } from "lodash"
 
 type SceneState = {
     backgroundColor: Brush
