@@ -11,6 +11,8 @@ export interface Scene {
     scale: ScaleFactor
     size: Size
     viewport: Rect
+    readonly width: number
+    readonly height: number
     readonly gridUnit: number
     readonly gridSpacing: number
     gridEnabled: boolean
@@ -25,7 +27,6 @@ export interface Scene {
 export interface SceneLayer {
     name: string
     readonly scene: Scene
-    readonly rect: Rect
     addItem(item: SceneItem): SceneLayer
     items(): Generator<SceneItem>
     render(painter: Painter): SceneLayer

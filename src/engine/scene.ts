@@ -84,6 +84,12 @@ export function createScene(size: Size): Scene {
         set gridEnabled(enabled: boolean) {
             state.gridEnabled = enabled
         },
+        get width(): number {
+            return state.rect.width
+        },
+        get height(): number {
+            return state.rect.height
+        },
         get size(): Size {
             return state.rect.size
         },

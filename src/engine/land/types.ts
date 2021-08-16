@@ -31,7 +31,7 @@ export interface Land<T extends Terrain = Terrain> extends SceneItem {
     terrains(rect: Rect): Generator<Terrain>
 }
 
-export type LandConfig = {
-    size: Size
+export type LandConfig<T extends Terrain> = {
+    generateTerrain: TerrainGenerator<T>
     zoneSize?: Size
 }

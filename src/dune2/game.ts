@@ -9,7 +9,7 @@ import { createScene, Scene, Unit } from "@/engine"
 import { createLand, Land } from "@/engine/land"
 
 import { PaintDevice } from "@/graphics"
-import { RectangularCoordinates } from "@/maths"
+import { RectangularCoordinates, Size } from "@/maths"
 
 export const Units = {
     Harvester,
@@ -19,7 +19,8 @@ export const Units = {
 
 export interface GameConfig {
     screen: PaintDevice,
-    land: LandConfig,
+    size: Size,
+    land?: LandConfig,
 }
 
 export interface Game {
@@ -30,19 +31,21 @@ export interface Game {
 }
 
 export function createGame(config: GameConfig): Game {
-    const scene = createScene(config.land.size)
+    const scene = createScene(config.size)
     const landLayer = scene.addLayer("land")
-    const map = createLand(scene, config.land, createTerrainGenerator(config.land))
 
-    scene.gridEnabled = false
-    landLayer.addItem(map)
+    const land = createLand(scene, {
+        generateTerrain: createTerrainGenerator(config.land ?? {}),
+    })
+
+    landLayer.addItem(land)
 
     return {
         get scene() {
             return scene
         },
         get land() {
-            return map
+            return land
         },
         addUnit(type, position) {
             const unit = new Units[type](scene, position)

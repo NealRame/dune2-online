@@ -212,7 +212,6 @@ export default defineComponent({
 
             const generateTerrain = createTerrainGenerator({
                 seed,
-                size,
                 terrainScale: unref(terrainScale),
                 terrainDetails: unref(terrainDetails),
                 terrainSandThreshold: unref(terrainSandThreshold),
@@ -228,7 +227,9 @@ export default defineComponent({
             scene.size = size
 
             const land = scene.addLayer("land")
-            land.addItem(createLand(scene, { size }, generateTerrain))
+            land.addItem(createLand(scene, {
+                generateTerrain,
+            }))
 
             showModal.value = false
         }

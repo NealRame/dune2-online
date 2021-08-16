@@ -88,11 +88,9 @@ export default defineComponent({
         onMounted(async () => {
             game = await createGame({
                 screen: unref(screen) as PaintDevice,
-                land: {
-                    size: {
-                        width: 128,
-                        height: 128,
-                    },
+                size: {
+                    width: 128,
+                    height: 128,
                 },
             })
             game.scene.scale = unref(scale)

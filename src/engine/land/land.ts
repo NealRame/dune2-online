@@ -54,7 +54,6 @@ export function generateLandZones<T extends Terrain>(
 
 export class LandImpl<T extends Terrain> implements Land<T> {
     private scene_: Scene
-    private size_: Size
 
     private terrains_: T[]
     private terrainsObserver_: Observer<T>
@@ -85,17 +84,16 @@ export class LandImpl<T extends Terrain> implements Land<T> {
 
     constructor(
         scene: Scene,
-        config: LandConfig,
-        generateTerrain: TerrainGenerator<T>,
+        config: LandConfig<T>,
     ) {
         this.scene_ = scene
-        this.size_ = config.size
         this.zoneSize_ = config.zoneSize ?? this.zoneSize_
 
-        this.positionToTerrainIndex_ = createPositionToZoneConverter(this.size_)
-        this.positionToZoneIndex_ = createPositionToZoneConverter(this.size_, this.zoneSize_)
+        const { size } = scene
+        this.positionToTerrainIndex_ = createPositionToZoneConverter(size)
+        this.positionToZoneIndex_ = createPositionToZoneConverter(size, this.zoneSize_)
 
-        this.terrains_ = generateLandTerrains(this, generateTerrain)
+        this.terrains_ = generateLandTerrains(this, config.generateTerrain)
         this.terrainsObserver_ = createObserver()
         this.terrainsObserver_.subscribe(terrain => {
             this.onTerrainChanged_(terrain)
@@ -113,18 +111,15 @@ export class LandImpl<T extends Terrain> implements Land<T> {
     }
 
     get width(): number {
-        return this.size_.width
+        return this.scene_.width
     }
 
     get height(): number {
-        return this.size_.height
+        return this.scene_.height
     }
 
     get size(): Size {
-        return {
-            width: this.size_.width,
-            height: this.size_.height,
-        }
+        return this.scene_.size
     }
 
     get rect(): Rect {
@@ -166,8 +161,7 @@ export class LandImpl<T extends Terrain> implements Land<T> {
 
 export function createLand<T extends Terrain>(
     scene: Scene,
-    landConfig: LandConfig,
-    terrainGenerator: TerrainGenerator<T>,
+    landConfig: LandConfig<T>,
 ): Land<T> {
-    return new LandImpl(scene, landConfig, terrainGenerator)
+    return new LandImpl(scene, landConfig)
 }

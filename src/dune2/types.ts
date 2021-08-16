@@ -1,6 +1,6 @@
 import { Image } from "@/engine"
 import { Color } from "@/graphics"
-import { Shape, Size } from "@/maths"
+import { Shape } from "@/maths"
 
 // Palette
 export type Palette = readonly Color.RGBA[]
@@ -17,7 +17,6 @@ export type TileDescriptor = {
 }
 
 export interface LandConfig {
-    size: Size,
     // Noise seed
     seed?: number,
     // Terrain values

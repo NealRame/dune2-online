@@ -163,7 +163,6 @@ function checkConfig(config: LandConfig): Required<LandConfig> {
     const spiceThreshold = clamp(config.spiceThreshold ?? 0.6, 0, 1)
     const spiceSaturationThreshold = clamp(config.spiceSaturationThreshold ?? (1 + spiceThreshold)/2, spiceThreshold, 1)
     return {
-        size: config.size,
         // Noise seed
         seed: config.seed ?? Date.now(),
         // Terrain values
@@ -181,9 +180,9 @@ function checkConfig(config: LandConfig): Required<LandConfig> {
     }
 }
 
-export function createTerrainGenerator(LandConfig: LandConfig)
+export function createTerrainGenerator(LandConfig?: LandConfig)
     : TerrainGenerator<Terrain> {
-    const config = checkConfig(LandConfig)
+    const config = checkConfig(LandConfig ?? {})
     const generateTerrainType = terrainTypeGenerator(config)
     const generateSpiceField = spiceFieldGenerator(config)
     return (land, position) => {
