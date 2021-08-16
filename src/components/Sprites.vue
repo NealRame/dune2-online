@@ -16,7 +16,7 @@ canvas {
 <script lang="ts">
 import Screen from "@/components/Screen.vue"
 
-import { Units } from "@/dune2"
+import { Units } from "@/dune2/game"
 import { createScene, ScaleFactor } from "@/engine"
 import { Direction } from "@/maths"
 

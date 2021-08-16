@@ -5,8 +5,7 @@ import { Harvester } from "./units/harvester"
 import { Quad } from "./units/quad"
 import { Trike } from "./units/trike"
 
-import { createScene, Scene, Unit } from "@/engine"
-import { createLand, Land } from "@/engine/land"
+import * as Engine from "@/engine"
 
 import { PaintDevice } from "@/graphics"
 import { RectangularCoordinates, Size } from "@/maths"
@@ -17,43 +16,38 @@ export const Units = {
     Trike,
 } as const
 
+export type UnitType = keyof typeof Units
+export type UnitFactory = (t: UnitType, p: RectangularCoordinates) => Engine.Unit
+
 export interface GameConfig {
     screen: PaintDevice,
     size: Size,
     land?: LandConfig,
 }
 
-export interface Game {
-    scene: Scene,
-    land: Land<Terrain>,
-    addUnit(type: keyof typeof Units, position: RectangularCoordinates): Unit
-    start(): void
+export interface Game extends Engine.Game<Terrain> {
+    createUnit: UnitFactory
+}
+
+function createUnitFactory(game: Engine.Game<Terrain>)
+    : UnitFactory {
+    return (type: UnitType, position: RectangularCoordinates) => {
+        const unit = new Units[type](game.scene, position)
+        game.addUnit(unit)
+        return unit
+    }
 }
 
 export function createGame(config: GameConfig): Game {
-    const scene = createScene(config.size)
-    const landLayer = scene.addLayer("land")
+    const { screen, size } = config
 
-    const land = createLand(scene, {
+    const game = Object.create(Engine.createGame<Terrain>({
+        screen,
+        size,
         generateTerrain: createTerrainGenerator(config.land ?? {}),
-    })
+    }))
 
-    landLayer.addItem(land)
+    game.createUnit = createUnitFactory(game)
 
-    return {
-        get scene() {
-            return scene
-        },
-        get land() {
-            return land
-        },
-        addUnit(type, position) {
-            const unit = new Units[type](scene, position)
-            landLayer.addItem(unit)
-            return unit
-        },
-        start(): void {
-            scene.run(config.screen.painter)
-        },
-    }
+    return game
 }

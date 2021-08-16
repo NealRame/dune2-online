@@ -1,7 +1,6 @@
-import { base64ToByteArray } from "@/utils"
-import { Palette, ImageSet } from "@/dune2"
-
+import { Palette, ImageSet } from "@/dune2/types"
 import { Image, ScaleFactors } from "@/engine"
+import { base64ToByteArray } from "@/utils"
 
 import { isNil } from "lodash"
 import { ungzip } from "pako"

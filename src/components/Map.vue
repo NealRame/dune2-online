@@ -146,7 +146,7 @@ import Modal from "@/components/Modal.vue"
 import ProgressBar from "@/components/ProgressBar.vue"
 import Screen, { ScreenMouseMotionEvent } from "@/components/Screen.vue"
 
-import { createTerrainGenerator } from "@/dune2"
+import { createTerrainGenerator } from "@/dune2/land"
 import { createLand, createScene } from "@/engine"
 import { PaintDevice } from "@/graphics"
 import { Rect, RectangularCoordinates, Vector } from "@/maths"

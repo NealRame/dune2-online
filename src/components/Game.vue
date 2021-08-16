@@ -18,7 +18,7 @@ canvas {
 <script lang="ts">
 import Screen, { ScreenMouseClickEvent, ScreenMouseMotionEvent } from "@/components/Screen.vue"
 
-import { createGame, Game } from "@/dune2/game"
+import { createGame, Game } from "@/dune2"
 import { screenToSceneScale, screenToSceneCoordinate, ScaleFactor } from "@/engine"
 import { PaintDevice } from "@/graphics"
 

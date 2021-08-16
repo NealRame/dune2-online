@@ -23,7 +23,9 @@ canvas {
 import Screen, { ScreenMouseClickEvent } from "@/components/Screen.vue"
 import TilePalette from "@/components/TilePalette.vue"
 
-import { Data, ImageLib, ImageSet } from "@/dune2"
+import { ImageLib, ImageSet } from "@/dune2/types"
+import { Data } from "@/dune2"
+
 import { createScene, createTile, Image, ScaleFactor } from "@/engine"
 import { PaintDevice } from "@/graphics"
 
