@@ -123,7 +123,7 @@ export class LandImpl<T extends Terrain> implements Land<T> {
     }
 
     get rect(): Rect {
-        return new Rect({ x: 0, y: 0 }, this.size)
+        return this.scene_.rect
     }
 
     get terrainsObserver(): Observer<T> {
@@ -151,10 +151,14 @@ export class LandImpl<T extends Terrain> implements Land<T> {
     }
 
     * terrains(
-        rect: Rect,
-    ): Generator<T> {
-        for (const { x, y } of zoneIterator(this.rect.intersected(rect))) {
-            yield this.terrain({ x, y }) as T
+        rect?: Rect,
+    ): Generator<T, void, undefined> {
+        if (!isNil(rect)) {
+            for (const { x, y } of zoneIterator(this.rect.intersected(rect ?? this.rect))) {
+                yield this.terrain({ x, y }) as T
+            }
+        } else {
+            yield * this.terrains_
         }
     }
 }
