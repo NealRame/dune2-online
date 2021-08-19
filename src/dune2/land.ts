@@ -1,5 +1,5 @@
 import { LandConfig, TerrainType } from "@/dune2/types"
-import { imageSet } from "@/dune2/data"
+import { imageSet, palette } from "@/dune2/data"
 
 import { RGBA } from "@/graphics/color"
 
@@ -20,6 +20,28 @@ export class Terrain extends AbstractTerrain {
     }
 
     get color(): RGBA {
+        const pal = palette()
+        if (this.revealed) {
+            switch (this.type) {
+            case TerrainType.Rock:
+                return pal[1*8 + 5]
+
+            case TerrainType.Dunes:
+                return pal[13*8 + 6]
+
+            case TerrainType.Mountain:
+                return pal[11*8 + 7]
+
+            case TerrainType.SpiceField:
+                return pal[10*8 + 3]
+
+            case TerrainType.SaturatedSpiceField:
+                return pal[10*8 + 3]
+
+            default:
+                return pal[13*8 + 6]
+            }
+        }
         return [0, 0, 0, 0]
     }
 
