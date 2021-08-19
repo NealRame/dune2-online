@@ -1,17 +1,28 @@
 <template>
-    <screen ref="screen"
+    <screen id="screen" ref="screen"
         :width="screenWidth"
         :height="screenHeight"
         @mouseClick="onMouseClick"
         @mouseMotion="onMouseMoved"
     />
+    <screen id="minimap" ref="minimap"
+        :width="minimapWidth"
+        :height="minimapHeight"
+    />
 </template>
 
 <style lang="scss" scoped>
-canvas {
-    position: absolute;
+canvas#screen {
+    position: fixed;
     left: 0;
     top: 0;
+}
+canvas#minimap {
+    position: fixed;
+    border: 1px solid white;
+    float: left;
+    top: 16px;
+    left: 16px;
 }
 </style>
 
@@ -36,8 +47,11 @@ export default defineComponent({
     components: { Screen },
     setup() {
         const screen = ref<PaintDevice | null>(null)
+        const minimap = ref<PaintDevice | null>(null)
         const screenWidth = ref(0)
         const screenHeight = ref(0)
+        const minimapWidth = ref(0)
+        const minimapHeight = ref(0)
         const scale = ref<ScaleFactor>(4)
 
         let game: Game | null = null
@@ -47,7 +61,7 @@ export default defineComponent({
             if (!isNil(game)) {
                 const width = window.innerWidth
                 const height = window.innerHeight
-                const scene = game.scene
+                const scene = game.engine.scene
 
                 const topLeft = scene.viewport?.topLeft() ?? { x: 0, y: 0 }
 
@@ -63,8 +77,8 @@ export default defineComponent({
         const updateViewport = ({ x: xOffset, y: yOffset }: RectangularCoordinates) => {
             if (xOffset !== 0 || yOffset !== 0) {
                 if (!isNil(game)) {
-                    const viewport = game.scene.viewport as Rect
-                    const rect = game.scene.rect
+                    const viewport = game.engine.scene.viewport as Rect
+                    const rect = game.engine.scene.rect
                     viewport.x = clamp(viewport.x + xOffset, 0, rect.rightX - viewport.width)
                     viewport.y = clamp(viewport.y + yOffset, 0, rect.bottomY - viewport.height)
                 }
@@ -73,14 +87,14 @@ export default defineComponent({
 
         const onMouseClick = (ev: ScreenMouseClickEvent) => {
             if (!isNil(game)) {
-                const scenePos = screenToSceneCoordinate(game.scene, ev.position)
+                const scenePos = screenToSceneCoordinate(game.engine.scene, ev.position)
                 console.log(scenePos)
             }
         }
 
         const onMouseMoved = (ev: ScreenMouseMotionEvent) => {
             if (!isNil(game) && ev.button) {
-                const sceneMove = screenToSceneScale(game.scene, ev.movement)
+                const sceneMove = screenToSceneScale(game.engine.scene, ev.movement)
                 updateViewport(sceneMove.opposite)
             }
         }
@@ -93,8 +107,19 @@ export default defineComponent({
                     height: 128,
                 },
             })
-            game.scene.scale = unref(scale)
-            game.start()
+            game.engine.scene.scale = unref(scale)
+            game.engine.start()
+
+            minimapWidth.value = game.engine.scene.width
+            minimapHeight.value = game.engine.scene.height
+
+            game.minimap.onChanged.subscribe(() => {
+                const painter = (unref(minimap) as PaintDevice).painter
+                const image = game?.minimap.image
+                if (!isNil(image)) {
+                    painter.drawImageBitmap(image, { x: 0, y: 0 })
+                }
+            })
 
             window.game = game
             window.addEventListener("resize", resize)
@@ -104,8 +129,11 @@ export default defineComponent({
 
         return {
             screen,
+            minimap,
             screenWidth,
             screenHeight,
+            minimapWidth,
+            minimapHeight,
             onMouseClick,
             onMouseMoved,
         }

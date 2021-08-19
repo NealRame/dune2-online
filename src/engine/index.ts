@@ -1,6 +1,7 @@
 export * from "./animation"
 export * from "./game"
 export * from "./land"
+export * from "./mini-map"
 export * from "./scene"
 export * from "./sprite"
 export * from "./tile"
