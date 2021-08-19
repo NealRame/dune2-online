@@ -4,7 +4,7 @@ import { Game } from "./game"
 import { Color } from "@/graphics"
 import { createObserver, Observer } from "@/utils"
 
-interface MiniMap {
+export interface MiniMap {
     readonly image: ImageBitmap|null
     readonly onChanged: Observer<void> // TODO: should be an emitter
 }
