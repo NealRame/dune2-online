@@ -2,9 +2,10 @@ import { Terrain } from "./land"
 import { Game } from "./game"
 
 import { Color } from "@/graphics"
+import { Size } from "@/maths"
 import { createObserver, Observer } from "@/utils"
 
-export interface MiniMap {
+export interface MiniMap extends Size {
     readonly image: ImageBitmap|null
     readonly onChanged: Observer<void> // TODO: should be an emitter
 }
@@ -31,6 +32,12 @@ export function createMiniMap<T extends Terrain>(game: Game<T>)
     })
 
     return {
+        get height() {
+            return game.scene.height
+        },
+        get width() {
+            return game.scene.width
+        },
         get image() {
             return canvas.transferToImageBitmap()
         },
