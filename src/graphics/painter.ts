@@ -145,16 +145,18 @@ export class Painter {
         imageBitmap: ImageBitmap,
         { x, y }: RectangularCoordinates,
         srcRect?: Rect,
+        dstSize?: Size,
     ): Painter {
         if (isNil(srcRect)) {
             this.context_.drawImage(imageBitmap, x, y)
         } else {
+            dstSize = dstSize ?? srcRect.size
             this.context_.drawImage(
                 imageBitmap,
                 srcRect.leftX, srcRect.topY,
                 srcRect.width, srcRect.height,
                 x, y,
-                srcRect.width, srcRect.height
+                dstSize.width, dstSize.height
             )
         }
         return this
