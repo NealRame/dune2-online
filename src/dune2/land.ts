@@ -23,23 +23,25 @@ export class Terrain extends AbstractTerrain {
         const pal = palette()
         if (this.revealed) {
             switch (this.type) {
-            case TerrainType.Rock:
-                return pal[1*8 + 5]
+            case TerrainType.Sand:
+                return pal[13*8 + 4]
+                // return pal[28*8 + 0]
 
             case TerrainType.Dunes:
-                return pal[13*8 + 6]
-
-            case TerrainType.Mountain:
-                return pal[11*8 + 7]
+                return pal[14*8 + 0]
+                // return pal[28*8 + 1]
 
             case TerrainType.SpiceField:
-                return pal[10*8 + 3]
+                return pal[14*8 + 6]
 
             case TerrainType.SaturatedSpiceField:
-                return pal[10*8 + 3]
+                return pal[14*8 + 7]
 
-            default:
-                return pal[13*8 + 6]
+            case TerrainType.Rock:
+                return pal[3*8 + 4]
+
+            case TerrainType.Mountain:
+                return pal[31*8 + 0]
             }
         }
         return [0, 0, 0, 0]
