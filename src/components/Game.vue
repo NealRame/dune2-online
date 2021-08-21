@@ -5,10 +5,7 @@
         @mouseClick="onMouseClick"
         @mouseMotion="onMouseMoved"
     />
-    <screen id="minimap" ref="minimap"
-        :width="minimapWidth"
-        :height="minimapHeight"
-    />
+    <minimap :minimap="minimap" />
 </template>
 
 <style lang="scss" scoped>
@@ -17,20 +14,14 @@ canvas#screen {
     left: 0;
     top: 0;
 }
-canvas#minimap {
-    position: fixed;
-    border: 1px solid white;
-    float: left;
-    top: 16px;
-    left: 16px;
-}
 </style>
 
 <script lang="ts">
+import Minimap from "@/components/Minimap.vue"
 import Screen, { ScreenMouseClickEvent, ScreenMouseMotionEvent } from "@/components/Screen.vue"
 
 import { createGame, Game } from "@/dune2"
-import { screenToSceneScale, screenToSceneCoordinate, ScaleFactor } from "@/engine"
+import { screenToSceneScale, screenToSceneCoordinate, ScaleFactor, MiniMap } from "@/engine"
 import { PaintDevice } from "@/graphics"
 
 import { clamp, debounce, isNil } from "lodash"
@@ -44,29 +35,29 @@ declare global {
 }
 
 export default defineComponent({
-    components: { Screen },
+    components: { Minimap, Screen },
     setup() {
         const screen = ref<PaintDevice | null>(null)
-        const minimap = ref<PaintDevice | null>(null)
-        const screenWidth = ref(0)
-        const screenHeight = ref(0)
-        const minimapWidth = ref(0)
-        const minimapHeight = ref(0)
+        const screenWidthRef = ref(0)
+        const screenHeightRef = ref(0)
         const scale = ref<ScaleFactor>(4)
 
-        let game: Game | null = null
+        const gameRef = ref<Game|null>(null)
+        const minimapRef = ref<MiniMap | null>(null)
 
         // handle window resize event
         const resize = debounce(() => {
+            const game = gameRef.value
             if (!isNil(game)) {
                 const width = window.innerWidth
                 const height = window.innerHeight
-                const scene = game.engine.scene
 
+                screenWidthRef.value = width
+                screenHeightRef.value = height
+
+                const scene = game.engine.scene
                 const topLeft = scene.viewport?.topLeft() ?? { x: 0, y: 0 }
 
-                screenWidth.value = width
-                screenHeight.value = height
                 scene.viewport = new Rect(topLeft, {
                     width: width/scene.gridSpacing,
                     height: height/scene.gridSpacing,
@@ -76,6 +67,7 @@ export default defineComponent({
 
         const updateViewport = ({ x: xOffset, y: yOffset }: RectangularCoordinates) => {
             if (xOffset !== 0 || yOffset !== 0) {
+                const game = gameRef.value
                 if (!isNil(game)) {
                     const viewport = game.engine.scene.viewport as Rect
                     const rect = game.engine.scene.rect
@@ -86,6 +78,7 @@ export default defineComponent({
         }
 
         const onMouseClick = (ev: ScreenMouseClickEvent) => {
+            const game = gameRef.value
             if (!isNil(game)) {
                 const scenePos = screenToSceneCoordinate(game.engine.scene, ev.position)
                 console.log(scenePos)
@@ -93,6 +86,7 @@ export default defineComponent({
         }
 
         const onMouseMoved = (ev: ScreenMouseMotionEvent) => {
+            const game = gameRef.value
             if (!isNil(game) && ev.button) {
                 const sceneMove = screenToSceneScale(game.engine.scene, ev.movement)
                 updateViewport(sceneMove.opposite)
@@ -100,26 +94,18 @@ export default defineComponent({
         }
 
         onMounted(async () => {
-            game = await createGame({
+            const game = await createGame({
                 screen: unref(screen) as PaintDevice,
                 size: {
-                    width: 128,
-                    height: 128,
+                    width: 64,
+                    height: 64,
                 },
             })
             game.engine.scene.scale = unref(scale)
             game.engine.start()
 
-            minimapWidth.value = game.engine.scene.width
-            minimapHeight.value = game.engine.scene.height
-
-            game.minimap.onChanged.subscribe(() => {
-                const painter = (unref(minimap) as PaintDevice).painter
-                const image = game?.minimap.image
-                if (!isNil(image)) {
-                    painter.drawImageBitmap(image, { x: 0, y: 0 })
-                }
-            })
+            gameRef.value = game
+            minimapRef.value = game.minimap
 
             window.game = game
             window.addEventListener("resize", resize)
@@ -129,11 +115,9 @@ export default defineComponent({
 
         return {
             screen,
-            minimap,
-            screenWidth,
-            screenHeight,
-            minimapWidth,
-            minimapHeight,
+            screenWidth: screenWidthRef,
+            screenHeight: screenHeightRef,
+            minimap: minimapRef,
             onMouseClick,
             onMouseMoved,
         }
