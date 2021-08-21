@@ -6,20 +6,20 @@ import { Unit } from "./unit"
 import { PaintDevice } from "@/graphics"
 import { Size } from "@/maths"
 
-export interface GameConfig<T extends Terrain> {
+export interface GameConfig<T extends Terrain = Terrain> {
     screen: PaintDevice
     size: Size
     generateTerrain: TerrainGenerator<T>
 }
 
-export interface Game<T extends Terrain> {
+export interface Game<T extends Terrain = Terrain> {
     scene: Scene,
     land: Land<T>,
     addUnit(unit: Unit): Game<T>
     start(): void
 }
 
-export function createGame<T extends Terrain>(config: GameConfig<T>): Game<T> {
+export function createGame<T extends Terrain = Terrain>(config: GameConfig<T>): Game<T> {
     const scene = createScene(config.size)
     const landLayer = scene.addLayer("land")
     const land = createLand(scene, config)
