@@ -13,7 +13,7 @@ type SceneState = {
     layers: SceneLayer[]
     rect: Rect
     scaleFactor: ScaleFactor
-    viewport: Rect | null
+    viewport: Rect
 
 }
 
@@ -60,7 +60,7 @@ export function createScene(size: Size): Scene {
         layers: [],
         scaleFactor: 1,
         rect: new Rect({ x: 0, y: 0 }, size),
-        viewport: null,
+        viewport: new Rect({ x: 0, y: 0 }, size),
     }
 
     const getGridSpacing = () => state.scaleFactor*state.gridUnit
@@ -100,9 +100,9 @@ export function createScene(size: Size): Scene {
             return state.rect.copy()
         },
         get viewport(): Rect {
-            return (state.viewport ?? state.rect).copy()
+            return state.viewport as Rect
         },
-        set viewport(rect: Rect | null) {
+        set viewport(rect: Rect) {
             state.viewport = rect
         },
         addLayer(name: string): SceneLayer {
