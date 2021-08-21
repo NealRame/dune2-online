@@ -17,7 +17,7 @@ canvas#screen {
 </style>
 
 <script lang="ts">
-import Minimap from "@/components/Minimap.vue"
+import Minimap from "@/components/MiniMap.vue"
 import Screen, { ScreenMouseClickEvent, ScreenMouseMotionEvent } from "@/components/Screen.vue"
 
 import { createGame, Game } from "@/dune2"
