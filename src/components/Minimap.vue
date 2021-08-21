@@ -40,23 +40,42 @@ canvas#minimap {
 <script lang="ts">
 import Screen, { ScreenMouseClickEvent, ScreenMouseMotionEvent } from "@/components/Screen.vue"
 
-import { ScaleFactor, MiniMap } from "@/engine"
+import * as Engine from "@/engine"
+import { Game } from "@/dune2"
 import { PaintDevice } from "@/graphics"
-import { Rect } from "@/maths"
 
 import { isNil } from "lodash"
-import { computed, defineComponent, onUpdated, ref, unref } from "vue"
+import { computed, defineComponent, onUpdated, ref, toRef, unref } from "vue"
 
 interface Data {
-    minimap: MiniMap|null
+    game: Game|null
 }
 
 export default defineComponent({
     components: { Screen },
-    props: ["minimap"],
+    props: ["game"],
     setup(props: Data) {
-        const screen = ref<PaintDevice | null>(null)
-        const scale = ref<ScaleFactor>(3)
+        const gameRef = toRef(props, "game")
+        const scaleRef = ref<Engine.ScaleFactor>(3)
+        const screenRef = ref<PaintDevice | null>(null)
+
+        const width = computed(() => {
+            const game = unref(gameRef)
+            const scale = unref(scaleRef)
+            if (!isNil(game)) {
+                return scale*game.engine.scene.width
+            }
+            return 0
+        })
+
+        const height = computed(() => {
+            const game = unref(gameRef)
+            const scale = unref(scaleRef)
+            if (!isNil(game)) {
+                return scale*game.engine.scene.height
+            }
+            return 0
+        })
 
         const onMouseClick = (ev: ScreenMouseClickEvent) => {
             // console.log(`minimap: ${ev.position.x} ${ev.position.y}`)
@@ -66,33 +85,20 @@ export default defineComponent({
             // console.log(`minimap: ${ev.position.x} ${ev.position.y}`)
         }
 
-        const width = computed(() => {
-            const minimap = props.minimap
-            if (!isNil(minimap)) {
-                return unref(scale)*minimap.width
-            }
-            return 0
-        })
-        const height = computed(() => {
-            const minimap = props.minimap
-            if (!isNil(minimap)) {
-                return unref(scale)*minimap.height
-            }
-            return 0
-        })
-
         onUpdated(() => {
             console.log("updated!")
-            const minimap = props.minimap
-            if (!isNil(minimap)) {
+            const game = unref(gameRef)
+            if (!isNil(game)) {
+                const minimap = Engine.createMiniMap(game.engine)
                 minimap.onChanged.subscribe(() => {
                     const image = minimap.image
-                    const painter = (unref(screen) as PaintDevice).painter
+                    const painter = (unref(screenRef) as PaintDevice).painter
+
                     if (!(isNil(painter) || isNil(image))) {
                         painter.drawImageBitmap(
                             image,
                             { x: 0, y: 0 },
-                            new Rect({ x: 0, y: 0 }, minimap),
+                            game.engine.scene.rect,
                             painter.size,
                         )
                     }
@@ -101,7 +107,7 @@ export default defineComponent({
         })
 
         return {
-            screen,
+            screen: screenRef,
             width,
             height,
             onMouseClick,

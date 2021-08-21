@@ -5,7 +5,7 @@
         @mouseClick="onMouseClick"
         @mouseMotion="onMouseMoved"
     />
-    <minimap :minimap="minimap" />
+    <minimap :game="game" />
 </template>
 
 <style lang="scss" scoped>
@@ -21,7 +21,7 @@ import Minimap from "@/components/Minimap.vue"
 import Screen, { ScreenMouseClickEvent, ScreenMouseMotionEvent } from "@/components/Screen.vue"
 
 import { createGame, Game } from "@/dune2"
-import { screenToSceneScale, screenToSceneCoordinate, ScaleFactor, MiniMap } from "@/engine"
+import { screenToSceneScale, screenToSceneCoordinate, ScaleFactor } from "@/engine"
 import { PaintDevice } from "@/graphics"
 
 import { clamp, debounce, isNil } from "lodash"
@@ -43,11 +43,10 @@ export default defineComponent({
         const scale = ref<ScaleFactor>(4)
 
         const gameRef = ref<Game|null>(null)
-        const minimapRef = ref<MiniMap | null>(null)
 
         // handle window resize event
         const resize = debounce(() => {
-            const game = gameRef.value
+            const game = unref(gameRef)
             if (!isNil(game)) {
                 const width = window.innerWidth
                 const height = window.innerHeight
@@ -67,7 +66,7 @@ export default defineComponent({
 
         const updateViewport = ({ x: xOffset, y: yOffset }: RectangularCoordinates) => {
             if (xOffset !== 0 || yOffset !== 0) {
-                const game = gameRef.value
+                const game = unref(gameRef)
                 if (!isNil(game)) {
                     const viewport = game.engine.scene.viewport as Rect
                     const rect = game.engine.scene.rect
@@ -78,7 +77,7 @@ export default defineComponent({
         }
 
         const onMouseClick = (ev: ScreenMouseClickEvent) => {
-            const game = gameRef.value
+            const game = unref(gameRef)
             if (!isNil(game)) {
                 const scenePos = screenToSceneCoordinate(game.engine.scene, ev.position)
                 console.log(scenePos)
@@ -86,7 +85,7 @@ export default defineComponent({
         }
 
         const onMouseMoved = (ev: ScreenMouseMotionEvent) => {
-            const game = gameRef.value
+            const game = unref(gameRef)
             if (!isNil(game) && ev.button) {
                 const sceneMove = screenToSceneScale(game.engine.scene, ev.movement)
                 updateViewport(sceneMove.opposite)
@@ -105,7 +104,6 @@ export default defineComponent({
             game.engine.start()
 
             gameRef.value = game
-            minimapRef.value = game.minimap
 
             window.game = game
             window.addEventListener("resize", resize)
@@ -117,7 +115,7 @@ export default defineComponent({
             screen,
             screenWidth: screenWidthRef,
             screenHeight: screenHeightRef,
-            minimap: minimapRef,
+            game: gameRef,
             onMouseClick,
             onMouseMoved,
         }

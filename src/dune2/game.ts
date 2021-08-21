@@ -27,7 +27,6 @@ export interface GameConfig {
 
 export interface Game {
     readonly engine: Engine.Game<Terrain>
-    readonly minimap: Engine.MiniMap
     createUnit: UnitFactory
 }
 
@@ -48,19 +47,10 @@ export function createGame(config: GameConfig): Game {
         size,
         generateTerrain: createTerrainGenerator(config.land ?? {}),
     })
-    const minimap = Engine.createMiniMap(engine)
     const createUnit = createUnitFactory(engine)
 
     return {
         get engine() { return engine },
-        get minimap() { return minimap },
         createUnit,
     }
-
-    // const game = Object.create()
-    // const minimap = Engine.
-
-    // game.createUnit =
-
-    // return game
 }
