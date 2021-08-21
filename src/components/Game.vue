@@ -5,7 +5,7 @@
         @mouseClick="onMouseClick"
         @mouseMotion="onMouseMoved"
     />
-    <minimap :game="game" />
+    <mini-map :game="game" />
 </template>
 
 <style lang="scss" scoped>
@@ -17,7 +17,7 @@ canvas#screen {
 </style>
 
 <script lang="ts">
-import Minimap from "@/components/MiniMap.vue"
+import MiniMap from "@/components/MiniMap.vue"
 import Screen, { ScreenMouseClickEvent, ScreenMouseMotionEvent } from "@/components/Screen.vue"
 
 import { createGame, Game } from "@/dune2"
@@ -35,7 +35,7 @@ declare global {
 }
 
 export default defineComponent({
-    components: { Minimap, Screen },
+    components: { MiniMap, Screen },
     setup() {
         const screen = ref<PaintDevice | null>(null)
         const screenWidthRef = ref(0)
