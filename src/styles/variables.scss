@@ -1,15 +1,16 @@
 $bg-color: #000;
 $fg-color: whitesmoke;
 
-$link-color: #940000;
+$link-color: #fc4300;
 
 $font-family: Avenir, Helvetica, Arial, sans-serif;
 
 $palette-width: 256px;
 
-//////////////////////////////////////////////////////////////////////////////
-// Progress bar
 
+/******************************************************************************
+* Progress bar                                                                *
+******************************************************************************/
 $progress-bar-border-color: white;
 $progress-bar-border-type: solid;
 $progress-bar-border-width: 1px;
@@ -24,15 +25,35 @@ $progress-bar-label-font-size: 1rem;
 
 $progress-bar-undeterminate-value-width: 25%;
 
-//////////////////////////////////////////////////////////////////////////////
-// Palette
+
+/******************************************************************************
+* Palette                                                                     *
+******************************************************************************/
 $palette-bg-color: rgb(32, 32, 32);
 $palette-color: rgb(128, 128, 128);
 
-//////////////////////////////////////////////////////////////////////////////
-// Modal
+
+/******************************************************************************
+* Modal                                                                       *
+******************************************************************************/
 $modal-background-color: #000000;
 $modal-opacity: 0.80;
 $modal-z-index: 1024;
 $modal-content-width: 33%;
 $modal-content-padding: 1rem;
+
+
+/******************************************************************************
+* Minimap                                                                     *
+******************************************************************************/
+$minimap-position-top: 16px;
+$minimap-position-right: 16px;
+$minimap-position-bottom: 16px;
+$minimap-position-left: 16px;
+$minimap-border-color1: sandybrown;
+$minimap-border-color2: lightgoldenrodyellow;
+$minimap-border-thickness: 1px;
+$minimap-border-type: solid;
+$minimap-border-radius: 8px;
+$minimap-shadow-color1: rgba($color: #000000, $alpha: 0.5);
+$minimap-shadow-color2: rgba($color: #000000, $alpha: 0.25);

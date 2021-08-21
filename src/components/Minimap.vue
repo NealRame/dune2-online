@@ -10,18 +10,29 @@
 <style lang="scss" scoped>
 canvas#minimap {
     position: fixed;
-    border: 1px solid #666;
-    border-radius: 4px;
-    box-shadow: 0 0 4px rgba($color: #000000, $alpha: 0.5);
-    right: 16px;
-    bottom: 16px;
-    -webkit-transition: box-shadow 0.1s linear;
-    transition: transform 0.1s box-shadow 0.1s linear;
+
+    right: $minimap-position-right;
+    bottom: $minimap-position-bottom;
+
+    border:
+        $minimap-border-color1
+        $minimap-border-thickness
+        $minimap-border-type;
+    border-radius: $minimap-border-radius;
+    box-shadow: 0 0 4px $minimap-shadow-color1;
+
+    -webkit-transition: all 0.2s ease-in;
+    transition: all 0.2s ease-in;
+
     &:hover {
-        box-shadow: 0 0 16px rgba($color: #000000, $alpha: 0.5);
-        -webkit-transition: box-shadow 0.1s linear;
-        transition: box-shadow 0.1s linear;
+        border-color: $minimap-border-color2;
+        border-radius: $minimap-border-radius;
+        box-shadow: 0 0 16px $minimap-shadow-color2;
+
         transform: scale(1.01);
+
+        -webkit-transition: all 0.2s ease-out;
+        transition: all 0.2s ease-out;
     }
 }
 </style>
@@ -45,7 +56,7 @@ export default defineComponent({
     props: ["minimap"],
     setup(props: Data) {
         const screen = ref<PaintDevice | null>(null)
-        const scale = ref<ScaleFactor>(2)
+        const scale = ref<ScaleFactor>(3)
 
         const onMouseClick = (ev: ScreenMouseClickEvent) => {
             // console.log(`minimap: ${ev.position.x} ${ev.position.y}`)
