@@ -146,6 +146,19 @@ export class LandImpl<T extends Terrain> implements Land<T> {
         return this
     }
 
+    reveal(position?: RectangularCoordinates, size?: Size): Land<T> {
+        if (isNil(position)) {
+            position = { x: 0, y: 0 }
+            size = this.size
+        } else {
+            size = size ?? { width: 1, height: 1 }
+        }
+        for (const terrain of this.terrains(new Rect(position, size))) {
+            terrain.reveal()
+        }
+        return this
+    }
+
     terrain(position: RectangularCoordinates): T|null {
         return this.terrains_[this.positionToTerrainIndex_(position)] as T
     }

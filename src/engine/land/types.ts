@@ -27,6 +27,7 @@ export type TerrainGenerator<T extends Terrain> = (l: Land<T>, p: RectangularCoo
 
 export interface Land<T extends Terrain = Terrain> extends SceneItem {
     readonly terrainsObserver: Observer<T>
+    reveal(position?: RectangularCoordinates, size?: Size): Land<T>
     terrain(position: RectangularCoordinates): T|null
     terrains(rect?: Rect): Generator<Terrain>
 }
