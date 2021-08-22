@@ -147,11 +147,11 @@ import ProgressBar from "@/components/ProgressBar.vue"
 import Screen, { ScreenMouseMotionEvent } from "@/components/Screen.vue"
 
 import { createTerrainGenerator } from "@/dune2/land"
-import { createLand, createScene } from "@/engine"
+import { createLand, createScene, Scene, screenToSceneCoordinate } from "@/engine"
 import { PaintDevice } from "@/graphics"
 import { Rect, RectangularCoordinates, Vector } from "@/maths"
 
-import { clamp, debounce } from "lodash"
+import { clamp, debounce, isNil } from "lodash"
 import { defineComponent, onMounted, ref, unref, watch } from "vue"
 
 export default defineComponent({
@@ -183,24 +183,22 @@ export default defineComponent({
         const spiceSaturationThreshold = ref(0.8)
         const spiceDetails = ref(1)
 
-        const scene = createScene({
-            width: unref(width),
-            height: unref(height),
-        })
-
         let seed: number = Date.now()
+        let scene: Scene|null = null
 
         const resize = debounce(() => {
             const width = window.innerWidth
             const height = window.innerHeight
-            const topLeft = scene.viewport?.topLeft() ?? { x: 0, y: 0 }
 
             screenWidth.value = width
             screenHeight.value = height
-            scene.viewport = new Rect(topLeft, {
-                width: width/scene.gridSpacing,
-                height: height/scene.gridSpacing,
-            })
+
+            if (!isNil(scene)) {
+                scene.viewport.size = {
+                    width: width/scene.gridSpacing,
+                    height: height/scene.gridSpacing,
+                }
+            }
         }, 60)
 
         const update = async () => {
@@ -223,22 +221,28 @@ export default defineComponent({
                 spiceSaturationThreshold: unref(spiceSaturationThreshold),
             })
 
-            scene.clear()
-            scene.size = size
+            if (!isNil(scene)) {
+                scene.stop()
+            }
 
-            const land = scene.addLayer("land")
-            land.addItem(createLand(scene, {
+            scene = createScene(size, (unref(screen) as PaintDevice).painter)
+            scene.scale = 1
+            scene.addLayer("land").addItem(createLand(scene, {
                 generateTerrain,
             }))
+            scene.run()
 
             showModal.value = false
         }
 
         const updateViewport = ({ x: xOffset, y: yOffset }: RectangularCoordinates) => {
-            const viewport = scene.viewport as Rect
-            const rect = scene.rect
-            viewport.x = clamp(viewport.x + xOffset, 0, rect.rightX - viewport.width)
-            viewport.y = clamp(viewport.y + yOffset, 0, rect.bottomY - viewport.height)
+            if (!isNil(scene)) {
+                const { x, y } = scene.viewport.position
+                scene.viewport.position = {
+                    x: x + xOffset,
+                    y: y + yOffset,
+                }
+            }
         }
 
         const onKeyPressed = (ev: KeyboardEvent) => {
@@ -257,17 +261,9 @@ export default defineComponent({
             }
         }
 
-        const screenToSceneCoordinates = (position: RectangularCoordinates) => {
-            const gridSpacing = scene.gridSpacing
-            return new Vector(
-                position.x/gridSpacing, // x
-                position.y/gridSpacing, // y
-            )
-        }
-
         const onMouseMoved = (ev: ScreenMouseMotionEvent) => {
-            if (ev.button) {
-                updateViewport(screenToSceneCoordinates(ev.movement).opposite)
+            if (ev.button && !isNil(scene)) {
+                updateViewport(screenToSceneCoordinate(scene, ev.movement).opposite)
             }
         }
 
@@ -277,23 +273,18 @@ export default defineComponent({
         }
 
         const onZoomInClicked = () => {
-            if (scene.scale < 4) {
+            if (!isNil(scene) && scene.scale < 4) {
                 scene.scale += 1
             }
         }
 
         const onZoomOutClicked = () => {
-            if (scene.scale > 1) {
+            if (!isNil(scene) && scene.scale > 1) {
                 scene.scale -= 1
             }
         }
 
         onMounted(() => {
-            const paintDevice = (unref(screen) as PaintDevice)
-
-            scene.scale = 1
-            scene.run(paintDevice.painter)
-
             document.addEventListener("keydown", onKeyPressed)
             window.addEventListener("resize", resize)
 

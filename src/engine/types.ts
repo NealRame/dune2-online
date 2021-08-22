@@ -1,27 +1,35 @@
 import { Painter } from "@/graphics"
-
-import { Rect, Size, Vector } from "@/maths"
+import { Rect, RectangularCoordinates, Size, Vector } from "@/maths"
+import { Observer } from "@/utils"
 
 export const ScaleFactors = [1, 2, 3, 4] as const
 export type ScaleFactor = typeof ScaleFactors[number]
 
 export type Image = Record<ScaleFactor, ImageBitmap>
 
-export interface Scene {
-    scale: ScaleFactor
+export interface Viewport {
+    readonly onChanged: Observer<Rect>
+    readonly rect: Rect
+    position: RectangularCoordinates
     size: Size
-    viewport: Rect
+}
+
+export interface Scene {
+    readonly size: Size
+    readonly viewport: Viewport
     readonly width: number
     readonly height: number
     readonly gridUnit: number
     readonly gridSpacing: number
-    gridEnabled: boolean
     readonly rect: Rect
+    scale: ScaleFactor
+    gridEnabled: boolean
     addLayer(name: string): SceneLayer
     clear(): Scene
-    render(painter: Painter): Scene
-    run(painter: Painter): Scene
+    render(): Scene
     update(): Scene
+    run(): Scene
+    stop(): Scene
 }
 
 export interface SceneLayer {

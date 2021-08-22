@@ -1,10 +1,12 @@
 import { SceneLayerImpl } from "./scene-layer"
-import { ScaleFactor, Scene, SceneLayer } from "./types"
+import { ScaleFactor, Scene, SceneLayer, Viewport } from "./types"
 
 import { cssHex } from "@/graphics/color"
 import { Brush, Painter } from "@/graphics/painter"
 
 import { Rect, RectangularCoordinates, Size, Vector } from "@/maths"
+import { createViewport } from "./viewport"
+import { isNil } from "lodash"
 
 type SceneState = {
     backgroundColor: Brush
@@ -13,8 +15,8 @@ type SceneState = {
     layers: SceneLayer[]
     rect: Rect
     scaleFactor: ScaleFactor
-    viewport: Rect
-
+    viewport: Viewport
+    requestAnimationId: number
 }
 
 type GridConfig = {
@@ -52,7 +54,7 @@ function drawGrid(
     }
 }
 
-export function createScene(size: Size): Scene {
+export function createScene(size: Size, painter: Painter): Scene {
     const state: SceneState = {
         backgroundColor: cssHex([0, 0, 0]),
         gridEnabled: false,
@@ -60,10 +62,12 @@ export function createScene(size: Size): Scene {
         layers: [],
         scaleFactor: 1,
         rect: new Rect({ x: 0, y: 0 }, size),
-        viewport: new Rect({ x: 0, y: 0 }, size),
+        viewport: createViewport(size),
+        requestAnimationId: 0
     }
 
     const getGridSpacing = () => state.scaleFactor*state.gridUnit
+    state.viewport.size = painter.rect.scaled(1/getGridSpacing()).size
 
     return {
         get scale(): ScaleFactor {
@@ -93,17 +97,11 @@ export function createScene(size: Size): Scene {
         get size(): Size {
             return state.rect.size
         },
-        set size(size: Size) {
-            state.rect = new Rect({ x: 0, y: 0 }, size)
-        },
         get rect(): Rect {
             return state.rect.copy()
         },
-        get viewport(): Rect {
-            return state.viewport as Rect
-        },
-        set viewport(rect: Rect) {
-            state.viewport = rect
+        get viewport(): Viewport {
+            return state.viewport
         },
         addLayer(name: string): SceneLayer {
             const layer = new SceneLayerImpl(this, name)
@@ -114,34 +112,26 @@ export function createScene(size: Size): Scene {
             state.layers = []
             return this
         },
-        render(painter: Painter): Scene {
-            const gridSpacing = getGridSpacing()
-            const viewport = state.viewport ?? painter.rect.scaled(1/gridSpacing)
+        render(): Scene {
+            if (!isNil(painter)) {
+                const gridSpacing = getGridSpacing()
+                const viewport = state.viewport.rect
 
-            painter.clear(state.backgroundColor)
+                painter.clear(state.backgroundColor)
 
-            // draw grid
-            if (state.gridEnabled) {
-                drawGrid(painter, {
-                    space: gridSpacing,
-                    offset: viewport.topLeft(),
-                })
+                // draw grid
+                if (state.gridEnabled) {
+                    drawGrid(painter, {
+                        space: gridSpacing,
+                        offset: viewport.topLeft(),
+                    })
+                }
+                // draw items
+                for (const layer of state.layers) {
+                    layer.render(painter)
+                }
             }
 
-            // draw items
-            for (const layer of state.layers) {
-                layer.render(painter)
-            }
-
-            return this
-        },
-        run(painter: Painter): Scene {
-            const loop = () => {
-                this.update()
-                    .render(painter)
-                requestAnimationFrame(loop)
-            }
-            loop()
             return this
         },
         update(): Scene {
@@ -150,6 +140,20 @@ export function createScene(size: Size): Scene {
             }
             return this
         },
+        run(): Scene {
+            const loop = () => {
+                this.update()
+                    .render()
+                state.requestAnimationId = requestAnimationFrame(loop)
+            }
+            loop()
+            return this
+        },
+        stop(): Scene {
+            cancelAnimationFrame(state.requestAnimationId)
+            state.requestAnimationId = 0
+            return this
+        }
     }
 }
 
@@ -171,8 +175,8 @@ export function sceneToScreenCoordinate(
     scene: Scene,
     { x, y }: RectangularCoordinates
 ): Vector {
-    const { viewport, gridSpacing } = scene
-    const topLeft = viewport?.topLeft() ?? Vector.Null()
+    const { gridSpacing, viewport } = scene
+    const topLeft = viewport.rect.topLeft()
     return (new Vector(x, y)).sub(topLeft).mul(gridSpacing)
 }
 
@@ -180,8 +184,8 @@ export function screenToSceneCoordinate(
     scene: Scene,
     { x, y }: RectangularCoordinates
 ): Vector {
-    const { viewport, gridSpacing } = scene
-    const topLeft = viewport?.topLeft() ?? Vector.Null()
+    const { gridSpacing, viewport } = scene
+    const topLeft = viewport.rect.topLeft()
     return (new Vector(x, y)).mul(1/gridSpacing).add(topLeft)
 }
 
@@ -196,7 +200,7 @@ export function sceneToScreenSize(scene: Scene, size: Size)
 
 export function screenToSceneSize(scene: Scene, size: Size)
     : Size {
-    const gridSpacing = scene.gridSpacing
+    const { gridSpacing } = scene
     return {
         width: size.width/gridSpacing,
         height: size.height/gridSpacing,
@@ -205,14 +209,14 @@ export function screenToSceneSize(scene: Scene, size: Size)
 
 export function sceneToScreenRect(scene: Scene, rect: Rect)
     : Rect {
-    const { viewport, gridSpacing } = scene
-    const topLeft = viewport?.topLeft() ?? Vector.Null()
+    const { gridSpacing, viewport } = scene
+    const topLeft = viewport.rect.topLeft()
     return rect.translated(topLeft.opposite).scale(gridSpacing)
 }
 
 export function screenToSceneRect(scene: Scene, rect: Rect)
     : Rect {
-    const { viewport, gridSpacing } = scene
-    const topLeft = viewport?.topLeft() ?? Vector.Null()
+    const { gridSpacing, viewport } = scene
+    const topLeft = viewport.rect.topLeft()
     return rect.scale(1/gridSpacing).translated(topLeft)
 }

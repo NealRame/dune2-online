@@ -26,7 +26,7 @@ import TilePalette from "@/components/TilePalette.vue"
 import { ImageLib, ImageSet } from "@/dune2/types"
 import { Data } from "@/dune2"
 
-import { createScene, createTile, Image, ScaleFactor } from "@/engine"
+import { createScene, createTile, Image, ScaleFactor, Scene, SceneLayer, screenToSceneCoordinate } from "@/engine"
 import { PaintDevice } from "@/graphics"
 
 import { defineComponent, onMounted, ref, unref } from "vue"
@@ -47,12 +47,8 @@ export default defineComponent({
         const images = ref<readonly Image[] | null>(null)
         const currentItem = ref<number | null>(null)
 
-        const scene = createScene({
-            width: 60,
-            height: 60,
-        })
-
-        const tilesLayer = scene.addLayer("tiles")
+        let scene: Scene|null = null
+        let tilesLayer: SceneLayer|null = null
 
         // handle window resize event
         const resize = debounce(() => {
@@ -64,28 +60,36 @@ export default defineComponent({
         onMounted(async () => {
             images.value = Data.imageSet(props.set as ImageSet)
 
+            scene = createScene({
+                width: 60,
+                height: 60,
+            }, (unref(screen) as PaintDevice).painter)
             scene.scale = unref(scale)
             scene.gridEnabled = true
-            scene.run((unref(screen) as PaintDevice).painter)
+            scene.run()
+
+            tilesLayer = scene.addLayer("tiles")
+
             window.addEventListener("resize", resize)
+
             resize()
         })
 
-        const screenToSceneCoordinates = (position: RectangularCoordinates) => {
-            const gridSpacing = scene.gridSpacing
-            return {
-                x: Math.floor(position.x/gridSpacing),
-                y: Math.floor(position.y/gridSpacing)
-            }
-        }
+        // const screenToSceneCoordinates = (position: RectangularCoordinates) => {
+        //     const gridSpacing = scene.gridSpacing
+        //     return {
+        //         x: Math.floor(position.x/gridSpacing),
+        //         y: Math.floor(position.y/gridSpacing)
+        //     }
+        // }
 
         const onMouseClick = (ev: ScreenMouseClickEvent) => {
             const image = unref(currentItem)
 
-            if (isNil(image)) return
+            if (isNil(image) || isNil(scene) || isNil(tilesLayer)) return
 
             tilesLayer.addItem(createTile(scene, {
-                position: screenToSceneCoordinates(ev.position),
+                position: screenToSceneCoordinate(scene, ev.position),
                 shape: { columns: 1, rows: 1 },
                 images: [Data.imageSet(props.set as keyof ImageLib)[image]]
             }))

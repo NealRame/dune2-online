@@ -54,13 +54,12 @@ export default defineComponent({
                 screenWidthRef.value = width
                 screenHeightRef.value = height
 
-                const scene = game.engine.scene
-                const topLeft = scene.viewport?.topLeft() ?? { x: 0, y: 0 }
+                const { gridSpacing, viewport } = game.engine.scene
 
-                scene.viewport = new Rect(topLeft, {
-                    width: width/scene.gridSpacing,
-                    height: height/scene.gridSpacing,
-                })
+                viewport.size = {
+                    width: width/gridSpacing,
+                    height: height/gridSpacing,
+                }
             }
         }, 60)
 
@@ -68,10 +67,12 @@ export default defineComponent({
             if (xOffset !== 0 || yOffset !== 0) {
                 const game = unref(gameRef)
                 if (!isNil(game)) {
-                    const viewport = game.engine.scene.viewport as Rect
-                    const rect = game.engine.scene.rect
-                    viewport.x = clamp(viewport.x + xOffset, 0, rect.rightX - viewport.width)
-                    viewport.y = clamp(viewport.y + yOffset, 0, rect.bottomY - viewport.height)
+                    const viewport = game.engine.scene.viewport
+                    const { x, y } = viewport.position
+                    viewport.position = {
+                        x: x + xOffset,
+                        y: y + yOffset,
+                    }
                 }
             }
         }
@@ -79,15 +80,16 @@ export default defineComponent({
         const onMouseClick = (ev: ScreenMouseClickEvent) => {
             const game = unref(gameRef)
             if (!isNil(game)) {
-                const scenePos = screenToSceneCoordinate(game.engine.scene, ev.position)
-                console.log(scenePos)
+                // const scenePos = screenToSceneCoordinate(game.engine.scene, ev.position)
+                // console.log(scenePos)
             }
         }
 
         const onMouseMoved = (ev: ScreenMouseMotionEvent) => {
             const game = unref(gameRef)
             if (!isNil(game) && ev.button) {
-                const sceneMove = screenToSceneScale(game.engine.scene, ev.movement)
+                const scene = game.engine.scene
+                const sceneMove = screenToSceneScale(scene, ev.movement)
                 updateViewport(sceneMove.opposite)
             }
         }

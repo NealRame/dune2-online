@@ -38,8 +38,9 @@ export class SceneLayerImpl implements SceneLayer {
 
     render(painter: Painter)
         : SceneLayer {
+        const viewportRect = this.scene_.viewport.rect
         for (const item of this.items_) {
-            item.render(painter, this.scene_.viewport)
+            item.render(painter, viewportRect)
         }
         return this
     }
