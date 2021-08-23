@@ -3,7 +3,6 @@
         :width="width"
         :height="height"
         @mouseClick="onMouseClick"
-        @mouseMotion="onMouseMoved"
     />
 </template>
 
@@ -46,6 +45,8 @@ import { PaintDevice } from "@/graphics"
 
 import { isNil } from "lodash"
 import { computed, defineComponent, onUpdated, ref, toRef, unref } from "vue"
+import { MiniMap, Viewport } from "@/engine"
+import { Vector } from "@/maths"
 
 interface Data {
     game: Game|null
@@ -58,6 +59,9 @@ export default defineComponent({
         const gameRef = toRef(props, "game")
         const scaleRef = ref<Engine.ScaleFactor>(3)
         const screenRef = ref<PaintDevice | null>(null)
+
+        let minimap: MiniMap|null = null
+        let viewport: Viewport|null = null
 
         const width = computed(() => {
             const game = unref(gameRef)
@@ -78,31 +82,57 @@ export default defineComponent({
         })
 
         const onMouseClick = (ev: ScreenMouseClickEvent) => {
-            // console.log(`minimap: ${ev.position.x} ${ev.position.y}`)
+            if (!isNil(viewport)) {
+                const { width, height } = viewport.size
+                const pos = new Vector(ev.position.x, ev.position.y)
+
+                viewport.position = pos.mul(1/unref(scaleRef)).sub({
+                    x: width/2,
+                    y: height/2,
+                })
+            }
         }
 
-        const onMouseMoved = (ev: ScreenMouseMotionEvent) => {
-            // console.log(`minimap: ${ev.position.x} ${ev.position.y}`)
+        const refresh = () => {
+            const game = unref(gameRef)
+            const painter = (unref(screenRef) as PaintDevice).painter
+
+            if (isNil(game)) return
+            if (isNil(painter)) return
+
+            const image = minimap?.image
+
+            painter.clear("#000")
+
+            if (!isNil(image)) {
+                painter.drawImageBitmap(
+                    image,
+                    { x: 0, y: 0 },
+                    game.engine.scene.rect,
+                    painter.size,
+                )
+            }
+
+            if (!isNil(viewport)) {
+                const rect = viewport.rect.scale(unref(scaleRef))
+                painter.pen = {
+                    lineWidth: 1,
+                    strokeStyle: "#fff",
+                }
+                painter.drawRect(rect.topLeft(), rect.size)
+            }
         }
 
         onUpdated(() => {
-            console.log("updated!")
             const game = unref(gameRef)
             if (!isNil(game)) {
-                const minimap = Engine.createMiniMap(game.engine)
-                minimap.onChanged.subscribe(() => {
-                    const image = minimap.image
-                    const painter = (unref(screenRef) as PaintDevice).painter
+                minimap = Engine.createMiniMap(game.engine)
+                minimap.onChanged.subscribe(refresh)
 
-                    if (!(isNil(painter) || isNil(image))) {
-                        painter.drawImageBitmap(
-                            image,
-                            { x: 0, y: 0 },
-                            game.engine.scene.rect,
-                            painter.size,
-                        )
-                    }
-                })
+                viewport = game.engine.scene.viewport
+                viewport.onChanged.subscribe(refresh)
+
+                refresh()
             }
         })
 
@@ -111,7 +141,6 @@ export default defineComponent({
             width,
             height,
             onMouseClick,
-            onMouseMoved,
         }
     }
 })

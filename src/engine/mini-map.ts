@@ -2,7 +2,9 @@ import { Terrain } from "./land"
 import { Game } from "./game"
 
 import { Color } from "@/graphics"
+import { Rect } from "@/maths"
 import { createObserver, Observer } from "@/utils"
+import { isNil } from "lodash"
 
 export interface MiniMap {
     readonly image: ImageBitmap|null
@@ -17,21 +19,26 @@ export function createMiniMap<T extends Terrain>(game: Game<T>)
     const canvas = new OffscreenCanvas(width, height)
     const context = canvas.getContext("2d") as OffscreenCanvasRenderingContext2D
 
-    context.save()
-    context.fillStyle = Color.cssRGB([0, 0, 0])
-    context.fillRect(0, 0, width, height)
-    context.restore()
+    let image: ImageBitmap|null = null
 
     game.land.terrainsObserver.subscribe(terrain => {
+        if (!isNil(image)) {
+            context.drawImage(image, 0, 0)
+        }
+
         const color = terrain.color
+
         context.fillStyle = Color.cssRGB(color)
         context.fillRect(terrain.x, terrain.y, 1, 1)
+
+        image = canvas.transferToImageBitmap()
+
         observer.publish()
     })
 
     return {
         get image() {
-            return canvas.transferToImageBitmap()
+            return image
         },
         get onChanged() {
             return observer
