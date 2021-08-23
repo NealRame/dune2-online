@@ -67,7 +67,11 @@ export function createScene(size: Size, painter: Painter): Scene {
     }
 
     const getGridSpacing = () => state.scaleFactor*state.gridUnit
-    state.viewport.size = painter.rect.scaled(1/getGridSpacing()).size
+    const updateViewport = () => {
+        state.viewport.size = painter.rect.scaled(1/getGridSpacing()).size
+    }
+
+    updateViewport()
 
     return {
         get scale(): ScaleFactor {
@@ -75,6 +79,7 @@ export function createScene(size: Size, painter: Painter): Scene {
         },
         set scale(f: ScaleFactor) {
             state.scaleFactor = f
+            updateViewport()
         },
         get gridUnit(): number {
             return state.gridUnit
