@@ -21,11 +21,9 @@ export interface Game<T extends Terrain = Terrain> {
 
 export function createGame<T extends Terrain = Terrain>(config: GameConfig<T>): Game<T> {
     const scene = createScene(config.size, config.screen.painter)
-    const landLayer = scene.addLayer("land")
     const land = createLand(scene, config)
 
-    scene.addLayer("land").addItem(land)
-    landLayer.addItem(land)
+    scene.addLayer(land)
 
     const unitLayer = scene.addLayer("units")
     // const structureLayer = scene.addLayer("structures")

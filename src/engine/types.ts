@@ -24,7 +24,7 @@ export interface Scene {
     readonly rect: Rect
     scale: ScaleFactor
     gridEnabled: boolean
-    addLayer(name: string): SceneLayer
+    addLayer(layer: string|SceneLayer): SceneLayer
     clear(): Scene
     render(): Scene
     update(): Scene
@@ -35,6 +35,8 @@ export interface Scene {
 export interface SceneLayer {
     name: string
     readonly scene: Scene
+    readonly size: Size
+    readonly rect: Rect
     addItem(item: SceneItem): SceneLayer
     items(): Generator<SceneItem>
     render(painter: Painter): SceneLayer

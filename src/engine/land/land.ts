@@ -4,7 +4,7 @@ import { Zone } from "./zone"
 
 import { createObserver, Observer } from "@/utils"
 
-import { Scene } from "@/engine"
+import { Scene, SceneItem } from "@/engine"
 import { Painter } from "@/graphics"
 import { Rect, RectangularCoordinates, Size, Vector } from "@/maths"
 
@@ -41,9 +41,9 @@ export function generateLandZones<T extends Terrain>(
     chunkSize: Size,
 ): Zone[] {
     const zones: Zone[] = []
-    for (const rect of zoneIterator(land.rect, chunkSize)) {
-        const zone = new Zone(land.scene, rect)
-        for (const terrain of land.terrains(rect)) {
+    for (const zoneRect of zoneIterator(land.rect, chunkSize)) {
+        const zone = new Zone(land.scene, zoneRect)
+        for (const terrain of land.terrains(zoneRect)) {
             zone.refresh(terrain)
         }
         zone.update()
@@ -102,20 +102,23 @@ export class LandImpl<T extends Terrain> implements Land<T> {
         this.zones_ = generateLandZones(this, this.zoneSize_)
     }
 
+    get name(): string {
+        return "land"
+    }
+
+    * items()
+        : Generator<SceneItem> {
+        for (const zone of this.zones_) {
+            yield zone
+        }
+    }
+
     get scene(): Scene {
         return this.scene_
     }
 
     get position(): Vector {
         return Vector.Null()
-    }
-
-    get width(): number {
-        return this.scene_.width
-    }
-
-    get height(): number {
-        return this.scene_.height
     }
 
     get size(): Size {
@@ -130,14 +133,18 @@ export class LandImpl<T extends Terrain> implements Land<T> {
         return this.terrainsObserver_
     }
 
-    update(): this {
+    addItem(): Land<T> {
+        return this
+    }
+
+    update(): Land<T> {
         return this
     }
 
     render(
         painter: Painter,
-        viewport: Rect,
     ): this {
+        const viewport = this.scene_.viewport.rect
         for (const chunk of this.zones_) {
             if (viewport.intersects(chunk.rect)) {
                 chunk.render(painter, viewport)
@@ -167,7 +174,7 @@ export class LandImpl<T extends Terrain> implements Land<T> {
         rect?: Rect,
     ): Generator<T, void, undefined> {
         if (!isNil(rect)) {
-            for (const { x, y } of zoneIterator(this.rect.intersected(rect ?? this.rect))) {
+            for (const { x, y } of zoneIterator(this.scene_.rect.intersected(rect))) {
                 yield this.terrain({ x, y }) as T
             }
         } else {

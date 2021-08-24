@@ -227,7 +227,7 @@ export default defineComponent({
 
             scene = createScene(size, (unref(screen) as PaintDevice).painter)
             scene.scale = 1
-            scene.addLayer("land").addItem(createLand(scene, {
+            scene.addLayer(createLand(scene, {
                 generateTerrain,
             }))
             scene.run()

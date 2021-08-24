@@ -108,8 +108,10 @@ export function createScene(size: Size, painter: Painter): Scene {
         get viewport(): Viewport {
             return state.viewport
         },
-        addLayer(name: string): SceneLayer {
-            const layer = new SceneLayerImpl(this, name)
+        addLayer(layer: string|SceneLayer): SceneLayer {
+            if (typeof layer === "string") {
+                layer = new SceneLayerImpl(this, layer)
+            }
             state.layers.push(layer)
             return layer
         },
