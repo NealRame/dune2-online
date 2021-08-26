@@ -23,7 +23,6 @@ export interface Scene {
     readonly gridSpacing: number
     readonly rect: Rect
     scale: ScaleFactor
-    gridEnabled: boolean
     addLayer(layer: string|SceneLayer): SceneLayer
     getLayer(layer: string|number): SceneLayer|null
     clear(): Scene

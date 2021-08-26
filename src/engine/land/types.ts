@@ -1,7 +1,7 @@
 import { Rect, RectangularCoordinates, Size } from "@/maths"
 
 import { Color } from "@/graphics"
-import { Image, SceneItem } from "@/engine"
+import { Image } from "@/engine"
 
 import { Observer } from "@/utils"
 import { SceneLayer } from "../types"

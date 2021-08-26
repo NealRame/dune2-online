@@ -10,48 +10,12 @@ import { isNil, matches } from "lodash"
 
 type SceneState = {
     backgroundColor: Brush
-    gridEnabled: boolean
     gridUnit: 16
     layers: SceneLayer[]
     rect: Rect
     scaleFactor: ScaleFactor
     viewport: Viewport
     requestAnimationId: number
-}
-
-type GridConfig = {
-    enabled?: boolean,
-    offset?: RectangularCoordinates,
-    space?: number,
-    color?: string,
-}
-
-function drawGrid(
-    painter: Painter, {
-        space = 16,
-        color = "#222",
-        offset = { x: 0, y: 0 },
-    }: GridConfig = { }
-): void {
-    const { width, height } = painter.size
-    painter.pen = {
-        lineWidth: 1,
-        strokeStyle: color
-    }
-    // Draw vertical grid lines
-    for (let x = 0.5 + offset.x%space; x < width; x += space) {
-        painter.drawLine(
-            { x, y: 0 },
-            { x, y: height }
-        )
-    }
-    // Draw horizontal grid lines
-    for (let y = 0.5 + offset.y%space; y < height; y += space) {
-        painter.drawLine(
-            { y, x: 0 },
-            { y, x: width }
-        )
-    }
 }
 
 export class SceneExistingLayer extends Error {
@@ -73,7 +37,6 @@ export class SceneExistingLayer extends Error {
 export function createScene(size: Size, painter: Painter): Scene {
     const state: SceneState = {
         backgroundColor: cssHex([0, 0, 0]),
-        gridEnabled: false,
         gridUnit: 16,
         layers: [],
         scaleFactor: 1,
@@ -102,12 +65,6 @@ export function createScene(size: Size, painter: Painter): Scene {
         },
         get gridSpacing(): number {
             return getGridSpacing()
-        },
-        get gridEnabled(): boolean {
-            return state.gridEnabled
-        },
-        set gridEnabled(enabled: boolean) {
-            state.gridEnabled = enabled
         },
         get width(): number {
             return state.rect.width
@@ -151,18 +108,7 @@ export function createScene(size: Size, painter: Painter): Scene {
         },
         render(): Scene {
             if (!isNil(painter)) {
-                const gridSpacing = getGridSpacing()
-                const viewport = state.viewport.rect
-
                 painter.clear(state.backgroundColor)
-
-                // draw grid
-                if (state.gridEnabled) {
-                    drawGrid(painter, {
-                        space: gridSpacing,
-                        offset: viewport.topLeft(),
-                    })
-                }
                 // draw items
                 for (const layer of state.layers) {
                     layer.render(painter)

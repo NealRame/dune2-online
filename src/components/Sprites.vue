@@ -17,7 +17,7 @@ canvas {
 import Screen from "@/components/Screen.vue"
 
 import { Units } from "@/dune2/game"
-import { createScene, ScaleFactor, Scene, SceneLayer } from "@/engine"
+import { createGrid, createScene, ScaleFactor, Scene } from "@/engine"
 import { Direction } from "@/maths"
 
 import { PaintDevice } from "@/graphics"
@@ -51,11 +51,11 @@ export default defineComponent({
                 height: 60,
             }, (unref(screen) as PaintDevice).painter)
             scene.scale = unref(scale)
-            scene.gridEnabled = true
             scene.run()
 
             const unit = new Units.Trike(scene, { x: 8, y: 8 })
 
+            scene.addLayer(createGrid(scene))
             scene.addLayer("units").addItem(unit)
 
             window.addEventListener("resize", resize)

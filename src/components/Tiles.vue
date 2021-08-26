@@ -26,12 +26,11 @@ import TilePalette from "@/components/TilePalette.vue"
 import { ImageLib, ImageSet } from "@/dune2/types"
 import { Data } from "@/dune2"
 
-import { createScene, createTile, Image, ScaleFactor, Scene, SceneLayer, screenToSceneCoordinate } from "@/engine"
+import { createGrid, createScene, createTile, Image, ScaleFactor, Scene, SceneLayer, screenToSceneCoordinate } from "@/engine"
 import { PaintDevice } from "@/graphics"
 
 import { defineComponent, onMounted, ref, unref } from "vue"
 import { debounce, isNil } from "lodash"
-import { RectangularCoordinates } from "@/maths"
 
 export default defineComponent({
     props: ["set"],
@@ -65,10 +64,12 @@ export default defineComponent({
                 height: 60,
             }, (unref(screen) as PaintDevice).painter)
             scene.scale = unref(scale)
-            scene.gridEnabled = true
             scene.run()
 
+            const grid = createGrid(scene)
+
             tilesLayer = scene.addLayer("tiles")
+            scene.addLayer(grid)
 
             window.addEventListener("resize", resize)
 
