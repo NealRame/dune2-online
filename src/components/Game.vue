@@ -2,7 +2,6 @@
     <screen id="screen" ref="screen"
         :width="screenWidth"
         :height="screenHeight"
-        @mouseClick="onMouseClick"
         @mouseMotion="onMouseMoved"
     />
     <mini-map :game="game" />
@@ -18,15 +17,15 @@ canvas#screen {
 
 <script lang="ts">
 import MiniMap from "@/components/MiniMap.vue"
-import Screen, { ScreenMouseClickEvent, ScreenMouseMotionEvent } from "@/components/Screen.vue"
+import Screen, { ScreenMouseMotionEvent } from "@/components/Screen.vue"
 
 import { createGame, Game } from "@/dune2"
-import { screenToSceneScale, screenToSceneCoordinate, ScaleFactor } from "@/engine"
+import { screenToSceneScale, ScaleFactor } from "@/engine"
 import { PaintDevice } from "@/graphics"
 
-import { clamp, debounce, isNil } from "lodash"
+import { debounce, isNil } from "lodash"
 import { defineComponent, onMounted, ref, unref } from "vue"
-import { Rect, RectangularCoordinates } from "@/maths"
+import { RectangularCoordinates } from "@/maths"
 
 declare global {
     interface Window {
@@ -77,14 +76,6 @@ export default defineComponent({
             }
         }
 
-        const onMouseClick = (ev: ScreenMouseClickEvent) => {
-            const game = unref(gameRef)
-            if (!isNil(game)) {
-                // const scenePos = screenToSceneCoordinate(game.engine.scene, ev.position)
-                // console.log(scenePos)
-            }
-        }
-
         const onMouseMoved = (ev: ScreenMouseMotionEvent) => {
             const game = unref(gameRef)
             if (!isNil(game) && ev.button) {
@@ -118,7 +109,6 @@ export default defineComponent({
             screenWidth: screenWidthRef,
             screenHeight: screenHeightRef,
             game: gameRef,
-            onMouseClick,
             onMouseMoved,
         }
     }
