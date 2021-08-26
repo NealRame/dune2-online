@@ -6,7 +6,7 @@ import { Brush, Painter } from "@/graphics/painter"
 
 import { Rect, RectangularCoordinates, Size, Vector } from "@/maths"
 import { createViewport } from "./viewport"
-import { isNil } from "lodash"
+import { isNil, matches } from "lodash"
 
 type SceneState = {
     backgroundColor: Brush
@@ -51,6 +51,22 @@ function drawGrid(
             { y, x: 0 },
             { y, x: width }
         )
+    }
+}
+
+export class SceneExistingLayer extends Error {
+    private name_: string
+
+    constructor(name: string) {
+        super(`Layer '${name}' already exist`)
+        this.name_ = name
+
+        // restore prototype chain
+        Object.setPrototypeOf(this, new.target.prototype)
+    }
+
+    get name(): string {
+        return this.name_
     }
 }
 
@@ -112,8 +128,22 @@ export function createScene(size: Size, painter: Painter): Scene {
             if (typeof layer === "string") {
                 layer = new SceneLayerImpl(this, layer)
             }
+
+            const { name } = layer
+            if (state.layers.some(matches({ name }))) {
+                throw new SceneExistingLayer(layer.name)
+            }
+
             state.layers.push(layer)
+
             return layer
+        },
+        getLayer(layer: string|number): SceneLayer|null {
+            if (typeof layer === "string") {
+                return state.layers.find(matches({ name: layer })) ?? null
+            } else {
+                return state.layers[layer] ?? null
+            }
         },
         clear(): Scene {
             state.layers = []

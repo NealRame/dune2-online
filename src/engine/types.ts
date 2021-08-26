@@ -25,6 +25,7 @@ export interface Scene {
     scale: ScaleFactor
     gridEnabled: boolean
     addLayer(layer: string|SceneLayer): SceneLayer
+    getLayer(layer: string|number): SceneLayer|null
     clear(): Scene
     render(): Scene
     update(): Scene
