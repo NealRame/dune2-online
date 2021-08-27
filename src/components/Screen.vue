@@ -19,6 +19,7 @@ export type ScreenMouseMotionEvent = {
 }
 
 export type ScreenMouseClickEvent = {
+    button: boolean,
     altKey: boolean,
     ctrlKey: boolean,
     metaKey: boolean,
@@ -60,6 +61,7 @@ export default defineComponent({
             const { left, top } = canvas.getBoundingClientRect()
 
             emit("mouseClick", {
+                button: true,
                 position: {
                     // TODO consider borders thickness
                     x: Math.round(clamp(e.clientX - left, 0, canvas.width)),
