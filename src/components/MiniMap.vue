@@ -126,7 +126,7 @@ export default defineComponent({
         onUpdated(() => {
             const game = unref(gameRef)
             if (!isNil(game)) {
-                minimap = Engine.createMiniMap(game.engine)
+                minimap = game.engine.minimap
                 minimap.onChanged.subscribe(refresh)
 
                 viewport = game.engine.scene.viewport
