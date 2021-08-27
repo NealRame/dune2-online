@@ -97,21 +97,6 @@ export default defineComponent({
                     height: canvas?.height ?? 0,
                 })
             })
-            // painter() {
-            //     if (isNil(painter)) {
-            //         throw new Error("No painter available yet")
-            //     }
-            //     return painter
-            // },
-            // rect() {
-            //     const canvas = unref(canvasRef)
-            //     if (!isNil(canvas)) {
-            //         return new Rect({ x: 0, y: 0 }, {
-            //             width: canvas.width,
-            //             height: canvas.height,
-            //         })
-            //     }
-            // }
         }
     }
 })
