@@ -42,13 +42,12 @@ export function createGame<T extends Terrain = Terrain>(config: GameConfig<T>): 
             return this
         },
         start(): Game<T> {
-            const loop = () => {
+            (function animationLoop() {
                 scene
                     .update()
                     .render()
-                requestAnimationId = requestAnimationFrame(loop)
-            }
-            loop()
+                requestAnimationId = requestAnimationFrame(animationLoop)
+            })()
             return this
         },
         stop(): Game<T> {
