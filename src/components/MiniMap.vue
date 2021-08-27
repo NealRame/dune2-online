@@ -2,7 +2,8 @@
     <screen id="minimap" ref="screen"
         :width="width"
         :height="height"
-        @mouseClick="onMouseClick"
+        @mouseClick="onMouseEvent"
+        @mouseMotion="onMouseEvent"
     />
 </template>
 
@@ -81,18 +82,6 @@ export default defineComponent({
             return 0
         })
 
-        const onMouseClick = (ev: ScreenMouseClickEvent) => {
-            if (!isNil(viewport)) {
-                const { width, height } = viewport.size
-                const pos = new Vector(ev.position.x, ev.position.y)
-
-                viewport.position = pos.mul(1/unref(scaleRef)).sub({
-                    x: width/2,
-                    y: height/2,
-                })
-            }
-        }
-
         const refresh = () => {
             const game = unref(gameRef)
             const painter = (unref(screenRef) as PaintDevice).painter
@@ -123,6 +112,17 @@ export default defineComponent({
             }
         }
 
+        const onMouseEvent = ({ button, position }: ScreenMouseClickEvent|ScreenMouseMotionEvent) => {
+            if (!isNil(viewport) && button) {
+                const { x, y } = position
+                const { width, height } = viewport.size
+                viewport.position = (new Vector(x, y)).mul(1/unref(scaleRef)).sub({
+                    x: width/2,
+                    y: height/2,
+                })
+            }
+        }
+
         onUpdated(() => {
             const game = unref(gameRef)
             if (!isNil(game)) {
@@ -140,7 +140,7 @@ export default defineComponent({
             screen: screenRef,
             width,
             height,
-            onMouseClick,
+            onMouseEvent,
         }
     }
 })
