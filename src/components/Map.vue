@@ -185,6 +185,16 @@ export default defineComponent({
 
         let seed: number = Date.now()
         let scene: Scene|null = null
+        let animationRequestId = 0
+
+        const runAnimationLoop = () => {
+            if (!isNil(scene)) {
+                scene
+                    .update()
+                    .render()
+                animationRequestId = requestAnimationFrame(runAnimationLoop)
+            }
+        }
 
         const resize = debounce(() => {
             const width = window.innerWidth
@@ -222,7 +232,7 @@ export default defineComponent({
             })
 
             if (!isNil(scene)) {
-                scene.stop()
+                cancelAnimationFrame(animationRequestId)
             }
 
             scene = createScene(size, (unref(screen) as PaintDevice).painter)
@@ -230,7 +240,8 @@ export default defineComponent({
             scene.addLayer(createLand(scene, {
                 generateTerrain,
             }))
-            scene.run()
+
+            runAnimationLoop()
 
             showModal.value = false
         }

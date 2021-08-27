@@ -23,7 +23,7 @@ import { Direction } from "@/maths"
 import { PaintDevice } from "@/graphics"
 
 import { defineComponent, onMounted, ref, unref } from "vue"
-import { debounce } from "lodash"
+import { debounce, isNil } from "lodash"
 
 export default defineComponent({
     components: { Screen },
@@ -51,7 +51,15 @@ export default defineComponent({
                 height: 60,
             }, (unref(screen) as PaintDevice).painter)
             scene.scale = unref(scale)
-            scene.run()
+
+            ;(function animationLoop() {
+                if (!isNil(scene)) {
+                    scene
+                        .update()
+                        .render()
+                    requestAnimationFrame(animationLoop)
+                }
+            })()
 
             const unit = new Units.Trike(scene, { x: 8, y: 8 })
 

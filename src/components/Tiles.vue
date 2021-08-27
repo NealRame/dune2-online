@@ -64,14 +64,20 @@ export default defineComponent({
                 height: 60,
             }, (unref(screen) as PaintDevice).painter)
             scene.scale = unref(scale)
-            scene.run()
-
-            const grid = createGrid(scene)
 
             tilesLayer = scene.addLayer("tiles")
-            scene.addLayer(grid)
+            scene.addLayer(createGrid(scene))
 
             window.addEventListener("resize", resize)
+
+            ;(function animationLoop() {
+                if (!isNil(scene)) {
+                    scene
+                        .update()
+                        .render()
+                    requestAnimationFrame(animationLoop)
+                }
+            })()
 
             resize()
         })

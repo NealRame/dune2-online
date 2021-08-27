@@ -13,20 +13,22 @@ export interface GameConfig<T extends Terrain = Terrain> {
 }
 
 export interface Game<T extends Terrain = Terrain> {
-    scene: Scene,
-    land: Land<T>,
+    scene: Scene
+    land: Land<T>
     addUnit(unit: Unit): Game<T>
-    start(): void
+    start(): Game<T>
+    stop(): Game<T>
 }
 
 export function createGame<T extends Terrain = Terrain>(config: GameConfig<T>): Game<T> {
+    let requestAnimationId = 0
     const scene = createScene(config.size, config.screen.painter)
     const land = createLand(scene, config)
 
     scene.addLayer(land)
 
-    const unitLayer = scene.addLayer("units")
     // const structureLayer = scene.addLayer("structures")
+    const unitLayer = scene.addLayer("units")
 
     return {
         get scene() {
@@ -39,8 +41,20 @@ export function createGame<T extends Terrain = Terrain>(config: GameConfig<T>): 
             unitLayer.addItem(unit)
             return this
         },
-        start(): void {
-            scene.run()
+        start(): Game<T> {
+            const loop = () => {
+                scene
+                    .update()
+                    .render()
+                requestAnimationId = requestAnimationFrame(loop)
+            }
+            loop()
+            return this
         },
+        stop(): Game<T> {
+            cancelAnimationFrame(requestAnimationId)
+            requestAnimationId = 0
+            return this
+        }
     }
 }
