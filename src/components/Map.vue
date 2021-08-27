@@ -149,9 +149,9 @@ import Screen, { ScreenMouseMotionEvent } from "@/components/Screen.vue"
 import { createTerrainGenerator } from "@/dune2/land"
 import { createLand, createScene, Scene, screenToSceneCoordinate } from "@/engine"
 import { PaintDevice } from "@/graphics"
-import { Rect, RectangularCoordinates, Vector } from "@/maths"
+import { RectangularCoordinates, Vector } from "@/maths"
 
-import { clamp, debounce, isNil } from "lodash"
+import { debounce, isNil } from "lodash"
 import { defineComponent, onMounted, ref, unref, watch } from "vue"
 
 export default defineComponent({
