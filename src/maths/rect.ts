@@ -1,7 +1,7 @@
 import { RectangularCoordinates, Size } from "./types"
 import { Vector } from "./vector"
 
-import { isNumber } from "lodash"
+import { isNil, isNumber } from "lodash"
 
 /**
  * @class Rect
@@ -250,5 +250,15 @@ export class Rect implements RectangularCoordinates, Size {
      */
     scaled(k: {kx: number, ky: number} | number): Rect {
         return this.copy().scale(k)
+    }
+
+    * partition(chunk: Size = { width: 1, height: 1 }): Generator<Rect> {
+        for (let y = this.y; y < this.y + this.height; y += chunk.height) {
+            for (let x = this.x; x < this.x + this.width; x += chunk.width) {
+                const width = Math.min(chunk.width, this.width - x)
+                const height = Math.min(chunk.height, this.height - y)
+                yield new Rect({ x, y }, { width, height })
+            }
+        }
     }
 }
