@@ -10,27 +10,12 @@ import { Rect, RectangularCoordinates, Size, Vector } from "@/maths"
 
 import { chain, isNil } from "lodash"
 
-export function * zoneIterator(
-    rect: Rect|null,
-    zoneSize: Size = { width: 1, height: 1 },
-): Generator<Rect> {
-    if (isNil(rect)) return
-    for (let y = rect.y; y < rect.y + rect.height; y += zoneSize.height) {
-        for (let x = rect.x; x < rect.x + rect.width; x += zoneSize.width) {
-            const width = Math.min(zoneSize.width, rect.width - x)
-            const height = Math.min(zoneSize.height, rect.height - y)
-
-            yield new Rect({ x, y }, { width, height })
-        }
-    }
-}
-
 export function generateLandTerrains<T extends Terrain>(
     land: Land<T>,
     generateTerrain: TerrainGenerator<T>,
 ): T[] {
     const terrains: T[] = []
-    for (const { x, y } of zoneIterator(land.rect)) {
+    for (const { x, y } of land.rect.partition()) {
         terrains.push(generateTerrain(land, { x, y }))
     }
     return terrains
@@ -41,7 +26,7 @@ export function generateLandZones<T extends Terrain>(
     chunkSize: Size,
 ): Zone[] {
     const zones: Zone[] = []
-    for (const zoneRect of zoneIterator(land.rect, chunkSize)) {
+    for (const zoneRect of land.rect.partition(chunkSize)) {
         const zone = new Zone(land.scene, zoneRect)
         for (const terrain of land.terrains(zoneRect)) {
             zone.refresh(terrain)
@@ -171,11 +156,14 @@ export class LandImpl<T extends Terrain> implements Land<T> {
     }
 
     * terrains(
-        rect?: Rect,
+        zone?: Rect,
     ): Generator<T, void, undefined> {
-        if (!isNil(rect)) {
-            for (const { x, y } of zoneIterator(this.scene_.rect.intersected(rect))) {
-                yield this.terrain({ x, y }) as T
+        if (!isNil(zone)) {
+            const rect = this.scene_.rect.intersected(zone)
+            if (!isNil(rect)) {
+                for (const { x, y } of rect.partition()) {
+                    yield this.terrain({ x, y }) as T
+                }
             }
         } else {
             yield * this.terrains_
