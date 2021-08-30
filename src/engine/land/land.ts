@@ -1,6 +1,6 @@
 import { Land, LandConfig, Terrain, TerrainGenerator } from "./types"
 import { createPositionToZoneConverter } from "./utils"
-import { Zone } from "./zone"
+import { ChunkItem } from "./chunkItem"
 
 import { createObserver, Observer } from "@/utils"
 
@@ -24,17 +24,17 @@ export function generateLandTerrains<T extends Terrain>(
 export function generateLandZones<T extends Terrain>(
     land: Land<T>,
     chunkSize: Size,
-): Zone[] {
-    const zones: Zone[] = []
-    for (const zoneRect of land.rect.partition(chunkSize)) {
-        const zone = new Zone(land.scene, zoneRect)
-        for (const terrain of land.terrains(zoneRect)) {
-            zone.refresh(terrain)
+): ChunkItem[] {
+    const chunks: ChunkItem[] = []
+    for (const chunkRect of land.rect.partition(chunkSize)) {
+        const chunk = new ChunkItem(land.scene, chunkRect)
+        for (const terrain of land.terrains(chunkRect)) {
+            chunk.refresh(terrain)
         }
-        zone.update()
-        zones.push(zone)
+        chunk.update()
+        chunks.push(chunk)
     }
-    return zones
+    return chunks
 }
 
 export class LandImpl<T extends Terrain> implements Land<T> {
@@ -43,19 +43,19 @@ export class LandImpl<T extends Terrain> implements Land<T> {
     private terrains_: T[]
     private terrainsObserver_: Observer<T>
 
-    private zoneSize_: Size = { width: 32, height: 32 }
-    private zones_: Zone[]
+    private chunkSize_: Size = { width: 32, height: 32 }
+    private items_: ChunkItem[]
 
     private positionToTerrainIndex_: (p: RectangularCoordinates) => number
     private positionToZoneIndex_: (p: RectangularCoordinates) => number
 
     private onTerrainChanged_(terrain: T) {
-        const zones = new Set<Zone>()
+        const zones = new Set<ChunkItem>()
         chain(terrain.neighbors)
             .tap(terrains => terrains.push(terrain))
             .forEach(terrain => {
                 if (!isNil(terrain)) {
-                    const zone = this.zones_[this.positionToZoneIndex_(terrain.position)]
+                    const zone = this.items_[this.positionToZoneIndex_(terrain.position)]
                     zone.refresh(terrain)
                     zones.add(zone)
                 }
@@ -72,11 +72,11 @@ export class LandImpl<T extends Terrain> implements Land<T> {
         config: LandConfig<T>,
     ) {
         this.scene_ = scene
-        this.zoneSize_ = config.zoneSize ?? this.zoneSize_
+        this.chunkSize_ = config.chunkSize ?? this.chunkSize_
 
         const { size } = scene
         this.positionToTerrainIndex_ = createPositionToZoneConverter(size)
-        this.positionToZoneIndex_ = createPositionToZoneConverter(size, this.zoneSize_)
+        this.positionToZoneIndex_ = createPositionToZoneConverter(size, this.chunkSize_)
 
         this.terrains_ = generateLandTerrains(this, config.generateTerrain)
         this.terrainsObserver_ = createObserver()
@@ -84,7 +84,7 @@ export class LandImpl<T extends Terrain> implements Land<T> {
             this.onTerrainChanged_(terrain)
         })
 
-        this.zones_ = generateLandZones(this, this.zoneSize_)
+        this.items_ = generateLandZones(this, this.chunkSize_)
     }
 
     get name(): string {
@@ -93,7 +93,7 @@ export class LandImpl<T extends Terrain> implements Land<T> {
 
     * items()
         : Generator<SceneItem> {
-        for (const zone of this.zones_) {
+        for (const zone of this.items_) {
             yield zone
         }
     }
@@ -130,7 +130,7 @@ export class LandImpl<T extends Terrain> implements Land<T> {
         painter: Painter,
     ): this {
         const viewport = this.scene_.viewport.rect
-        for (const chunk of this.zones_) {
+        for (const chunk of this.items_) {
             if (viewport.intersects(chunk.rect)) {
                 chunk.render(painter, viewport)
             }

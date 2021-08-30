@@ -8,7 +8,7 @@ import { RectangularCoordinates, Rect } from "@/maths"
 
 import { isNil } from "lodash"
 
-export class Zone extends AbstractSceneItem {
+export class ChunkItem extends AbstractSceneItem {
     private image_: Partial<Image> = {}
     private redraw_: [RectangularCoordinates, Image[]][] = []
 
@@ -20,7 +20,7 @@ export class Zone extends AbstractSceneItem {
         this.height_ = rect.height
     }
 
-    refresh(terrain: Terrain): Zone {
+    refresh(terrain: Terrain): ChunkItem {
         this.redraw_.push([
             terrain.position,
             terrain.image(),
@@ -28,7 +28,7 @@ export class Zone extends AbstractSceneItem {
         return this
     }
 
-    update(): Zone {
+    update(): ChunkItem {
         const { gridUnit } = this.scene
         const { width, height } = this.rect
 
@@ -60,7 +60,7 @@ export class Zone extends AbstractSceneItem {
     render(
         painter: Painter,
         viewport: Rect,
-    ): Zone {
+    ): ChunkItem {
         const { gridSpacing, scale } = this.scene
 
         if (this.rect.intersects(viewport)) {

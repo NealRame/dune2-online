@@ -36,5 +36,5 @@ export interface Land<T extends Terrain = Terrain> extends SceneLayer {
 
 export type LandConfig<T extends Terrain> = {
     generateTerrain: TerrainGenerator<T>
-    zoneSize?: Size
+    chunkSize?: Size
 }
