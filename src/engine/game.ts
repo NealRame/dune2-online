@@ -1,5 +1,4 @@
 import { createLand, Land, Terrain, TerrainGenerator } from "./land"
-import { createMiniMap, MiniMap } from "./mini-map"
 import { createScene } from "./scene"
 import { Scene } from "./types"
 import { Unit } from "./unit"
@@ -10,7 +9,6 @@ import { isNil } from "lodash"
 
 interface GameState {
     animationRequestId: number
-    minimap: MiniMap|null
     scene: Scene
 }
 
@@ -22,7 +20,6 @@ export interface GameConfig<T extends Terrain = Terrain> {
 
 export interface Game<T extends Terrain = Terrain> {
     readonly land: Land<T>
-    readonly minimap: MiniMap
     readonly scene: Scene
     addUnit(unit: Unit): Game<T>
     start(): Game<T>
@@ -33,7 +30,6 @@ export function createGame<T extends Terrain = Terrain>(config: GameConfig<T>)
     : Game<T> {
     const state: GameState = {
         animationRequestId: 0,
-        minimap: null,
         scene: createScene(config.size, config.screen.painter),
     }
 
@@ -43,12 +39,6 @@ export function createGame<T extends Terrain = Terrain>(config: GameConfig<T>)
     return {
         get land() {
             return state.scene.getLayer("land") as Land<T>
-        },
-        get minimap() {
-            if (isNil(state.minimap)) {
-                state.minimap = createMiniMap(this)
-            }
-            return state.minimap
         },
         get scene() {
             return state.scene

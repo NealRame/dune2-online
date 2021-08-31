@@ -96,7 +96,7 @@ export default defineComponent({
         const scaleRef = ref<Engine.ScaleFactor>(3)
         const screenRef = ref<PaintDevice | null>(null)
 
-        let minimap: MiniMap|null = null
+        let miniMap: MiniMap|null = null
         let viewport: Viewport|null = null
 
         const width = computed(() => {
@@ -124,7 +124,7 @@ export default defineComponent({
             if (isNil(game)) return
             if (isNil(painter)) return
 
-            const image = minimap?.image
+            const image = miniMap?.image
 
             painter.clear("#000")
 
@@ -175,8 +175,8 @@ export default defineComponent({
         onUpdated(() => {
             const game = unref(gameRef)
             if (!isNil(game)) {
-                minimap = game.engine.minimap
-                minimap.onChanged.subscribe(refresh)
+                miniMap = game.miniMap
+                miniMap.onChanged.subscribe(refresh)
 
                 viewport = game.engine.scene.viewport
                 viewport.onChanged.subscribe(refresh)
