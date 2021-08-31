@@ -238,6 +238,8 @@ export default defineComponent({
             scene = createScene(size, (unref(screen) as PaintDevice).painter)
             scene.scale = 1
             scene.addLayer(createLand(scene, {
+                chunkEnabled: false,
+                fogOfWarEnabled: false,
                 generateTerrain,
             }))
 

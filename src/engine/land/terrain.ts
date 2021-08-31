@@ -12,6 +12,7 @@ export abstract class AbstractTerrain implements Terrain {
     constructor(land: Land, position: RectangularCoordinates) {
         this.land_ = land as Land<this>
         this.position_ = position
+        this.revealed_ = !land.fogOfWar
     }
 
     get x(): number {

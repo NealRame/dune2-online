@@ -8,7 +8,18 @@ import { Scene, SceneItem } from "@/engine"
 import { Painter } from "@/graphics"
 import { Rect, RectangularCoordinates, Size, Vector } from "@/maths"
 
-import { chain, isNil } from "lodash"
+import { chain, isNil, remove } from "lodash"
+import { TerrainItem } from "./terrainItem"
+
+export function ensureLandConfiguration<T extends Terrain>(
+    config: LandConfig<T>,
+): Required<LandConfig<T>> {
+    return Object.assign({
+        chunkEnabled: true,
+        chunkSize: { width: 32, height: 32 },
+        fogOfWarEnabled: true,
+    }, config)
+}
 
 export function generateLandTerrains<T extends Terrain>(
     land: Land<T>,
@@ -21,11 +32,22 @@ export function generateLandTerrains<T extends Terrain>(
     return terrains
 }
 
-export function generateLandZones<T extends Terrain>(
-    land: Land<T>,
+export function generateLandTerrainItems(
+    land: Land
+): Array<SceneItem> {
+    const items: Array<TerrainItem> = []
+    for (const terrain of land.terrains()) {
+        items.push(new TerrainItem(land.scene, terrain))
+    }
+    return items
+}
+
+export function generateLandChunkItems(
+    land: Land,
     chunkSize: Size,
-): ChunkItem[] {
+): Array<SceneItem> {
     const chunks: ChunkItem[] = []
+
     for (const chunkRect of land.rect.partition(chunkSize)) {
         const chunk = new ChunkItem(land.scene, chunkRect)
         for (const terrain of land.terrains(chunkRect)) {
@@ -34,57 +56,53 @@ export function generateLandZones<T extends Terrain>(
         chunk.update()
         chunks.push(chunk)
     }
+
+    const positionToChunkIndex = createPositionToZoneConverter(land.size, chunkSize)
+
+    land.terrainsObserver.subscribe(terrain => {
+        chain(terrain.neighbors as Array<Terrain>)
+            .tap(terrains => remove(terrains, isNil))
+            .tap(terrains => terrains.push(terrain))
+            .map(terrain => {
+                const chunk = chunks[positionToChunkIndex(terrain.position)]
+                chunk.refresh(terrain)
+                return chunk
+            })
+            .uniq()
+            .forEach(chunk => chunk.update())
+            .value()
+    })
+
     return chunks
 }
 
-export class LandImpl<T extends Terrain> implements Land<T> {
-    private scene_: Scene
+export function generateLandItems<T extends Terrain>(
+    land: Land<T>,
+    config: Required<LandConfig<T>>
+): Array<SceneItem> {
+    return config.chunkEnabled
+        ? generateLandChunkItems(land, config.chunkSize)
+        : generateLandTerrainItems(land)
+}
 
+export class LandImpl<T extends Terrain> implements Land<T> {
+    private fogOfWar_: boolean
+    private items_: SceneItem[]
+    private positionToTerrainIndex_: (p: RectangularCoordinates) => number
+    private scene_: Scene
     private terrains_: T[]
     private terrainsObserver_: Observer<T>
-
-    private chunkSize_: Size = { width: 32, height: 32 }
-    private items_: ChunkItem[]
-
-    private positionToTerrainIndex_: (p: RectangularCoordinates) => number
-    private positionToZoneIndex_: (p: RectangularCoordinates) => number
-
-    private onTerrainChanged_(terrain: T) {
-        const zones = new Set<ChunkItem>()
-        chain(terrain.neighbors)
-            .tap(terrains => terrains.push(terrain))
-            .forEach(terrain => {
-                if (!isNil(terrain)) {
-                    const zone = this.items_[this.positionToZoneIndex_(terrain.position)]
-                    zone.refresh(terrain)
-                    zones.add(zone)
-                }
-            })
-            .value()
-
-        for (const zone of zones) {
-            zone.update()
-        }
-    }
 
     constructor(
         scene: Scene,
         config: LandConfig<T>,
     ) {
+        this.fogOfWar_ = config.fogOfWarEnabled ?? true
+        this.positionToTerrainIndex_ = createPositionToZoneConverter(scene.size)
         this.scene_ = scene
-        this.chunkSize_ = config.chunkSize ?? this.chunkSize_
-
-        const { size } = scene
-        this.positionToTerrainIndex_ = createPositionToZoneConverter(size)
-        this.positionToZoneIndex_ = createPositionToZoneConverter(size, this.chunkSize_)
-
-        this.terrains_ = generateLandTerrains(this, config.generateTerrain)
         this.terrainsObserver_ = createObserver()
-        this.terrainsObserver_.subscribe(terrain => {
-            this.onTerrainChanged_(terrain)
-        })
-
-        this.items_ = generateLandZones(this, this.chunkSize_)
+        this.terrains_ = generateLandTerrains(this, config.generateTerrain)
+        this.items_ = generateLandItems(this, ensureLandConfiguration(config))
     }
 
     get name(): string {
@@ -112,6 +130,10 @@ export class LandImpl<T extends Terrain> implements Land<T> {
 
     get rect(): Rect {
         return this.scene_.rect
+    }
+
+    get fogOfWar(): boolean {
+        return this.fogOfWar_
     }
 
     get terrainsObserver(): Observer<T> {
