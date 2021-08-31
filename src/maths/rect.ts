@@ -1,7 +1,7 @@
 import { RectangularCoordinates, Size } from "./types"
 import { Vector } from "./vector"
 
-import { isNil, isNumber } from "lodash"
+import { isNumber } from "lodash"
 
 /**
  * @class Rect
@@ -35,6 +35,13 @@ export class Rect implements RectangularCoordinates, Size {
             width: this.width,
             height: this.height,
         }
+    }
+
+    /**
+     * @returns the area of this Rect
+     */
+    get area(): number {
+        return this.width*this.height
     }
 
     /**
