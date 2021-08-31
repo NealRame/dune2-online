@@ -15,7 +15,6 @@ type SceneState = {
     rect: Rect
     scaleFactor: ScaleFactor
     viewport: Viewport
-    // requestAnimationId: number
 }
 
 export class SceneExistingLayer extends Error {
@@ -42,7 +41,6 @@ export function createScene(size: Size, painter: Painter): Scene {
         scaleFactor: 1,
         rect: new Rect({ x: 0, y: 0 }, size),
         viewport: createViewport(size),
-        // requestAnimationId: 0
     }
 
     const getGridSpacing = () => state.scaleFactor*state.gridUnit
