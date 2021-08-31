@@ -28,8 +28,8 @@ export interface Scene {
     clear(): Scene
     render(): Scene
     update(): Scene
-    // run(): Scene
-    // stop(): Scene
+    zoomIn(): Scene
+    zoomOut(): Scene
 }
 
 export interface SceneLayer {

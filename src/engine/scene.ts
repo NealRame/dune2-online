@@ -6,7 +6,7 @@ import { Brush, Painter } from "@/graphics/painter"
 
 import { Rect, RectangularCoordinates, Size, Vector } from "@/maths"
 import { createViewport } from "./viewport"
-import { isNil, matches } from "lodash"
+import { clamp, isNil, matches } from "lodash"
 
 type SceneState = {
     backgroundColor: Brush
@@ -57,8 +57,10 @@ export function createScene(size: Size, painter: Painter): Scene {
             return state.scaleFactor
         },
         set scale(f: ScaleFactor) {
-            state.scaleFactor = f
-            updateViewport()
+            if (state.scaleFactor !== f) {
+                state.scaleFactor = f
+                updateViewport()
+            }
         },
         get gridUnit(): number {
             return state.gridUnit
@@ -123,20 +125,14 @@ export function createScene(size: Size, painter: Painter): Scene {
             }
             return this
         },
-        // run(): Scene {
-        //     const loop = () => {
-        //         this.update()
-        //             .render()
-        //         state.requestAnimationId = requestAnimationFrame(loop)
-        //     }
-        //     loop()
-        //     return this
-        // },
-        // stop(): Scene {
-        //     cancelAnimationFrame(state.requestAnimationId)
-        //     state.requestAnimationId = 0
-        //     return this
-        // }
+        zoomIn(): Scene {
+            this.scale = clamp(this.scale + 1, 1, 4) as ScaleFactor
+            return this
+        },
+        zoomOut(): Scene {
+            this.scale = clamp(this.scale - 1, 1, 4) as ScaleFactor
+            return this
+        }
     }
 }
 
