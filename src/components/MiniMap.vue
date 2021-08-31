@@ -16,33 +16,60 @@
 </template>
 
 <style lang="scss" scoped>
-canvas#minimap {
+#minimap-wrapper {
     position: fixed;
-
     right: $minimap-position-right;
     bottom: $minimap-position-bottom;
 
-    border:
-        $minimap-border-color1
-        $minimap-border-thickness
-        $minimap-border-type;
-    border-radius: $minimap-border-radius;
-    box-shadow: 0 0 4px $minimap-shadow-color1;
-
-    -webkit-transition: all 0.2s ease-in;
-    transition: all 0.2s ease-in;
-
-    &:hover {
-        border-color: $minimap-border-color2;
+    canvas#minimap {
+        border:
+            $minimap-border-color1
+            $minimap-border-thickness
+            $minimap-border-type;
         border-radius: $minimap-border-radius;
-        box-shadow: 0 0 16px $minimap-shadow-color2;
+        box-shadow: 0 0 4px $minimap-shadow-color1;
 
-        transform: scale(1.01);
+        transition: all 0.2s ease-in;
+        -webkit-transition: all 0.2s ease-in;
 
-        -webkit-transition: all 0.2s ease-out;
-        transition: all 0.2s ease-out;
+        &:hover {
+            border-color: $minimap-border-color2;
+            border-radius: $minimap-border-radius;
+            box-shadow: 0 0 16px $minimap-shadow-color2;
+
+            transform: scale($minimap-scale-factor);
+
+            -webkit-transition: all 0.2s ease-out;
+            transition: all 0.2s ease-out;
+        }
+    }
+
+    button {
+        background-color: transparent;
+
+        border: none;
+
+        color: whitesmoke;
+        cursor: pointer;
+
+        float: left;
+        clear: both;
+
+        height: $minimap-zoom-button-width;
+        width: $minimap-zoom-button-height;
+
+        -webkit-transition: all 0.2s ease-in;
+        transition: all 0.2s ease-in;
+
+        &:hover {
+            transform: scale($minimap-zoom-button-scale-factor);
+
+            -webkit-transition: all 0.2s ease-out;
+            transition: all 0.2s ease-out;
+        }
     }
 }
+
 </style>
 
 <script lang="ts">
