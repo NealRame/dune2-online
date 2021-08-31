@@ -1,10 +1,18 @@
 <template>
-    <screen id="minimap" ref="screen"
-        :width="width"
-        :height="height"
-        @mouseClick="onMouseEvent"
-        @mouseMotion="onMouseEvent"
-    />
+    <div id="minimap-wrapper">
+        <button id="zoom-in">
+            <font-awesome-icon icon="search-plus" @click="onZoomInClicked"/>
+        </button>
+        <button id="zoom-out">
+            <font-awesome-icon icon="search-minus" @click="onZoomOutClicked"/>
+        </button>
+        <screen id="minimap" ref="screen"
+            :width="width"
+            :height="height"
+            @mouseClick="onMouseEvent"
+            @mouseMotion="onMouseEvent"
+        />
+    </div>
 </template>
 
 <style lang="scss" scoped>
@@ -112,6 +120,20 @@ export default defineComponent({
             }
         }
 
+        const onZoomInClicked = () => {
+            const game = unref(gameRef)
+            if (!isNil(game)) {
+                game.engine.scene.zoomIn()
+            }
+        }
+
+        const onZoomOutClicked = () => {
+            const game = unref(gameRef)
+            if (!isNil(game)) {
+                game.engine.scene.zoomOut()
+            }
+        }
+
         const onMouseEvent = ({ button, position }: ScreenMouseClickEvent|ScreenMouseMotionEvent) => {
             if (!isNil(viewport) && button) {
                 const { x, y } = position
@@ -141,6 +163,8 @@ export default defineComponent({
             width,
             height,
             onMouseEvent,
+            onZoomInClicked,
+            onZoomOutClicked,
         }
     }
 })
