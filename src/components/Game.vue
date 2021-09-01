@@ -102,6 +102,8 @@ export default defineComponent({
             window.addEventListener("resize", debounce(resize, 60))
 
             resize()
+
+            game.initialize()
         })
 
         return {

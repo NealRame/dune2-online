@@ -9,6 +9,7 @@ import * as Engine from "@/engine"
 
 import { PaintDevice } from "@/graphics"
 import { RectangularCoordinates, Size } from "@/maths"
+import { once } from "lodash"
 
 export const Units = {
     Harvester,
@@ -29,6 +30,7 @@ export interface Game {
     readonly engine: Engine.Game<Terrain>
     readonly miniMap: Engine.MiniMap
     createUnit: UnitFactory
+    initialize: () => void
 }
 
 function createUnitFactory(game: Engine.Game<Terrain>)
@@ -63,11 +65,12 @@ export function createGame(config: GameConfig): Game {
     const miniMap = Engine.createMiniMap(engine)
     const createUnit = createUnitFactory(engine)
 
-    setupStartLocation(engine)
-
     return {
         get engine() { return engine },
         get miniMap() { return miniMap },
         createUnit,
+        initialize: once(() => {
+            setupStartLocation(engine)
+        })
     }
 }
