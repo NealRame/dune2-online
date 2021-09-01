@@ -44,7 +44,7 @@ export default defineComponent({
         const gameRef = ref<Game|null>(null)
 
         // handle window resize event
-        const resize = debounce(() => {
+        const resize = () => {
             const game = unref(gameRef)
             if (!isNil(game)) {
                 const width = window.innerWidth
@@ -60,7 +60,7 @@ export default defineComponent({
                     height: height/gridSpacing,
                 }
             }
-        }, 60)
+        }
 
         const updateViewport = ({ x: xOffset, y: yOffset }: RectangularCoordinates) => {
             if (xOffset !== 0 || yOffset !== 0) {
@@ -99,7 +99,7 @@ export default defineComponent({
             gameRef.value = game
 
             window.game = game
-            window.addEventListener("resize", resize)
+            window.addEventListener("resize", debounce(resize, 60))
 
             resize()
         })
