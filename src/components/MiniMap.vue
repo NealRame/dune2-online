@@ -23,7 +23,7 @@
 
     canvas#minimap {
         border:
-            $minimap-border-color1
+            $minimap-color1
             $minimap-border-thickness
             $minimap-border-type;
         border-radius: $minimap-border-radius;
@@ -33,7 +33,7 @@
         -webkit-transition: all 0.2s ease-in;
 
         &:hover {
-            border-color: $minimap-border-color2;
+            border-color: $minimap-color2;
             border-radius: $minimap-border-radius;
             box-shadow: 0 0 16px $minimap-shadow-color2;
 
@@ -48,8 +48,7 @@
         background-color: transparent;
 
         border: none;
-
-        color: whitesmoke;
+        color: $minimap-color1;
         cursor: pointer;
 
         float: left;
@@ -62,6 +61,7 @@
         transition: all 0.2s ease-in;
 
         &:hover {
+            color: $minimap-color2;
             transform: scale($minimap-zoom-button-scale-factor);
 
             -webkit-transition: all 0.2s ease-out;

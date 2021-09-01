@@ -50,8 +50,8 @@ $minimap-position-top: 16px;
 $minimap-position-right: 16px;
 $minimap-position-bottom: 16px;
 $minimap-position-left: 16px;
-$minimap-border-color1: sandybrown;
-$minimap-border-color2: lightgoldenrodyellow;
+$minimap-color1: sandybrown;
+$minimap-color2: whitesmoke;
 $minimap-border-thickness: 1px;
 $minimap-border-type: solid;
 $minimap-border-radius: 8px;
@@ -60,4 +60,5 @@ $minimap-shadow-color2: rgba($color: #000000, $alpha: 0.25);
 $minimap-scale-factor: 1.01;
 $minimap-zoom-button-width: 24px;
 $minimap-zoom-button-height: 24px;
-$minimap-zoom-button-scale-factor: 1.5;
+$minimap-zoom-button-scale-factor: 1.4;
+
