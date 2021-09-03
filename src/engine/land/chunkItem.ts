@@ -1,9 +1,10 @@
 import { Terrain } from "./types"
 
-import { AbstractSceneItem } from "@/engine/scene/item"
+import { ScaleFactors } from "@/engine/scale"
+import { AbstractSceneItem, Image, Scene } from "@/engine/scene"
 
-import { Image, ScaleFactors, Scene } from "@/engine"
 import { Painter } from "@/graphics"
+
 import { RectangularCoordinates, Rect } from "@/maths"
 
 import { isNil } from "lodash"

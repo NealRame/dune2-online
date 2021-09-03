@@ -1,6 +1,9 @@
-import { ScaleFactor, Viewport } from "@/engine"
+import { ScaleFactor } from "@/engine/scale"
+import { Viewport } from "@/engine/viewport"
 import { Painter } from "@/graphics"
 import { Rect, Size, Vector } from "@/maths"
+
+export type Image = Record<ScaleFactor, ImageBitmap>
 
 export interface Scene {
     readonly size: Size

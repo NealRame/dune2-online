@@ -4,8 +4,8 @@ import { Scene, SceneLayer } from "./types"
 import { cssHex } from "@/graphics/color"
 import { Brush, Painter } from "@/graphics/painter"
 
+import { ScaleFactor } from "@/engine/scale"
 import { createViewport, Viewport } from "@/engine/viewport"
-import { ScaleFactor } from "@/engine/types"
 
 import { Rect, RectangularCoordinates, Size, Vector } from "@/maths"
 

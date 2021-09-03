@@ -1,8 +1,6 @@
 import { AbstractSceneItem } from "./item"
 import { Tile } from "./tile"
-import { Scene } from "./types"
-
-import { Image } from "../types"
+import { Image, Scene } from "./types"
 
 import { Painter } from "@/graphics"
 import { Rect, RectangularCoordinates, Size, Shape, Vector } from "@/maths"
