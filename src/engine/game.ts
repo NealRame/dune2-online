@@ -1,6 +1,5 @@
 import { createLand, Land, Terrain, TerrainGenerator } from "./land"
-import { createScene } from "./scene"
-import { Scene } from "./types"
+import { createScene, Scene } from "./scene"
 import { Unit } from "./unit"
 
 import { PaintDevice } from "@/graphics"

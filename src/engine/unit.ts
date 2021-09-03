@@ -1,9 +1,10 @@
+import { Sprite } from "@/engine/scene/sprite"
+
 import {
     Animation,
     createSequenceAnimation,
     createTransitionAnimation,
     Scene,
-    Sprite,
 } from "@/engine"
 import {
     Direction,

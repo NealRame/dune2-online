@@ -20,6 +20,7 @@
     position: fixed;
     right: $minimap-position-right;
     bottom: $minimap-position-bottom;
+    padding: 0;
 
     canvas#minimap {
         border:

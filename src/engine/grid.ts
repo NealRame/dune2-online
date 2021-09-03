@@ -1,4 +1,4 @@
-import { Scene, SceneItem, SceneLayer } from "./types"
+import { Scene, SceneItem, SceneLayer } from "./scene"
 
 import { Color, Painter } from "@/graphics"
 import { Rect, Size } from "@/maths"

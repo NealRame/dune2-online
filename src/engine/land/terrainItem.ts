@@ -1,7 +1,6 @@
 import { Terrain } from "./types"
-import { SceneItem } from "../types"
 
-import { Scene } from "@/engine"
+import { Scene, SceneItem } from "@/engine"
 import { Painter } from "@/graphics"
 import { Rect, Size, Vector } from "@/maths"
 

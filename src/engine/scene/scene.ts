@@ -1,11 +1,14 @@
-import { SceneLayerImpl } from "./scene-layer"
-import { ScaleFactor, Scene, SceneLayer, Viewport } from "./types"
+import { SceneLayerImpl } from "./layer"
+import { Scene, SceneLayer } from "./types"
 
 import { cssHex } from "@/graphics/color"
 import { Brush, Painter } from "@/graphics/painter"
 
+import { createViewport } from "@/engine/viewport"
+import { ScaleFactor, Viewport } from "@/engine/types"
+
 import { Rect, RectangularCoordinates, Size, Vector } from "@/maths"
-import { createViewport } from "./viewport"
+
 import { clamp, isNil, matches } from "lodash"
 
 type SceneState = {

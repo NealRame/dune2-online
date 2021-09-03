@@ -1,6 +1,6 @@
 import { Terrain } from "./types"
 
-import { AbstractSceneItem } from "../scene-item"
+import { AbstractSceneItem } from "@/engine/scene/item"
 
 import { Image, ScaleFactors, Scene } from "@/engine"
 import { Painter } from "@/graphics"
