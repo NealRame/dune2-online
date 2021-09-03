@@ -4,12 +4,12 @@ import { Scene, SceneLayer } from "./types"
 import { cssHex } from "@/graphics/color"
 import { Brush, Painter } from "@/graphics/painter"
 
-import { ScaleFactor } from "@/engine/scale"
+import { scaleDown, ScaleFactor, scaleUp } from "@/engine/scale"
 import { createViewport, Viewport } from "@/engine/viewport"
 
 import { Rect, RectangularCoordinates, Size, Vector } from "@/maths"
 
-import { clamp, isNil, matches } from "lodash"
+import { isNil, matches } from "lodash"
 
 type SceneState = {
     backgroundColor: Brush
@@ -127,11 +127,11 @@ export function createScene(size: Size, painter: Painter): Scene {
             return this
         },
         zoomIn(): Scene {
-            this.scale = clamp(this.scale + 1, 1, 4) as ScaleFactor
+            this.scale = scaleUp(this.scale)
             return this
         },
         zoomOut(): Scene {
-            this.scale = clamp(this.scale - 1, 1, 4) as ScaleFactor
+            this.scale = scaleDown(this.scale)
             return this
         }
     }
