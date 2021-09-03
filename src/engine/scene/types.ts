@@ -1,4 +1,4 @@
-import { ScaleFactor, Viewport } from "@/engine/types"
+import { ScaleFactor, Viewport } from "@/engine"
 import { Painter } from "@/graphics"
 import { Rect, Size, Vector } from "@/maths"
 
