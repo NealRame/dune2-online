@@ -91,7 +91,6 @@ export default defineComponent({
                     height: 64,
                 },
             })
-            game.engine.start()
 
             gameRef.value = game
 

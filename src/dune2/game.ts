@@ -71,6 +71,7 @@ export function createGame(config: GameConfig): Game {
         createUnit,
         initialize: once(() => {
             setupStartLocation(engine)
+            engine.start()
         })
     }
 }
