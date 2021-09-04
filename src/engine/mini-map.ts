@@ -1,9 +1,9 @@
+import { Engine } from "./engine"
 import { Terrain } from "./land"
-import { Game } from "./game"
 
 import { Color } from "@/graphics"
-import { Rect } from "@/maths"
 import { createObserver, Observer } from "@/utils"
+
 import { isNil } from "lodash"
 
 export interface MiniMap {
@@ -11,7 +11,7 @@ export interface MiniMap {
     readonly onChanged: Observer<void> // TODO: should be an emitter
 }
 
-export function createMiniMap<T extends Terrain>(game: Game<T>)
+export function createMiniMap<T extends Terrain>(game: Engine<T>)
     : MiniMap {
     const observer = createObserver<void>()
     const { width, height } = game.scene.size

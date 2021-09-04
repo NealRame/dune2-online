@@ -1,35 +1,36 @@
-import { createLand, Land, Terrain, TerrainGenerator } from "./land"
 import { createScene, Scene } from "./scene"
+import { createLand, Land, Terrain, TerrainGenerator } from "./land"
 import { Unit } from "./unit"
 
-import { PaintDevice } from "@/graphics"
+import { Painter } from "@/graphics"
 import { Size } from "@/maths"
+
 import { isNil } from "lodash"
 
-interface GameState {
+interface State {
     animationRequestId: number
     scene: Scene
 }
 
-export interface GameConfig<T extends Terrain = Terrain> {
-    screen: PaintDevice
+export interface Config<T extends Terrain = Terrain> {
+    painter: Painter
     size: Size
     generateTerrain: TerrainGenerator<T>
 }
 
-export interface Game<T extends Terrain = Terrain> {
+export interface Engine<T extends Terrain = Terrain> {
     readonly land: Land<T>
     readonly scene: Scene
-    addUnit(unit: Unit): Game<T>
-    start(): Game<T>
-    stop(): Game<T>
+    addUnit(unit: Unit): Engine<T>
+    start(): Engine<T>
+    stop(): Engine<T>
 }
 
-export function createGame<T extends Terrain = Terrain>(config: GameConfig<T>)
-    : Game<T> {
-    const state: GameState = {
+export function create<T extends Terrain>(config: Config<T>)
+    : Engine<T> {
+    const state: State = {
         animationRequestId: 0,
-        scene: createScene(config.size, config.screen.painter),
+        scene: createScene(config.size, config.painter),
     }
 
     state.scene.addLayer(createLand(state.scene, config))
@@ -49,7 +50,7 @@ export function createGame<T extends Terrain = Terrain>(config: GameConfig<T>)
             }
             return this
         },
-        start(): Game<T> {
+        start(): Engine<T> {
             (function animationLoop() {
                 state.scene
                     .update()
@@ -58,7 +59,7 @@ export function createGame<T extends Terrain = Terrain>(config: GameConfig<T>)
             })()
             return this
         },
-        stop(): Game<T> {
+        stop(): Engine<T> {
             cancelAnimationFrame(state.animationRequestId)
             state.animationRequestId = 0
             return this

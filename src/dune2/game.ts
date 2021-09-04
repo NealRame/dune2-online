@@ -7,7 +7,7 @@ import { Trike } from "./units/trike"
 
 import * as Engine from "@/engine"
 
-import { PaintDevice } from "@/graphics"
+import { Painter } from "@/graphics"
 import { RectangularCoordinates, Size } from "@/maths"
 import { once } from "lodash"
 
@@ -21,19 +21,19 @@ export type UnitType = keyof typeof Units
 export type UnitFactory = (t: UnitType, p: RectangularCoordinates) => Engine.Unit
 
 export interface GameConfig {
-    screen: PaintDevice,
+    painter: Painter,
     size: Size,
     land?: LandConfig,
 }
 
 export interface Game {
-    readonly engine: Engine.Game<Terrain>
+    readonly engine: Engine.Engine<Terrain>
     readonly miniMap: Engine.MiniMap
     createUnit: UnitFactory
     initialize: () => void
 }
 
-function createUnitFactory(game: Engine.Game<Terrain>)
+function createUnitFactory(game: Engine.Engine<Terrain>)
     : UnitFactory {
     return (type: UnitType, position: RectangularCoordinates) => {
         const unit = new Units[type](game.scene, position)
@@ -42,7 +42,7 @@ function createUnitFactory(game: Engine.Game<Terrain>)
     }
 }
 
-function setupStartLocation(engine: Engine.Game<Terrain>): void {
+function setupStartLocation(engine: Engine.Engine<Terrain>): void {
     const { land, scene } = engine
     const x = Math.floor(land.size.width/2)
     const y = Math.floor(land.size.height/2)
@@ -56,9 +56,9 @@ function setupStartLocation(engine: Engine.Game<Terrain>): void {
 }
 
 export function createGame(config: GameConfig): Game {
-    const { screen, size } = config
-    const engine = Engine.createGame<Terrain>({
-        screen,
+    const { painter, size } = config
+    const engine = Engine.create<Terrain>({
+        painter,
         size,
         generateTerrain: createTerrainGenerator(config.land ?? {}),
     })

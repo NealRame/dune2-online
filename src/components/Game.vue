@@ -21,7 +21,7 @@ import Screen, { ScreenMouseMotionEvent } from "@/components/Screen.vue"
 
 import { createGame, Game } from "@/dune2"
 import { screenToSceneScale, ScaleFactor } from "@/engine"
-import { PaintDevice } from "@/graphics"
+import { PaintDevice, Painter } from "@/graphics"
 
 import { debounce, isNil } from "lodash"
 import { defineComponent, onMounted, ref, unref } from "vue"
@@ -87,7 +87,7 @@ export default defineComponent({
 
         onMounted(async () => {
             const game = await createGame({
-                screen: unref(screen) as PaintDevice,
+                painter: unref(screen)?.painter as Painter,
                 size: {
                     width: 64,
                     height: 64,
