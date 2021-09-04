@@ -36,7 +36,7 @@ declare global {
 export default defineComponent({
     components: { MiniMap, Screen },
     setup() {
-        const screen = ref<PaintDevice | null>(null)
+        const screenRef = ref<PaintDevice | null>(null)
         const screenWidthRef = ref(0)
         const screenHeightRef = ref(0)
         const scale = ref<ScaleFactor>(4)
@@ -87,7 +87,7 @@ export default defineComponent({
 
         onMounted(async () => {
             const game = await createGame({
-                painter: unref(screen)?.painter as Painter,
+                painter: unref(screenRef)?.painter as Painter,
                 size: {
                     width: 64,
                     height: 64,
@@ -107,7 +107,7 @@ export default defineComponent({
         })
 
         return {
-            screen,
+            screen: screenRef,
             screenWidth: screenWidthRef,
             screenHeight: screenHeightRef,
             game: gameRef,
