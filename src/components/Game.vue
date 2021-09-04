@@ -20,7 +20,7 @@ import MiniMap from "@/components/MiniMap.vue"
 import Screen, { ScreenMouseMotionEvent } from "@/components/Screen.vue"
 
 import { createGame, Game } from "@/dune2"
-import { screenToSceneScale, ScaleFactor } from "@/engine"
+import { screenToSceneScale } from "@/engine"
 import { PaintDevice, Painter } from "@/graphics"
 
 import { debounce, isNil } from "lodash"
@@ -36,12 +36,10 @@ declare global {
 export default defineComponent({
     components: { MiniMap, Screen },
     setup() {
+        const gameRef = ref<Game|null>(null)
         const screenRef = ref<PaintDevice | null>(null)
         const screenWidthRef = ref(0)
         const screenHeightRef = ref(0)
-        const scale = ref<ScaleFactor>(4)
-
-        const gameRef = ref<Game|null>(null)
 
         // handle window resize event
         const resize = () => {
@@ -93,7 +91,6 @@ export default defineComponent({
                     height: 64,
                 },
             })
-            game.engine.scene.scale = unref(scale)
             game.engine.start()
 
             gameRef.value = game
@@ -107,10 +104,10 @@ export default defineComponent({
         })
 
         return {
+            game: gameRef,
             screen: screenRef,
             screenWidth: screenWidthRef,
             screenHeight: screenHeightRef,
-            game: gameRef,
             onMouseMoved,
         }
     }
