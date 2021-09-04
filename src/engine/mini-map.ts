@@ -21,7 +21,7 @@ export function createMiniMap<T extends Terrain>(game: Engine<T>)
 
     let image: ImageBitmap|null = null
 
-    game.land.terrainsObserver.subscribe(terrain => {
+    game.land.onTerrainChanged(terrain => {
         if (!isNil(image)) {
             context.drawImage(image, 0, 0)
         }

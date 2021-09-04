@@ -26,12 +26,13 @@ export interface Terrain {
 export type TerrainGenerator<T extends Terrain> = (l: Land<T>, p: RectangularCoordinates) => T
 
 export interface Land<T extends Terrain = Terrain> extends SceneLayer {
-    readonly terrainsObserver: Observer<T>
     readonly size: Size
     readonly fogOfWar: boolean
     reveal(position?: RectangularCoordinates, size?: Size): Land<T>
     terrain(position: RectangularCoordinates): T|null
     terrains(rect?: Rect): Generator<Terrain>
+    onTerrainChanged(callback: (terrain: T) => void): () => void
+    updateTerrain(terrain: T): Land<T>
 }
 
 export type LandConfig<T extends Terrain> = {

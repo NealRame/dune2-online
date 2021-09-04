@@ -59,7 +59,7 @@ export function generateLandChunkItems(
 
     const positionToChunkIndex = createPositionToZoneConverter(land.size, chunkSize)
 
-    land.terrainsObserver.subscribe(terrain => {
+    land.onTerrainChanged(terrain => {
         chain(terrain.neighbors as Array<Terrain>)
             .tap(terrains => remove(terrains, isNil))
             .tap(terrains => terrains.push(terrain))
@@ -136,10 +136,6 @@ export class LandImpl<T extends Terrain> implements Land<T> {
         return this.fogOfWar_
     }
 
-    get terrainsObserver(): Observer<T> {
-        return this.terrainsObserver_
-    }
-
     addItem(): Land<T> {
         return this
     }
@@ -190,6 +186,17 @@ export class LandImpl<T extends Terrain> implements Land<T> {
         } else {
             yield * this.terrains_
         }
+    }
+
+    onTerrainChanged(callback: (t: T) => void): () => void {
+        return this.terrainsObserver_.subscribe(callback)
+    }
+
+    updateTerrain(
+        terrain: T
+    ) : Land<T> {
+        this.terrainsObserver_.publish(terrain)
+        return this
     }
 }
 

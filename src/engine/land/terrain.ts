@@ -53,7 +53,7 @@ export abstract class AbstractTerrain implements Terrain {
     }
 
     update(): Terrain {
-        this.land_.terrainsObserver.publish(this)
+        this.land_.updateTerrain(this)
         return this
     }
 }
