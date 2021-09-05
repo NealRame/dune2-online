@@ -3,8 +3,6 @@ import { Rect, RectangularCoordinates, Size } from "@/maths"
 import { Image, SceneLayer } from "@/engine"
 import { Color } from "@/graphics"
 
-import { Observer } from "@/utils"
-
 export type Neighborhood<T extends Terrain> = [T|null, T|null, T|null, T|null]
 
 export interface Terrain {
