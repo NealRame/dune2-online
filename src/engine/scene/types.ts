@@ -1,12 +1,12 @@
 import { ScaleFactor } from "@/engine/scale"
 import { Viewport } from "@/engine/viewport"
 import { Painter } from "@/graphics"
-import { Rect, Size, Vector } from "@/maths"
+import { Rect, ISize, Vector } from "@/maths"
 
 export type Image = Record<ScaleFactor, ImageBitmap>
 
 export interface Scene {
-    readonly size: Size
+    readonly size: ISize
     readonly viewport: Viewport
     readonly width: number
     readonly height: number
@@ -26,7 +26,7 @@ export interface Scene {
 export interface SceneLayer {
     name: string
     readonly scene: Scene
-    readonly size: Size
+    readonly size: ISize
     readonly rect: Rect
     addItem(item: SceneItem): SceneLayer
     items(): Generator<SceneItem>
@@ -38,7 +38,7 @@ export interface SceneItem {
     readonly scene: Scene
     readonly width: number
     readonly height: number
-    readonly size: Size
+    readonly size: ISize
     readonly rect: Rect
     readonly position: Vector
     render(painter: Painter, viewport: Rect): SceneItem

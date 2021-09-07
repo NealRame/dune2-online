@@ -6,7 +6,7 @@ import { createObserver, Observer } from "@/utils"
 
 import { Scene, SceneItem } from "@/engine"
 import { Painter } from "@/graphics"
-import { Rect, IRectangularCoordinates, Size, Vector } from "@/maths"
+import { Rect, IRectangularCoordinates, ISize, Vector } from "@/maths"
 
 import { chain, isNil, remove } from "lodash"
 import { TerrainItem } from "./terrainItem"
@@ -44,7 +44,7 @@ export function generateLandTerrainItems(
 
 export function generateLandChunkItems(
     land: Land,
-    chunkSize: Size,
+    chunkSize: ISize,
 ): Array<SceneItem> {
     const chunks: ChunkItem[] = []
 
@@ -124,7 +124,7 @@ export class LandImpl<T extends Terrain> implements Land<T> {
         return Vector.Null()
     }
 
-    get size(): Size {
+    get size(): ISize {
         return this.scene_.size
     }
 
@@ -156,7 +156,7 @@ export class LandImpl<T extends Terrain> implements Land<T> {
         return this
     }
 
-    reveal(position?: IRectangularCoordinates, size?: Size): Land<T> {
+    reveal(position?: IRectangularCoordinates, size?: ISize): Land<T> {
         if (isNil(position)) {
             position = { x: 0, y: 0 }
             size = this.size

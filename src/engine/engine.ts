@@ -3,7 +3,7 @@ import { createLand, Land, Terrain, TerrainGenerator } from "./land"
 import { Unit } from "./unit"
 
 import { Painter } from "@/graphics"
-import { Size } from "@/maths"
+import { ISize } from "@/maths"
 
 import { isNil } from "lodash"
 
@@ -14,7 +14,7 @@ interface State {
 
 export interface Config<T extends Terrain = Terrain> {
     painter: Painter
-    size: Size
+    size: ISize
     generateTerrain: TerrainGenerator<T>
 }
 

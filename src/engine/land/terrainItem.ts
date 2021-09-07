@@ -2,7 +2,7 @@ import { Terrain } from "./types"
 
 import { Scene, SceneItem } from "@/engine"
 import { Painter } from "@/graphics"
-import { Rect, Size, Vector } from "@/maths"
+import { Rect, ISize, Vector } from "@/maths"
 
 export class TerrainItem implements SceneItem {
     private scene_: Scene
@@ -25,7 +25,7 @@ export class TerrainItem implements SceneItem {
         return 1
     }
 
-    get size(): Size {
+    get size(): ISize {
         return {
             width: 1,
             height: 1,

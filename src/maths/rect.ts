@@ -1,4 +1,4 @@
-import { IRectangularCoordinates, Size } from "./types"
+import { IRectangularCoordinates, ISize } from "./types"
 import { Vector } from "./vector"
 
 import { isNumber } from "lodash"
@@ -6,7 +6,7 @@ import { isNumber } from "lodash"
 /**
  * @class Rect
  */
-export class Rect implements IRectangularCoordinates, Size {
+export class Rect implements IRectangularCoordinates, ISize {
     x: number
     y: number
     width: number
@@ -19,7 +19,7 @@ export class Rect implements IRectangularCoordinates, Size {
      */
     constructor(
         { x, y }: IRectangularCoordinates,
-        { width, height }: Size
+        { width, height }: ISize
     ) {
         this.x = x
         this.y = y
@@ -30,7 +30,7 @@ export class Rect implements IRectangularCoordinates, Size {
     /**
      * @returns the size to this Rect
      */
-    get size(): Size {
+    get size(): ISize {
         return {
             width: this.width,
             height: this.height,
@@ -204,7 +204,7 @@ export class Rect implements IRectangularCoordinates, Size {
      * @param size
      * @returns this
      */
-    crop({ width, height }: Size): Rect {
+    crop({ width, height }: ISize): Rect {
         this.width = width
         this.height = height
         return this
@@ -214,7 +214,7 @@ export class Rect implements IRectangularCoordinates, Size {
      * @param size
      * @returns a copy of thie Rect that it is cropped to the given size
      */
-    cropped({ width, height }: Size): Rect {
+    cropped({ width, height }: ISize): Rect {
         return this.copy().crop({ width, height })
     }
 
@@ -259,7 +259,7 @@ export class Rect implements IRectangularCoordinates, Size {
         return this.copy().scale(k)
     }
 
-    * partition(chunk: Size = { width: 1, height: 1 }): Generator<Rect> {
+    * partition(chunk: ISize = { width: 1, height: 1 }): Generator<Rect> {
         for (let y = this.y; y < this.y + this.height; y += chunk.height) {
             for (let x = this.x; x < this.x + this.width; x += chunk.width) {
                 const width = Math.min(chunk.width, this.width - x)

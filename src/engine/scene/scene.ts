@@ -7,7 +7,7 @@ import { Brush, Painter } from "@/graphics/painter"
 import { scaleDown, ScaleFactor, scaleUp } from "@/engine/scale"
 import { createViewport, Viewport } from "@/engine/viewport"
 
-import { Rect, IRectangularCoordinates, Size, Vector } from "@/maths"
+import { Rect, IRectangularCoordinates, ISize, Vector } from "@/maths"
 
 import { isNil, matches } from "lodash"
 
@@ -36,7 +36,7 @@ export class SceneExistingLayer extends Error {
     }
 }
 
-export function createScene(size: Size, painter: Painter): Scene {
+export function createScene(size: ISize, painter: Painter): Scene {
     const state: SceneState = {
         backgroundColor: cssHex([0, 0, 0]),
         gridUnit: 16,
@@ -75,7 +75,7 @@ export function createScene(size: Size, painter: Painter): Scene {
         get height(): number {
             return state.rect.height
         },
-        get size(): Size {
+        get size(): ISize {
             return state.rect.size
         },
         get rect(): Rect {
@@ -169,8 +169,8 @@ export function screenToSceneCoordinate(
     return (new Vector(x, y)).mul(1/gridSpacing).add(topLeft)
 }
 
-export function sceneToScreenSize(scene: Scene, size: Size)
-    : Size {
+export function sceneToScreenSize(scene: Scene, size: ISize)
+    : ISize {
     const gridSpacing = scene.gridSpacing
     return {
         width: size.width*gridSpacing,
@@ -178,8 +178,8 @@ export function sceneToScreenSize(scene: Scene, size: Size)
     }
 }
 
-export function screenToSceneSize(scene: Scene, size: Size)
-    : Size {
+export function screenToSceneSize(scene: Scene, size: ISize)
+    : ISize {
     const { gridSpacing } = scene
     return {
         width: size.width/gridSpacing,

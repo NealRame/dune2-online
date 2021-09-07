@@ -1,7 +1,7 @@
 import { Scene, SceneItem, SceneLayer } from "./types"
 
 import { Painter } from "@/graphics"
-import { Rect, Size } from "@/maths"
+import { Rect, ISize } from "@/maths"
 
 export class SceneLayerImpl implements SceneLayer {
     private items_: SceneItem[] = []
@@ -19,7 +19,7 @@ export class SceneLayerImpl implements SceneLayer {
     }
 
     get size()
-        : Size {
+        : ISize {
         return this.scene_.size
     }
 

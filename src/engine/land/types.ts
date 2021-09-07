@@ -1,4 +1,4 @@
-import { Rect, IRectangularCoordinates, Size } from "@/maths"
+import { Rect, IRectangularCoordinates, ISize } from "@/maths"
 
 import { Image, SceneLayer } from "@/engine"
 import { Color } from "@/graphics"
@@ -24,9 +24,9 @@ export interface Terrain {
 export type TerrainGenerator<T extends Terrain> = (l: Land<T>, p: IRectangularCoordinates) => T
 
 export interface Land<T extends Terrain = Terrain> extends SceneLayer {
-    readonly size: Size
+    readonly size: ISize
     readonly fogOfWar: boolean
-    reveal(position?: IRectangularCoordinates, size?: Size): Land<T>
+    reveal(position?: IRectangularCoordinates, size?: ISize): Land<T>
     terrain(position: IRectangularCoordinates): T|null
     terrains(rect?: Rect): Generator<Terrain>
     onTerrainChanged(callback: (terrain: T) => void): () => void
@@ -35,7 +35,7 @@ export interface Land<T extends Terrain = Terrain> extends SceneLayer {
 
 export type LandConfig<T extends Terrain> = {
     generateTerrain: TerrainGenerator<T>
-    chunkSize?: Size,
+    chunkSize?: ISize,
     chunkEnabled?: boolean,
     fogOfWarEnabled?: boolean,
 }

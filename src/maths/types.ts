@@ -2,7 +2,7 @@ export interface IRectangularCoordinates {
     x: number,
     y: number,
 }
-export interface Size {
+export interface ISize {
     width: number
     height: number
 }

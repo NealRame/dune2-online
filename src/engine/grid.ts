@@ -1,7 +1,7 @@
 import { Scene, SceneItem, SceneLayer } from "./scene"
 
 import { Color, Painter } from "@/graphics"
-import { Rect, Size } from "@/maths"
+import { Rect, ISize } from "@/maths"
 
 export interface GridConfig {
     space?: number,
@@ -28,7 +28,7 @@ export function createGrid(
         get scene(): Scene {
             return scene
         },
-        get size(): Size {
+        get size(): ISize {
             return scene.size
         },
         get rect(): Rect {

@@ -1,4 +1,4 @@
-import { Rect, IRectangularCoordinates, Size } from "@/maths"
+import { Rect, IRectangularCoordinates, ISize } from "@/maths"
 
 import { isNil } from "lodash"
 
@@ -21,7 +21,7 @@ export class Painter {
         this.context_ = canvas.getContext("2d") as CanvasRenderingContext2D
     }
 
-    get size(): Size {
+    get size(): ISize {
         const { width, height } = this.canvas_
         return {
             width,
@@ -97,7 +97,7 @@ export class Painter {
 
     drawRect(
         { x, y }: IRectangularCoordinates,
-        { width, height }: Size,
+        { width, height }: ISize,
     ): Painter {
         this.context_.beginPath()
         this.context_.moveTo(x, y)
@@ -111,7 +111,7 @@ export class Painter {
 
     fillRect(
         { x, y }: IRectangularCoordinates,
-        { width, height }: Size,
+        { width, height }: ISize,
     ): Painter {
         this.context_.beginPath()
         this.context_.moveTo(x, y)
@@ -145,7 +145,7 @@ export class Painter {
         imageBitmap: ImageBitmap,
         { x, y }: IRectangularCoordinates,
         srcRect?: Rect,
-        dstSize?: Size,
+        dstSize?: ISize,
     ): Painter {
         if (isNil(srcRect)) {
             this.context_.drawImage(imageBitmap, x, y)

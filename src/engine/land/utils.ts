@@ -1,13 +1,13 @@
-import { IRectangularCoordinates, Size } from "@/maths"
+import { IRectangularCoordinates, ISize } from "@/maths"
 
-export function indexToPositionConverter({ width }: Size)
+export function indexToPositionConverter({ width }: ISize)
     : (n: number) => IRectangularCoordinates {
     return n => ({ x: n%width, y: Math.floor(n/width) })
 }
 
 export function createPositionToZoneConverter(
-    landSize: Size,
-    zoneSize?: Size,
+    landSize: ISize,
+    zoneSize?: ISize,
 ): (p: IRectangularCoordinates) => number {
     const zoneWidth = zoneSize?.width ?? 1
     const zoneHeight = zoneSize?.height ?? 1

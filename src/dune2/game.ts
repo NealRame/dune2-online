@@ -8,7 +8,7 @@ import { Trike } from "./units/trike"
 import * as Engine from "@/engine"
 
 import { Painter } from "@/graphics"
-import { IRectangularCoordinates, Size } from "@/maths"
+import { IRectangularCoordinates, ISize } from "@/maths"
 import { once } from "lodash"
 
 export const Units = {
@@ -22,7 +22,7 @@ export type UnitFactory = (t: UnitType, p: IRectangularCoordinates) => Engine.Un
 
 export interface GameConfig {
     painter: Painter,
-    size: Size,
+    size: ISize,
     land?: LandConfig,
 }
 

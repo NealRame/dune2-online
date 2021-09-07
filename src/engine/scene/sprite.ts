@@ -3,7 +3,7 @@ import { Tile } from "./tile"
 import { Image, Scene } from "./types"
 
 import { Painter } from "@/graphics"
-import { Rect, IRectangularCoordinates, Size, Shape, Vector } from "@/maths"
+import { Rect, IRectangularCoordinates, ISize, Shape, Vector } from "@/maths"
 
 import { isNil } from "lodash"
 
@@ -35,7 +35,7 @@ export class Sprite extends AbstractSceneItem {
         this.frameIndex_ = index
     }
 
-    get size(): Size {
+    get size(): ISize {
         return this.frames_[this.frameIndex_]?.size ?? {
             width: 0,
             height: 0,

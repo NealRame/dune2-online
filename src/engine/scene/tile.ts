@@ -2,11 +2,11 @@ import { AbstractSceneItem } from "./item"
 import { Image, Scene } from "./types"
 
 import { Painter } from "@/graphics"
-import { Rect, IRectangularCoordinates, Shape, Size } from "@/maths"
+import { Rect, IRectangularCoordinates, Shape, ISize } from "@/maths"
 
 import { isMatch } from "lodash"
 
-function getImageSize(scene: Scene, image: Image): Size {
+function getImageSize(scene: Scene, image: Image): ISize {
     const { width: w, height: h } = image[1]
     return {
         width: w/scene.gridUnit,
@@ -31,7 +31,7 @@ function checkShape({ columns, rows }: Shape, images: Image[]) {
 }
 
 export class Tile extends AbstractSceneItem {
-    private imageSize_: Size
+    private imageSize_: ISize
     private images_: Image[]
     private shape_: Shape
 

@@ -1,4 +1,4 @@
-import { Rect, IRectangularCoordinates, Size } from "@/maths"
+import { Rect, IRectangularCoordinates, ISize } from "@/maths"
 import { createObserver, Observer } from "@/utils"
 
 import { clamp } from "lodash"
@@ -7,10 +7,10 @@ export interface Viewport {
     readonly onChanged: Observer<Rect>
     readonly rect: Rect
     position: IRectangularCoordinates
-    size: Size
+    size: ISize
 }
 
-export function createViewport(sceneSize: Size): Viewport {
+export function createViewport(sceneSize: ISize): Viewport {
     const observer = createObserver<Rect>()
     const rect = new Rect({ x: 0, y: 0 }, sceneSize)
 
@@ -20,7 +20,7 @@ export function createViewport(sceneSize: Size): Viewport {
         observer.publish(rect.copy())
     }
 
-    const setSize = (size: Size) => {
+    const setSize = (size: ISize) => {
         rect.width = clamp(size.width, 0, sceneSize.width)
         rect.height = clamp(size.height, 0, sceneSize.height)
         setPosition(rect.topLeft())
@@ -39,10 +39,10 @@ export function createViewport(sceneSize: Size): Viewport {
         set position(pos: IRectangularCoordinates) {
             setPosition(pos)
         },
-        get size(): Size {
+        get size(): ISize {
             return rect.size
         },
-        set size(size: Size) {
+        set size(size: ISize) {
             setSize(size)
         },
     }

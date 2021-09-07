@@ -1,7 +1,7 @@
 import { Scene, SceneItem } from "./types"
 
 import { Painter } from "@/graphics"
-import { Rect, IRectangularCoordinates, Size, Vector } from "@/maths"
+import { Rect, IRectangularCoordinates, ISize, Vector } from "@/maths"
 
 export abstract class AbstractSceneItem implements SceneItem {
     private scene_: Scene
@@ -35,7 +35,7 @@ export abstract class AbstractSceneItem implements SceneItem {
         return this.height_
     }
 
-    get size(): Size {
+    get size(): ISize {
         return {
             width: this.width_,
             height: this.height_,
