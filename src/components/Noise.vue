@@ -71,7 +71,7 @@ canvas {
 import Screen from "@/components/Screen.vue"
 
 import { createNoise2DGenerator } from "@/maths"
-import { PaintDevice } from "@/graphics"
+import { IPaintDevice } from "@/graphics"
 
 import { computed, defineComponent, onMounted, ref, unref } from "vue"
 
@@ -81,7 +81,7 @@ export default defineComponent({
     },
     emits: ["update:scale", "update:contrast", "update:amplitude", "update:octaves"],
     setup(props, { emit }) {
-        const screen = ref<PaintDevice | null>(null)
+        const screen = ref<IPaintDevice | null>(null)
         const width = ref(512)
         const height = ref(512)
         const scale = ref(128)
@@ -114,7 +114,7 @@ export default defineComponent({
                     image1.data[4*(unref(width)*y + x) + 3] = 255
                 }
             }
-            (unref(screen) as PaintDevice).painter
+            (unref(screen) as IPaintDevice).painter
                 .clear("#000")
                 .drawImageData(image1, { x: 0, y: 0 })
         }

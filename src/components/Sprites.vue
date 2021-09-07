@@ -20,7 +20,7 @@ import { Units } from "@/dune2/game"
 import { createGrid, createScene, ScaleFactor, Scene } from "@/engine"
 import { Direction } from "@/maths"
 
-import { PaintDevice } from "@/graphics"
+import { IPaintDevice } from "@/graphics"
 
 import { defineComponent, onMounted, ref, unref } from "vue"
 import { debounce, isNil } from "lodash"
@@ -28,7 +28,7 @@ import { debounce, isNil } from "lodash"
 export default defineComponent({
     components: { Screen },
     setup() {
-        const screen = ref<PaintDevice | null>(null)
+        const screen = ref<IPaintDevice | null>(null)
         const screenWidth = ref(0)
         const screenHeight = ref(0)
         const scale = ref<ScaleFactor>(4)
@@ -49,7 +49,7 @@ export default defineComponent({
             scene = createScene({
                 width: 60,
                 height: 60,
-            }, (unref(screen) as PaintDevice).painter)
+            }, (unref(screen) as IPaintDevice).painter)
             scene.scale = unref(scale)
 
             ;(function animationLoop() {

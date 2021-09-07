@@ -148,7 +148,7 @@ import Screen, { ScreenMouseMotionEvent } from "@/components/Screen.vue"
 
 import { createTerrainGenerator } from "@/dune2/land"
 import { createLand, createScene, Scene, screenToSceneCoordinate } from "@/engine"
-import { PaintDevice } from "@/graphics"
+import { IPaintDevice } from "@/graphics"
 import { IRectangularCoordinates, Vector } from "@/maths"
 
 import { debounce, isNil } from "lodash"
@@ -162,7 +162,7 @@ export default defineComponent({
     },
     setup() {
         const showInspector = ref<boolean>(false)
-        const screen = ref<PaintDevice | null>(null)
+        const screen = ref<IPaintDevice | null>(null)
 
         const showModal = ref<boolean>(true)
 
@@ -235,7 +235,7 @@ export default defineComponent({
                 cancelAnimationFrame(animationRequestId)
             }
 
-            scene = createScene(size, (unref(screen) as PaintDevice).painter)
+            scene = createScene(size, (unref(screen) as IPaintDevice).painter)
             scene.scale = 1
             scene.addLayer(createLand(scene, {
                 chunkEnabled: false,

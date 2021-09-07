@@ -78,7 +78,7 @@ import Screen, { ScreenMouseClickEvent, ScreenMouseMotionEvent } from "@/compone
 
 import * as Engine from "@/engine"
 import { Game } from "@/dune2"
-import { PaintDevice } from "@/graphics"
+import { IPaintDevice } from "@/graphics"
 
 import { isNil } from "lodash"
 import { computed, defineComponent, onUpdated, ref, toRef, unref } from "vue"
@@ -95,7 +95,7 @@ export default defineComponent({
     setup(props: Data) {
         const gameRef = toRef(props, "game")
         const scaleRef = ref<Engine.ScaleFactor>(3)
-        const screenRef = ref<PaintDevice | null>(null)
+        const screenRef = ref<IPaintDevice | null>(null)
 
         let miniMap: MiniMap|null = null
         let viewport: Viewport|null = null
@@ -120,7 +120,7 @@ export default defineComponent({
 
         const refresh = () => {
             const game = unref(gameRef)
-            const painter = (unref(screenRef) as PaintDevice).painter
+            const painter = (unref(screenRef) as IPaintDevice).painter
 
             if (isNil(game)) return
             if (isNil(painter)) return

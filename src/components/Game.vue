@@ -22,7 +22,7 @@ import Screen, { ScreenMouseMotionEvent } from "@/components/Screen.vue"
 import { createGame, Game } from "@/dune2"
 import { screenToSceneScale } from "@/engine"
 import { IRectangularCoordinates } from "@/maths"
-import { PaintDevice, Painter } from "@/graphics"
+import { IPaintDevice, Painter } from "@/graphics"
 
 import { debounce, isNil } from "lodash"
 import { defineComponent, onMounted, ref, unref } from "vue"
@@ -37,7 +37,7 @@ export default defineComponent({
     components: { MiniMap, Screen },
     setup() {
         const gameRef = ref<Game|null>(null)
-        const screenRef = ref<PaintDevice | null>(null)
+        const screenRef = ref<IPaintDevice | null>(null)
         const screenWidthRef = ref(0)
         const screenHeightRef = ref(0)
 

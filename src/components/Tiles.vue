@@ -27,7 +27,7 @@ import { ImageLib, ImageSet } from "@/dune2/types"
 import { Data } from "@/dune2"
 
 import { createGrid, createScene, createTile, Image, ScaleFactor, Scene, SceneLayer, screenToSceneCoordinate } from "@/engine"
-import { PaintDevice } from "@/graphics"
+import { IPaintDevice } from "@/graphics"
 
 import { defineComponent, onMounted, ref, unref } from "vue"
 import { debounce, isNil } from "lodash"
@@ -39,7 +39,7 @@ export default defineComponent({
         TilePalette,
     },
     setup(props) {
-        const screen = ref<PaintDevice | null>(null)
+        const screen = ref<IPaintDevice | null>(null)
         const screenWidth = ref(0)
         const screenHeight = ref(0)
         const scale = ref<ScaleFactor>(4)
@@ -51,7 +51,7 @@ export default defineComponent({
 
         // handle window resize event
         const resize = debounce(() => {
-            const { x: leftPos } = (unref(screen) as PaintDevice).rect
+            const { x: leftPos } = (unref(screen) as IPaintDevice).rect
             screenWidth.value = window.innerWidth - leftPos
             screenHeight.value = window.innerHeight
         }, 60)
@@ -62,7 +62,7 @@ export default defineComponent({
             scene = createScene({
                 width: 60,
                 height: 60,
-            }, (unref(screen) as PaintDevice).painter)
+            }, (unref(screen) as IPaintDevice).painter)
             scene.scale = unref(scale)
 
             tilesLayer = scene.addLayer("tiles")
