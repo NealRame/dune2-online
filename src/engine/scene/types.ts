@@ -1,5 +1,5 @@
 import { ScaleFactor } from "@/engine/scale"
-import { Viewport } from "@/engine/viewport"
+import { IViewport } from "@/engine/viewport"
 import { Painter } from "@/graphics"
 import { Rect, ISize, Vector } from "@/maths"
 
@@ -7,7 +7,7 @@ export type Image = Record<ScaleFactor, ImageBitmap>
 
 export interface Scene {
     readonly size: ISize
-    readonly viewport: Viewport
+    readonly viewport: IViewport
     readonly width: number
     readonly height: number
     readonly gridUnit: number

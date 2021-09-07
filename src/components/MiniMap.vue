@@ -97,7 +97,7 @@ export default defineComponent({
         const screenRef = ref<IPaintDevice | null>(null)
 
         let miniMap: Engine.MiniMap|null = null
-        let viewport: Engine.Viewport|null = null
+        let viewport: Engine.IViewport|null = null
 
         const width = computed(() => {
             const game = unref(gameRef)

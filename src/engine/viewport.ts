@@ -3,14 +3,14 @@ import { createObserver, Observer } from "@/utils"
 
 import { clamp } from "lodash"
 
-export interface Viewport {
+export interface IViewport {
     readonly onChanged: Observer<Rect>
     readonly rect: Rect
     position: IRectangularCoordinates
     size: ISize
 }
 
-export function createViewport(sceneSize: ISize): Viewport {
+export function createViewport(sceneSize: ISize): IViewport {
     const observer = createObserver<Rect>()
     const rect = new Rect({ x: 0, y: 0 }, sceneSize)
 

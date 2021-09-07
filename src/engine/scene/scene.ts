@@ -5,7 +5,7 @@ import { cssHex } from "@/graphics/color"
 import { Brush, Painter } from "@/graphics/painter"
 
 import { scaleDown, ScaleFactor, scaleUp } from "@/engine/scale"
-import { createViewport, Viewport } from "@/engine/viewport"
+import { createViewport, IViewport } from "@/engine/viewport"
 
 import { Rect, IRectangularCoordinates, ISize, Vector } from "@/maths"
 
@@ -17,7 +17,7 @@ type SceneState = {
     layers: SceneLayer[]
     rect: Rect
     scaleFactor: ScaleFactor
-    viewport: Viewport
+    viewport: IViewport
 }
 
 export class SceneExistingLayer extends Error {
@@ -81,7 +81,7 @@ export function createScene(size: ISize, painter: Painter): Scene {
         get rect(): Rect {
             return state.rect.copy()
         },
-        get viewport(): Viewport {
+        get viewport(): IViewport {
             return state.viewport
         },
         addLayer(layer: string|SceneLayer): SceneLayer {
