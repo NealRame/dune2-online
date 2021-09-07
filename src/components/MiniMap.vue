@@ -96,7 +96,7 @@ export default defineComponent({
         const scaleRef = ref<Engine.ScaleFactor>(3)
         const screenRef = ref<IPaintDevice | null>(null)
 
-        let miniMap: Engine.MiniMap|null = null
+        let miniMap: Engine.IMiniMap|null = null
         let viewport: Engine.IViewport|null = null
 
         const width = computed(() => {

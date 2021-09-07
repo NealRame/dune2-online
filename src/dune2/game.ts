@@ -28,7 +28,7 @@ export interface GameConfig {
 
 export interface Game {
     readonly engine: Engine.Engine<Terrain>
-    readonly miniMap: Engine.MiniMap
+    readonly miniMap: Engine.IMiniMap
     createUnit: UnitFactory
     initialize: () => void
 }

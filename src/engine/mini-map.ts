@@ -6,13 +6,13 @@ import { createObserver, Observer } from "@/utils"
 
 import { isNil } from "lodash"
 
-export interface MiniMap {
+export interface IMiniMap {
     readonly image: ImageBitmap|null
     readonly onChanged: Observer<void> // TODO: should be an emitter
 }
 
 export function createMiniMap<T extends Terrain>(game: Engine<T>)
-    : MiniMap {
+    : IMiniMap {
     const observer = createObserver<void>()
     const { width, height } = game.scene.size
 
