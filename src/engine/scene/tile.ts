@@ -2,7 +2,7 @@ import { AbstractSceneItem } from "./item"
 import { Image, Scene } from "./types"
 
 import { Painter } from "@/graphics"
-import { Rect, IRectangularCoordinates, Shape, ISize } from "@/maths"
+import { Rect, IRectangularCoordinates, IShape, ISize } from "@/maths"
 
 import { isMatch } from "lodash"
 
@@ -24,7 +24,7 @@ function checkImages(scene: Scene, images: Image[]) {
     }
 }
 
-function checkShape({ columns, rows }: Shape, images: Image[]) {
+function checkShape({ columns, rows }: IShape, images: Image[]) {
     if (columns*rows > images.length) {
         throw new Error("Inconsistent number of images for the shape of the sprite")
     }
@@ -33,12 +33,12 @@ function checkShape({ columns, rows }: Shape, images: Image[]) {
 export class Tile extends AbstractSceneItem {
     private imageSize_: ISize
     private images_: Image[]
-    private shape_: Shape
+    private shape_: IShape
 
     constructor(
         scene: Scene,
         position: IRectangularCoordinates,
-        shape: Shape,
+        shape: IShape,
         images: Image[],
     ) {
         super(scene)
@@ -75,7 +75,7 @@ export class Tile extends AbstractSceneItem {
 
 export type TileConfig = {
     position?: IRectangularCoordinates,
-    shape: Shape,
+    shape: IShape,
     images: Image[]
 }
 

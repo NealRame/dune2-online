@@ -1,4 +1,4 @@
-import { Direction, IRectangularCoordinates, Transform2DMatrix } from "./types"
+import { Direction, IRectangularCoordinates, ITransform2DMatrix } from "./types"
 
 export class Vector implements IRectangularCoordinates {
     x: number
@@ -65,7 +65,7 @@ export class Vector implements IRectangularCoordinates {
      * Transform with the given 2D transform matrix
      * @returns this
      */
-    transform({ m11, m12, m21, m22 }: Transform2DMatrix): Vector {
+    transform({ m11, m12, m21, m22 }: ITransform2DMatrix): Vector {
         const { x, y } = this
         this.x = x*m11 + y*m12
         this.y = x*m21 + y*m22

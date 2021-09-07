@@ -3,7 +3,7 @@ import { Tile } from "./tile"
 import { Image, Scene } from "./types"
 
 import { Painter } from "@/graphics"
-import { Rect, IRectangularCoordinates, ISize, Shape, Vector } from "@/maths"
+import { Rect, IRectangularCoordinates, ISize, IShape, Vector } from "@/maths"
 
 import { isNil } from "lodash"
 
@@ -42,7 +42,7 @@ export class Sprite extends AbstractSceneItem {
         }
     }
 
-    addFrame(shape: Shape, images: Image[]): Sprite {
+    addFrame(shape: IShape, images: Image[]): Sprite {
         this.frames_.push(new Tile(
             this.scene,
             { x: 0, y: 0 },

@@ -7,12 +7,12 @@ export interface ISize {
     height: number
 }
 
-export interface Shape {
+export interface IShape {
     columns: number,
     rows: number,
 }
 
-export interface Transform2DMatrix {
+export interface ITransform2DMatrix {
     m11: number,
     m12: number,
     m21: number,

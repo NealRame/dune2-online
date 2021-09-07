@@ -6,12 +6,12 @@ import DecodeImagesWorker from "worker-loader!./decode-images"
 
 import { ImageSet, Palette, TileDescriptor } from "@/dune2/types"
 import { Image } from "@/engine"
-import { Shape } from "@/maths"
+import { IShape } from "@/maths"
 
 import PromiseWorker from "promise-worker"
 
 type TileData = {
-    shape: Shape,
+    shape: IShape,
     indexes: number[],
 }
 
