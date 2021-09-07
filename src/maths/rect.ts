@@ -1,4 +1,4 @@
-import { RectangularCoordinates, Size } from "./types"
+import { IRectangularCoordinates, Size } from "./types"
 import { Vector } from "./vector"
 
 import { isNumber } from "lodash"
@@ -6,7 +6,7 @@ import { isNumber } from "lodash"
 /**
  * @class Rect
  */
-export class Rect implements RectangularCoordinates, Size {
+export class Rect implements IRectangularCoordinates, Size {
     x: number
     y: number
     width: number
@@ -18,7 +18,7 @@ export class Rect implements RectangularCoordinates, Size {
      * @param size
      */
     constructor(
-        { x, y }: RectangularCoordinates,
+        { x, y }: IRectangularCoordinates,
         { width, height }: Size
     ) {
         this.x = x
@@ -111,7 +111,7 @@ export class Rect implements RectangularCoordinates, Size {
      * @param point a Point like object
      * @returns true if and only if the given point is contained
      */
-    contains({ x, y }: RectangularCoordinates): boolean {
+    contains({ x, y }: IRectangularCoordinates): boolean {
         return x >= this.leftX && x <= this.rightX
             && y >= this.topY  && y <= this.bottomY
     }
@@ -223,7 +223,7 @@ export class Rect implements RectangularCoordinates, Size {
      * @param vector
      * @returns this
      */
-    translate({ x, y }: RectangularCoordinates) : Rect {
+    translate({ x, y }: IRectangularCoordinates) : Rect {
         this.x += x
         this.y += y
         return this
@@ -233,7 +233,7 @@ export class Rect implements RectangularCoordinates, Size {
      * @param vector
      * @returns a copy of this Rect that is translated using given vector
      */
-    translated({ x, y }: RectangularCoordinates): Rect {
+    translated({ x, y }: IRectangularCoordinates): Rect {
         return this.copy().translate({ x, y })
     }
 

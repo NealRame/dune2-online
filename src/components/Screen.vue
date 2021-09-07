@@ -3,7 +3,7 @@
 </template>
 
 <script lang="ts">
-import { Rect, RectangularCoordinates } from "@/maths"
+import { Rect, IRectangularCoordinates } from "@/maths"
 import { Painter } from "@/graphics"
 
 import { clamp, isNil } from "lodash"
@@ -14,8 +14,8 @@ export type ScreenMouseMotionEvent = {
     altKey: boolean,
     ctrlKey: boolean,
     metaKey: boolean,
-    movement: RectangularCoordinates,
-    position: RectangularCoordinates,
+    movement: IRectangularCoordinates,
+    position: IRectangularCoordinates,
 }
 
 export type ScreenMouseClickEvent = {
@@ -23,7 +23,7 @@ export type ScreenMouseClickEvent = {
     altKey: boolean,
     ctrlKey: boolean,
     metaKey: boolean,
-    position: RectangularCoordinates,
+    position: IRectangularCoordinates,
 }
 
 export default defineComponent({

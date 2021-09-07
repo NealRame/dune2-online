@@ -1,7 +1,7 @@
 import { Scene, SceneItem } from "./types"
 
 import { Painter } from "@/graphics"
-import { Rect, RectangularCoordinates, Size, Vector } from "@/maths"
+import { Rect, IRectangularCoordinates, Size, Vector } from "@/maths"
 
 export abstract class AbstractSceneItem implements SceneItem {
     private scene_: Scene
@@ -22,7 +22,7 @@ export abstract class AbstractSceneItem implements SceneItem {
         return new Vector(this.x, this.y)
     }
 
-    set position({ x, y }: RectangularCoordinates) {
+    set position({ x, y }: IRectangularCoordinates) {
         this.x = x
         this.y = y
     }

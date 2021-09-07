@@ -1,4 +1,4 @@
-export interface RectangularCoordinates {
+export interface IRectangularCoordinates {
     x: number,
     y: number,
 }

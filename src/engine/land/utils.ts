@@ -1,21 +1,21 @@
-import { RectangularCoordinates, Size } from "@/maths"
+import { IRectangularCoordinates, Size } from "@/maths"
 
 export function indexToPositionConverter({ width }: Size)
-    : (n: number) => RectangularCoordinates {
+    : (n: number) => IRectangularCoordinates {
     return n => ({ x: n%width, y: Math.floor(n/width) })
 }
 
 export function createPositionToZoneConverter(
     landSize: Size,
     zoneSize?: Size,
-): (p: RectangularCoordinates) => number {
+): (p: IRectangularCoordinates) => number {
     const zoneWidth = zoneSize?.width ?? 1
     const zoneHeight = zoneSize?.height ?? 1
 
     const zonesColCount = Math.ceil(landSize.width/zoneWidth)
     const zonesRowCount = Math.ceil(landSize.height/zoneHeight)
 
-    return ({ x, y }: RectangularCoordinates): number => {
+    return ({ x, y }: IRectangularCoordinates): number => {
         const zoneCol = Math.floor(x/zoneWidth)
         const zoneRow = Math.floor(y/zoneHeight)
 

@@ -2,14 +2,14 @@ import { Land, Neighborhood, Terrain } from "./types"
 
 import { Image } from "@/engine"
 import { Color } from "@/graphics"
-import { RectangularCoordinates } from "@/maths"
+import { IRectangularCoordinates } from "@/maths"
 
 export abstract class AbstractTerrain implements Terrain {
-    protected position_: RectangularCoordinates
+    protected position_: IRectangularCoordinates
     private land_: Land<this>
     private revealed_ = false
 
-    constructor(land: Land, position: RectangularCoordinates) {
+    constructor(land: Land, position: IRectangularCoordinates) {
         this.land_ = land as Land<this>
         this.position_ = position
         this.revealed_ = !land.fogOfWar
@@ -23,7 +23,7 @@ export abstract class AbstractTerrain implements Terrain {
         return this.position_.y
     }
 
-    get position(): RectangularCoordinates {
+    get position(): IRectangularCoordinates {
         return this.position_
     }
 

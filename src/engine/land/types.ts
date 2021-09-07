@@ -1,4 +1,4 @@
-import { Rect, RectangularCoordinates, Size } from "@/maths"
+import { Rect, IRectangularCoordinates, Size } from "@/maths"
 
 import { Image, SceneLayer } from "@/engine"
 import { Color } from "@/graphics"
@@ -9,7 +9,7 @@ export interface Terrain {
     readonly x: number
     readonly y: number
 
-    readonly position: RectangularCoordinates
+    readonly position: IRectangularCoordinates
     readonly revealed: boolean
 
     readonly neighbors: Neighborhood<Terrain>
@@ -21,13 +21,13 @@ export interface Terrain {
     update(): Terrain
 }
 
-export type TerrainGenerator<T extends Terrain> = (l: Land<T>, p: RectangularCoordinates) => T
+export type TerrainGenerator<T extends Terrain> = (l: Land<T>, p: IRectangularCoordinates) => T
 
 export interface Land<T extends Terrain = Terrain> extends SceneLayer {
     readonly size: Size
     readonly fogOfWar: boolean
-    reveal(position?: RectangularCoordinates, size?: Size): Land<T>
-    terrain(position: RectangularCoordinates): T|null
+    reveal(position?: IRectangularCoordinates, size?: Size): Land<T>
+    terrain(position: IRectangularCoordinates): T|null
     terrains(rect?: Rect): Generator<Terrain>
     onTerrainChanged(callback: (terrain: T) => void): () => void
     updateTerrain(terrain: T): Land<T>

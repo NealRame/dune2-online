@@ -21,11 +21,11 @@ import Screen, { ScreenMouseMotionEvent } from "@/components/Screen.vue"
 
 import { createGame, Game } from "@/dune2"
 import { screenToSceneScale } from "@/engine"
+import { IRectangularCoordinates } from "@/maths"
 import { PaintDevice, Painter } from "@/graphics"
 
 import { debounce, isNil } from "lodash"
 import { defineComponent, onMounted, ref, unref } from "vue"
-import { RectangularCoordinates } from "@/maths"
 
 declare global {
     interface Window {
@@ -60,7 +60,7 @@ export default defineComponent({
             }
         }
 
-        const updateViewport = ({ x: xOffset, y: yOffset }: RectangularCoordinates) => {
+        const updateViewport = ({ x: xOffset, y: yOffset }: IRectangularCoordinates) => {
             if (xOffset !== 0 || yOffset !== 0) {
                 const game = unref(gameRef)
                 if (!isNil(game)) {

@@ -5,13 +5,13 @@ import { AbstractSceneItem, Image, Scene } from "@/engine/scene"
 
 import { Painter } from "@/graphics"
 
-import { RectangularCoordinates, Rect } from "@/maths"
+import { IRectangularCoordinates, Rect } from "@/maths"
 
 import { isNil } from "lodash"
 
 export class ChunkItem extends AbstractSceneItem {
     private image_: Partial<Image> = {}
-    private redraw_: [RectangularCoordinates, Image[]][] = []
+    private redraw_: [IRectangularCoordinates, Image[]][] = []
 
     constructor(scene: Scene, rect: Rect) {
         super(scene)

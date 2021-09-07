@@ -1,4 +1,4 @@
-import { RectangularCoordinates } from "@/maths"
+import { IRectangularCoordinates } from "@/maths"
 import { Sprite } from "../sprite"
 
 export class Structure extends Sprite {
@@ -7,7 +7,7 @@ export class Structure extends Sprite {
     protected buildingTime_: number
     protected buildingProgress_: number
 
-    constructor(position: RectangularCoordinates) {
+    constructor(position: IRectangularCoordinates) {
         super(position)
         this.buildingTime_ = 0
         this.buildingProgress_ = 1

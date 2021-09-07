@@ -10,7 +10,7 @@ import {
     Direction,
     DirectionCount,
     Easing,
-    RectangularCoordinates,
+    IRectangularCoordinates,
     Vector
 } from "@/maths"
 import { createObserver, EventCallback, Observer } from "@/utils"
@@ -33,7 +33,7 @@ export class Unit extends Sprite {
     private moveObserver_: Observer<void>
     private animation_: Animation|null
 
-    constructor(scene: Scene, position: RectangularCoordinates) {
+    constructor(scene: Scene, position: IRectangularCoordinates) {
         super(scene, position)
         this.hitPoints_ = 1
         this.speed_ = 1
