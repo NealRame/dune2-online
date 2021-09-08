@@ -12,7 +12,7 @@ export interface IShape {
     rows: number,
 }
 
-export interface ITransform2DMatrix {
+export interface ITransformMatrix2D {
     m11: number,
     m12: number,
     m21: number,
