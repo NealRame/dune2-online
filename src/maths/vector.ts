@@ -116,67 +116,67 @@ export class Vector implements IVector2D {
         return `(${this.x}, ${this.y})`
     }
 
-    static Null(): Vector {
+    static get Null(): Vector {
         return new Vector( 0,  0)
     }
 
-    static Up(): Vector {
+    static get Up(): Vector {
         return new Vector( 0, -1)
     }
 
-    static Left(): Vector {
+    static get Left(): Vector {
         return new Vector(-1,  0)
     }
 
-    static Down(): Vector {
+    static get Down(): Vector {
         return new Vector( 0,  1)
     }
 
-    static Right(): Vector {
+    static get Right(): Vector {
         return new Vector( 1,  0)
     }
 
-    static UpLeft(): Vector {
+    static get UpLeft(): Vector {
         return new Vector(-Math.sqrt(1), -Math.sqrt(1))
     }
 
-    static UpRight(): Vector {
+    static get UpRight(): Vector {
         return new Vector( Math.sqrt(1), -Math.sqrt(1))
     }
 
-    static DownRight(): Vector {
+    static get DownRight(): Vector {
         return new Vector( Math.sqrt(1),  Math.sqrt(1))
     }
 
-    static DownLeft(): Vector {
+    static get DownLeft(): Vector {
         return new Vector(-Math.sqrt(1),  Math.sqrt(1))
     }
 
     static FromDirection(direction: Direction): Vector {
         switch (direction) {
         case Direction.North:
-            return Vector.Up()
+            return Vector.Up
 
         case Direction.Northeast:
-            return Vector.UpRight()
+            return Vector.UpRight
 
         case Direction.East:
-            return Vector.Right()
+            return Vector.Right
 
         case Direction.Southeast:
-            return Vector.DownRight()
+            return Vector.DownRight
 
         case Direction.South:
-            return Vector.Down()
+            return Vector.Down
 
         case Direction.Southwest:
-            return Vector.DownLeft()
+            return Vector.DownLeft
 
         case Direction.West:
-            return Vector.Left()
+            return Vector.Left
 
         case Direction.Northwest:
-            return Vector.UpLeft()
+            return Vector.UpLeft
         }
 
         const exhaustiveCheck_: never = direction

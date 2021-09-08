@@ -121,7 +121,7 @@ export class LandImpl<T extends ITerrain> implements ILand<T> {
     }
 
     get position(): Vector {
-        return Vector.Null()
+        return Vector.Null
     }
 
     get size(): ISize {

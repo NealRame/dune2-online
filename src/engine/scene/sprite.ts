@@ -61,7 +61,7 @@ export class Sprite extends AbstractSceneItem {
         if (this.frameIndex_ <= this.frames_.length) {
             this.frames_[this.frameIndex_].render(
                 painter,
-                new Rect(Vector.Null(), this.size)
+                new Rect(Vector.Null, this.size)
             )
         }
 

@@ -261,16 +261,16 @@ export default defineComponent({
         const onKeyPressed = (ev: KeyboardEvent) => {
             if (!ev.altKey) return
             if (ev.code === "ArrowLeft") {
-                updateViewport(Vector.Left())
+                updateViewport(Vector.Left)
             } else
             if (ev.code === "ArrowRight") {
-                updateViewport(Vector.Right())
+                updateViewport(Vector.Right)
             } else
             if (ev.code === "ArrowUp") {
-                updateViewport(Vector.Up())
+                updateViewport(Vector.Up)
             } else
             if (ev.code === "ArrowDown") {
-                updateViewport(Vector.Down())
+                updateViewport(Vector.Down)
             }
         }
 
