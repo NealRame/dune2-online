@@ -1,4 +1,4 @@
-import { Terrain } from "./types"
+import { ITerrain } from "./types"
 
 import { IScene, ISceneItem } from "@/engine"
 import { Painter } from "@/graphics"
@@ -6,9 +6,9 @@ import { Rect, ISize, Vector } from "@/maths"
 
 export class TerrainItem implements ISceneItem {
     private scene_: IScene
-    private terrain_: Terrain
+    private terrain_: ITerrain
 
-    constructor(scene: IScene, terrain: Terrain) {
+    constructor(scene: IScene, terrain: ITerrain) {
         this.scene_ = scene
         this.terrain_ = terrain
     }

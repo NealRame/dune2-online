@@ -1,5 +1,5 @@
 import { createScene, IScene } from "./scene"
-import { createLand, Land, Terrain, TerrainGenerator } from "./land"
+import { createLand, Land, ITerrain, TerrainGenerator } from "./land"
 import { Unit } from "./unit"
 
 import { Painter } from "@/graphics"
@@ -12,13 +12,13 @@ interface State {
     scene: IScene
 }
 
-export interface Config<T extends Terrain = Terrain> {
+export interface Config<T extends ITerrain = ITerrain> {
     painter: Painter
     size: ISize
     generateTerrain: TerrainGenerator<T>
 }
 
-export interface Engine<T extends Terrain = Terrain> {
+export interface Engine<T extends ITerrain = ITerrain> {
     readonly land: Land<T>
     readonly scene: IScene
     addUnit(unit: Unit): Engine<T>
@@ -26,7 +26,7 @@ export interface Engine<T extends Terrain = Terrain> {
     stop(): Engine<T>
 }
 
-export function create<T extends Terrain>(config: Config<T>)
+export function create<T extends ITerrain>(config: Config<T>)
     : Engine<T> {
     const state: State = {
         animationRequestId: 0,

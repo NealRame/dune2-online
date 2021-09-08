@@ -1,5 +1,5 @@
 import { Engine } from "./engine"
-import { Terrain } from "./land"
+import { ITerrain } from "./land"
 
 import { Color } from "@/graphics"
 import { createObserver, Observer } from "@/utils"
@@ -11,7 +11,7 @@ export interface IMiniMap {
     readonly onChanged: Observer<void> // TODO: should be an emitter
 }
 
-export function createMiniMap<T extends Terrain>(game: Engine<T>)
+export function createMiniMap<T extends ITerrain>(game: Engine<T>)
     : IMiniMap {
     const observer = createObserver<void>()
     const { width, height } = game.scene.size

@@ -1,4 +1,4 @@
-import { Land, LandConfig, Terrain, TerrainGenerator } from "./types"
+import { Land, LandConfig, ITerrain, TerrainGenerator } from "./types"
 import { createPositionToZoneConverter } from "./utils"
 import { ChunkItem } from "./chunkItem"
 
@@ -11,7 +11,7 @@ import { Rect, IRectangularCoordinates, ISize, Vector } from "@/maths"
 import { chain, isNil, remove } from "lodash"
 import { TerrainItem } from "./terrainItem"
 
-export function ensureLandConfiguration<T extends Terrain>(
+export function ensureLandConfiguration<T extends ITerrain>(
     config: LandConfig<T>,
 ): Required<LandConfig<T>> {
     return Object.assign({
@@ -21,7 +21,7 @@ export function ensureLandConfiguration<T extends Terrain>(
     }, config)
 }
 
-export function generateLandTerrains<T extends Terrain>(
+export function generateLandTerrains<T extends ITerrain>(
     land: Land<T>,
     generateTerrain: TerrainGenerator<T>,
 ): T[] {
@@ -60,7 +60,7 @@ export function generateLandChunkItems(
     const positionToChunkIndex = createPositionToZoneConverter(land.size, chunkSize)
 
     land.onTerrainChanged(terrain => {
-        chain(terrain.neighbors as Array<Terrain>)
+        chain(terrain.neighbors as Array<ITerrain>)
             .tap(terrains => remove(terrains, isNil))
             .tap(terrains => terrains.push(terrain))
             .map(terrain => {
@@ -76,7 +76,7 @@ export function generateLandChunkItems(
     return chunks
 }
 
-export function generateLandItems<T extends Terrain>(
+export function generateLandItems<T extends ITerrain>(
     land: Land<T>,
     config: Required<LandConfig<T>>
 ): Array<ISceneItem> {
@@ -85,7 +85,7 @@ export function generateLandItems<T extends Terrain>(
         : generateLandTerrainItems(land)
 }
 
-export class LandImpl<T extends Terrain> implements Land<T> {
+export class LandImpl<T extends ITerrain> implements Land<T> {
     private fogOfWar_: boolean
     private items_: ISceneItem[]
     private positionToTerrainIndex_: (p: IRectangularCoordinates) => number
@@ -200,7 +200,7 @@ export class LandImpl<T extends Terrain> implements Land<T> {
     }
 }
 
-export function createLand<T extends Terrain>(
+export function createLand<T extends ITerrain>(
     scene: IScene,
     landConfig: LandConfig<T>,
 ): Land<T> {

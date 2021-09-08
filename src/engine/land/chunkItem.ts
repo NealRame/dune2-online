@@ -1,4 +1,4 @@
-import { Terrain } from "./types"
+import { ITerrain } from "./types"
 
 import { ScaleFactors } from "@/engine/scale"
 import { AbstractSceneItem, Image, IScene } from "@/engine/scene"
@@ -21,7 +21,7 @@ export class ChunkItem extends AbstractSceneItem {
         this.height_ = rect.height
     }
 
-    refresh(terrain: Terrain): ChunkItem {
+    refresh(terrain: ITerrain): ChunkItem {
         this.redraw_.push([
             terrain.position,
             terrain.image(),

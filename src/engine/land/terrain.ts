@@ -1,10 +1,10 @@
-import { Land, Neighborhood, Terrain } from "./types"
+import { Land, Neighborhood, ITerrain } from "./types"
 
 import { Image } from "@/engine"
 import { Color } from "@/graphics"
 import { IRectangularCoordinates } from "@/maths"
 
-export abstract class AbstractTerrain implements Terrain {
+export abstract class AbstractTerrain implements ITerrain {
     protected position_: IRectangularCoordinates
     private land_: Land<this>
     private revealed_ = false
@@ -44,7 +44,7 @@ export abstract class AbstractTerrain implements Terrain {
     abstract get color(): Color.RGBA
     abstract image(): Image[]
 
-    reveal(): Terrain {
+    reveal(): ITerrain {
         if (!this.revealed) {
             this.revealed_ = true
             this.update()
@@ -52,7 +52,7 @@ export abstract class AbstractTerrain implements Terrain {
         return this
     }
 
-    update(): Terrain {
+    update(): ITerrain {
         this.land_.updateTerrain(this)
         return this
     }
