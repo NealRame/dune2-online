@@ -6,7 +6,7 @@ import { RGBA } from "@/graphics/color"
 import { Image } from "@/engine"
 import { AbstractTerrain, ILand, Neighborhood, TerrainGenerator } from "@/engine/land"
 
-import { createNoise2DGenerator, createRangeMapper, IRectangularCoordinates } from "@/maths"
+import { createNoise2DGenerator, createRangeMapper, IVector2D } from "@/maths"
 
 import { chain, clamp, flow, isNil } from "lodash"
 
@@ -14,7 +14,7 @@ export class Terrain extends AbstractTerrain {
     spice = 0
     type = TerrainType.Dunes
 
-    constructor(land: ILand<Terrain>, position: IRectangularCoordinates) {
+    constructor(land: ILand<Terrain>, position: IVector2D) {
         super(land, position)
         this.position_ = position
     }

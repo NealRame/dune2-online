@@ -8,7 +8,7 @@ import { Trike } from "./units/trike"
 import * as Engine from "@/engine"
 
 import { Painter } from "@/graphics"
-import { IRectangularCoordinates, ISize } from "@/maths"
+import { IVector2D, ISize } from "@/maths"
 import { once } from "lodash"
 
 export const Units = {
@@ -18,7 +18,7 @@ export const Units = {
 } as const
 
 export type UnitType = keyof typeof Units
-export type UnitFactory = (t: UnitType, p: IRectangularCoordinates) => Engine.Unit
+export type UnitFactory = (t: UnitType, p: IVector2D) => Engine.Unit
 
 export interface GameConfig {
     painter: Painter,
@@ -35,7 +35,7 @@ export interface Game {
 
 function createUnitFactory(game: Engine.Engine<Terrain>)
     : UnitFactory {
-    return (type: UnitType, position: IRectangularCoordinates) => {
+    return (type: UnitType, position: IVector2D) => {
         const unit = new Units[type](game.scene, position)
         game.addUnit(unit)
         return unit

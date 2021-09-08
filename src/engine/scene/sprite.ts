@@ -3,7 +3,7 @@ import { Tile } from "./tile"
 import { Image, IScene } from "./types"
 
 import { Painter } from "@/graphics"
-import { Rect, IRectangularCoordinates, ISize, IShape, Vector } from "@/maths"
+import { Rect, IVector2D, ISize, IShape, Vector } from "@/maths"
 
 import { isNil } from "lodash"
 
@@ -15,7 +15,7 @@ export class Sprite extends AbstractSceneItem {
 
     constructor(
         scene: IScene,
-        position: IRectangularCoordinates,
+        position: IVector2D,
     ) {
         super(scene)
         this.position = position
@@ -76,7 +76,7 @@ export class Sprite extends AbstractSceneItem {
 }
 
 export type SpriteConfig = {
-    position?: IRectangularCoordinates,
+    position?: IVector2D,
     onUpdate?: SpriteUpdateDelegate,
 }
 

@@ -6,7 +6,7 @@ import { createObserver, Observer } from "@/utils"
 
 import { IScene, ISceneItem } from "@/engine"
 import { Painter } from "@/graphics"
-import { Rect, IRectangularCoordinates, ISize, Vector } from "@/maths"
+import { Rect, IVector2D, ISize, Vector } from "@/maths"
 
 import { chain, isNil, remove } from "lodash"
 import { TerrainItem } from "./terrainItem"
@@ -88,7 +88,7 @@ export function generateLandItems<T extends ITerrain>(
 export class LandImpl<T extends ITerrain> implements ILand<T> {
     private fogOfWar_: boolean
     private items_: ISceneItem[]
-    private positionToTerrainIndex_: (p: IRectangularCoordinates) => number
+    private positionToTerrainIndex_: (p: IVector2D) => number
     private scene_: IScene
     private terrains_: T[]
     private terrainsObserver_: Observer<T>
@@ -156,7 +156,7 @@ export class LandImpl<T extends ITerrain> implements ILand<T> {
         return this
     }
 
-    reveal(position?: IRectangularCoordinates, size?: ISize): ILand<T> {
+    reveal(position?: IVector2D, size?: ISize): ILand<T> {
         if (isNil(position)) {
             position = { x: 0, y: 0 }
             size = this.size
@@ -169,7 +169,7 @@ export class LandImpl<T extends ITerrain> implements ILand<T> {
         return this
     }
 
-    terrain(position: IRectangularCoordinates): T|null {
+    terrain(position: IVector2D): T|null {
         return this.terrains_[this.positionToTerrainIndex_(position)] as T
     }
 

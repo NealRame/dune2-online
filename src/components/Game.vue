@@ -21,7 +21,7 @@ import Screen, { ScreenMouseMotionEvent } from "@/components/Screen.vue"
 
 import { createGame, Game } from "@/dune2"
 import { screenToSceneScale } from "@/engine"
-import { IRectangularCoordinates } from "@/maths"
+import { IVector2D } from "@/maths"
 import { IPaintDevice, Painter } from "@/graphics"
 
 import { debounce, isNil } from "lodash"
@@ -60,7 +60,7 @@ export default defineComponent({
             }
         }
 
-        const updateViewport = ({ x: xOffset, y: yOffset }: IRectangularCoordinates) => {
+        const updateViewport = ({ x: xOffset, y: yOffset }: IVector2D) => {
             if (xOffset !== 0 || yOffset !== 0) {
                 const game = unref(gameRef)
                 if (!isNil(game)) {

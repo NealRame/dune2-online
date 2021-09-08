@@ -2,7 +2,7 @@ import { AbstractSceneItem } from "./item"
 import { Image, IScene } from "./types"
 
 import { Painter } from "@/graphics"
-import { Rect, IRectangularCoordinates, IShape, ISize } from "@/maths"
+import { Rect, IVector2D, IShape, ISize } from "@/maths"
 
 import { isMatch } from "lodash"
 
@@ -37,7 +37,7 @@ export class Tile extends AbstractSceneItem {
 
     constructor(
         scene: IScene,
-        position: IRectangularCoordinates,
+        position: IVector2D,
         shape: IShape,
         images: Image[],
     ) {
@@ -74,7 +74,7 @@ export class Tile extends AbstractSceneItem {
 }
 
 export type TileConfig = {
-    position?: IRectangularCoordinates,
+    position?: IVector2D,
     shape: IShape,
     images: Image[]
 }

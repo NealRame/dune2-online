@@ -1,4 +1,4 @@
-import { Rect, IRectangularCoordinates, ISize } from "@/maths"
+import { Rect, IVector2D, ISize } from "@/maths"
 
 import { Image, ISceneLayer } from "@/engine"
 import { Color } from "@/graphics"
@@ -9,7 +9,7 @@ export interface ITerrain {
     readonly x: number
     readonly y: number
 
-    readonly position: IRectangularCoordinates
+    readonly position: IVector2D
     readonly revealed: boolean
 
     readonly neighbors: Neighborhood<ITerrain>
@@ -21,13 +21,13 @@ export interface ITerrain {
     update(): ITerrain
 }
 
-export type TerrainGenerator<T extends ITerrain> = (l: ILand<T>, p: IRectangularCoordinates) => T
+export type TerrainGenerator<T extends ITerrain> = (l: ILand<T>, p: IVector2D) => T
 
 export interface ILand<T extends ITerrain = ITerrain> extends ISceneLayer {
     readonly size: ISize
     readonly fogOfWar: boolean
-    reveal(position?: IRectangularCoordinates, size?: ISize): ILand<T>
-    terrain(position: IRectangularCoordinates): T|null
+    reveal(position?: IVector2D, size?: ISize): ILand<T>
+    terrain(position: IVector2D): T|null
     terrains(rect?: Rect): Generator<ITerrain>
     onTerrainChanged(callback: (terrain: T) => void): () => void
     updateTerrain(terrain: T): ILand<T>

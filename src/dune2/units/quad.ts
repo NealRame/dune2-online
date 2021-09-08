@@ -1,9 +1,9 @@
 import { imageSet } from "@/dune2/data"
 import { Unit, IScene } from "@/engine"
-import { IRectangularCoordinates } from "@/maths"
+import { IVector2D } from "@/maths"
 
 export class Quad extends Unit {
-    constructor(scene: IScene, position: IRectangularCoordinates) {
+    constructor(scene: IScene, position: IVector2D) {
         super(scene, position)
 
         const images = imageSet("units")

@@ -3,10 +3,10 @@ import { Structure } from "./structure"
 import { createTile } from "@/core/tile"
 import { imageSet } from "@/dune2/data"
 
-import { IRectangularCoordinates } from "@/maths"
+import { IVector2D } from "@/maths"
 
 export class ConcreteSlab extends Structure {
-    constructor(position: IRectangularCoordinates) {
+    constructor(position: IVector2D) {
         super(position)
 
         const terrain = imageSet("terrain")

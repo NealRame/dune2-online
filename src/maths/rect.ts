@@ -1,4 +1,4 @@
-import { IRectangularCoordinates, ISize } from "./types"
+import { IVector2D, ISize } from "./types"
 import { Vector } from "./vector"
 
 import { isNumber } from "lodash"
@@ -6,7 +6,7 @@ import { isNumber } from "lodash"
 /**
  * @class Rect
  */
-export class Rect implements IRectangularCoordinates, ISize {
+export class Rect implements IVector2D, ISize {
     x: number
     y: number
     width: number
@@ -18,7 +18,7 @@ export class Rect implements IRectangularCoordinates, ISize {
      * @param size
      */
     constructor(
-        { x, y }: IRectangularCoordinates,
+        { x, y }: IVector2D,
         { width, height }: ISize
     ) {
         this.x = x
@@ -111,7 +111,7 @@ export class Rect implements IRectangularCoordinates, ISize {
      * @param point a Point like object
      * @returns true if and only if the given point is contained
      */
-    contains({ x, y }: IRectangularCoordinates): boolean {
+    contains({ x, y }: IVector2D): boolean {
         return x >= this.leftX && x <= this.rightX
             && y >= this.topY  && y <= this.bottomY
     }
@@ -223,7 +223,7 @@ export class Rect implements IRectangularCoordinates, ISize {
      * @param vector
      * @returns this
      */
-    translate({ x, y }: IRectangularCoordinates) : Rect {
+    translate({ x, y }: IVector2D) : Rect {
         this.x += x
         this.y += y
         return this
@@ -233,7 +233,7 @@ export class Rect implements IRectangularCoordinates, ISize {
      * @param vector
      * @returns a copy of this Rect that is translated using given vector
      */
-    translated({ x, y }: IRectangularCoordinates): Rect {
+    translated({ x, y }: IVector2D): Rect {
         return this.copy().translate({ x, y })
     }
 

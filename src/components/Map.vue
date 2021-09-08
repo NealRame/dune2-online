@@ -149,7 +149,7 @@ import Screen, { ScreenMouseMotionEvent } from "@/components/Screen.vue"
 import { createTerrainGenerator } from "@/dune2/land"
 import { createLand, createScene, IScene, screenToSceneCoordinate } from "@/engine"
 import { IPaintDevice } from "@/graphics"
-import { IRectangularCoordinates, Vector } from "@/maths"
+import { IVector2D, Vector } from "@/maths"
 
 import { debounce, isNil } from "lodash"
 import { defineComponent, onMounted, ref, unref, watch } from "vue"
@@ -248,7 +248,7 @@ export default defineComponent({
             showModal.value = false
         }
 
-        const updateViewport = ({ x: xOffset, y: yOffset }: IRectangularCoordinates) => {
+        const updateViewport = ({ x: xOffset, y: yOffset }: IVector2D) => {
             if (!isNil(scene)) {
                 const { x, y } = scene.viewport.position
                 scene.viewport.position = {

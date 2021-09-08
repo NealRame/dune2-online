@@ -3,10 +3,10 @@ import { Structure } from "./structure"
 import { tiles } from "../data"
 import { createTile } from "../tile"
 
-import { IRectangularCoordinates } from "@/maths"
+import { IVector2D } from "@/maths"
 
 export class ConcreteSlab extends Structure {
-    constructor(position: IRectangularCoordinates) {
+    constructor(position: IVector2D) {
         super(position)
 
         const tileDescriptors = tiles()

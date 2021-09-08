@@ -7,7 +7,7 @@ import { Brush, Painter } from "@/graphics/painter"
 import { scaleDown, ScaleFactor, scaleUp } from "@/engine/scale"
 import { createViewport, IViewport } from "@/engine/viewport"
 
-import { Rect, IRectangularCoordinates, ISize, Vector } from "@/maths"
+import { Rect, IVector2D, ISize, Vector } from "@/maths"
 
 import { isNil, matches } from "lodash"
 
@@ -139,21 +139,21 @@ export function createScene(size: ISize, painter: Painter): IScene {
 
 export function screenToSceneScale(
     scene: IScene,
-    { x, y }: IRectangularCoordinates
+    { x, y }: IVector2D
 ): Vector {
     return (new Vector(x, y)).mul(1/scene.gridSpacing)
 }
 
 export function sceneToScreenScale(
     scene: IScene,
-    { x, y }: IRectangularCoordinates
+    { x, y }: IVector2D
 ): Vector {
     return (new Vector(x, y)).mul(scene.gridSpacing)
 }
 
 export function sceneToScreenCoordinate(
     scene: IScene,
-    { x, y }: IRectangularCoordinates
+    { x, y }: IVector2D
 ): Vector {
     const { gridSpacing, viewport } = scene
     const topLeft = viewport.rect.topLeft()
@@ -162,7 +162,7 @@ export function sceneToScreenCoordinate(
 
 export function screenToSceneCoordinate(
     scene: IScene,
-    { x, y }: IRectangularCoordinates
+    { x, y }: IVector2D
 ): Vector {
     const { gridSpacing, viewport } = scene
     const topLeft = viewport.rect.topLeft()

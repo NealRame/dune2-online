@@ -1,4 +1,4 @@
-import { Rect, IRectangularCoordinates, ISize } from "@/maths"
+import { Rect, IVector2D, ISize } from "@/maths"
 
 import { isNil } from "lodash"
 
@@ -68,7 +68,7 @@ export class Painter {
 
     // Transformation
 
-    translate({ x, y }: IRectangularCoordinates): Painter {
+    translate({ x, y }: IVector2D): Painter {
         this.context_.translate(x, y)
         return this
     }
@@ -85,8 +85,8 @@ export class Painter {
     }
 
     drawLine(
-        { x: x1, y: y1 }: IRectangularCoordinates,
-        { x: x2, y: y2 }: IRectangularCoordinates,
+        { x: x1, y: y1 }: IVector2D,
+        { x: x2, y: y2 }: IVector2D,
     ): Painter {
         this.context_.beginPath()
         this.context_.moveTo(x1, y1)
@@ -96,7 +96,7 @@ export class Painter {
     }
 
     drawRect(
-        { x, y }: IRectangularCoordinates,
+        { x, y }: IVector2D,
         { width, height }: ISize,
     ): Painter {
         this.context_.beginPath()
@@ -110,7 +110,7 @@ export class Painter {
     }
 
     fillRect(
-        { x, y }: IRectangularCoordinates,
+        { x, y }: IVector2D,
         { width, height }: ISize,
     ): Painter {
         this.context_.beginPath()
@@ -125,7 +125,7 @@ export class Painter {
 
     drawImageData(
         imageData: ImageData,
-        { x, y }: IRectangularCoordinates,
+        { x, y }: IVector2D,
         srcRect?: Rect
     ): Painter {
         if (isNil(srcRect)) {
@@ -143,7 +143,7 @@ export class Painter {
 
     drawImageBitmap(
         imageBitmap: ImageBitmap,
-        { x, y }: IRectangularCoordinates,
+        { x, y }: IVector2D,
         srcRect?: Rect,
         dstSize?: ISize,
     ): Painter {

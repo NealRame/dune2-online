@@ -1,5 +1,5 @@
 import { makeNoise2D } from "open-simplex-noise"
-import { IRectangularCoordinates } from "./types"
+import { IVector2D } from "./types"
 
 export type Noise2DGeneratorConfig = {
     amplitude?: number,
@@ -9,7 +9,7 @@ export type Noise2DGeneratorConfig = {
     scale?: number,
     seed?: number,
 }
-export type Noise2DFunction = (pos: IRectangularCoordinates) => number
+export type Noise2DFunction = (pos: IVector2D) => number
 
 const noise2DGeneratorConfigDefaults = {
     scale: 1,

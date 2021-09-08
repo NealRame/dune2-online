@@ -1,6 +1,6 @@
-import { Direction, IRectangularCoordinates, ITransform2DMatrix } from "./types"
+import { Direction, IVector2D, ITransform2DMatrix } from "./types"
 
-export class Vector implements IRectangularCoordinates {
+export class Vector implements IVector2D {
     x: number
     y: number
 
@@ -35,7 +35,7 @@ export class Vector implements IRectangularCoordinates {
      * Add the given Vector like object
      * @returns this
      */
-    add({ x, y }: IRectangularCoordinates): Vector {
+    add({ x, y }: IVector2D): Vector {
         this.x += x
         this.y += y
         return this
@@ -45,7 +45,7 @@ export class Vector implements IRectangularCoordinates {
      * Sub the given Vector like object
      * @returns this
      */
-    sub({ x, y }: IRectangularCoordinates): Vector {
+    sub({ x, y }: IVector2D): Vector {
         this.x -= x
         this.y -= y
         return this
@@ -76,7 +76,7 @@ export class Vector implements IRectangularCoordinates {
      * Dot product with the Vector like object
      * @returns this
      */
-    dot({ x, y }: IRectangularCoordinates): number {
+    dot({ x, y }: IVector2D): number {
         return this.x*x + this.y*y
     }
 
@@ -84,7 +84,7 @@ export class Vector implements IRectangularCoordinates {
      * Distance to the givent Vector like object
      * @returns this
      */
-    distance({ x, y }: IRectangularCoordinates): number {
+    distance({ x, y }: IVector2D): number {
         x = this.x - x
         y = this.y - y
         return Math.sqrt(x*x + y*y)
@@ -93,7 +93,7 @@ export class Vector implements IRectangularCoordinates {
     /**
      * @returns true if the given Vector like object has same x and y values
      */
-    equal({ x, y }: IRectangularCoordinates): boolean {
+    equal({ x, y }: IVector2D): boolean {
         return this.x === x && this.y === y
     }
 
