@@ -1,5 +1,5 @@
 import { createScene, IScene } from "./scene"
-import { createLand, Land, ITerrain, TerrainGenerator } from "./land"
+import { createLand, ILand, ITerrain, TerrainGenerator } from "./land"
 import { Unit } from "./unit"
 
 import { Painter } from "@/graphics"
@@ -19,7 +19,7 @@ export interface Config<T extends ITerrain = ITerrain> {
 }
 
 export interface Engine<T extends ITerrain = ITerrain> {
-    readonly land: Land<T>
+    readonly land: ILand<T>
     readonly scene: IScene
     addUnit(unit: Unit): Engine<T>
     start(): Engine<T>
@@ -38,7 +38,7 @@ export function create<T extends ITerrain>(config: Config<T>)
 
     return {
         get land() {
-            return state.scene.getLayer("land") as Land<T>
+            return state.scene.getLayer("land") as ILand<T>
         },
         get scene() {
             return state.scene

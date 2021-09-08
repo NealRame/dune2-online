@@ -1,4 +1,4 @@
-import { Land, LandConfig, ITerrain, TerrainGenerator } from "./types"
+import { ILand, LandConfig, ITerrain, TerrainGenerator } from "./types"
 import { createPositionToZoneConverter } from "./utils"
 import { ChunkItem } from "./chunkItem"
 
@@ -22,7 +22,7 @@ export function ensureLandConfiguration<T extends ITerrain>(
 }
 
 export function generateLandTerrains<T extends ITerrain>(
-    land: Land<T>,
+    land: ILand<T>,
     generateTerrain: TerrainGenerator<T>,
 ): T[] {
     const terrains: T[] = []
@@ -33,7 +33,7 @@ export function generateLandTerrains<T extends ITerrain>(
 }
 
 export function generateLandTerrainItems(
-    land: Land
+    land: ILand
 ): Array<ISceneItem> {
     const items: Array<TerrainItem> = []
     for (const terrain of land.terrains()) {
@@ -43,7 +43,7 @@ export function generateLandTerrainItems(
 }
 
 export function generateLandChunkItems(
-    land: Land,
+    land: ILand,
     chunkSize: ISize,
 ): Array<ISceneItem> {
     const chunks: ChunkItem[] = []
@@ -77,7 +77,7 @@ export function generateLandChunkItems(
 }
 
 export function generateLandItems<T extends ITerrain>(
-    land: Land<T>,
+    land: ILand<T>,
     config: Required<LandConfig<T>>
 ): Array<ISceneItem> {
     return config.chunkEnabled
@@ -85,7 +85,7 @@ export function generateLandItems<T extends ITerrain>(
         : generateLandTerrainItems(land)
 }
 
-export class LandImpl<T extends ITerrain> implements Land<T> {
+export class LandImpl<T extends ITerrain> implements ILand<T> {
     private fogOfWar_: boolean
     private items_: ISceneItem[]
     private positionToTerrainIndex_: (p: IRectangularCoordinates) => number
@@ -136,11 +136,11 @@ export class LandImpl<T extends ITerrain> implements Land<T> {
         return this.fogOfWar_
     }
 
-    addItem(): Land<T> {
+    addItem(): ILand<T> {
         return this
     }
 
-    update(): Land<T> {
+    update(): ILand<T> {
         return this
     }
 
@@ -156,7 +156,7 @@ export class LandImpl<T extends ITerrain> implements Land<T> {
         return this
     }
 
-    reveal(position?: IRectangularCoordinates, size?: ISize): Land<T> {
+    reveal(position?: IRectangularCoordinates, size?: ISize): ILand<T> {
         if (isNil(position)) {
             position = { x: 0, y: 0 }
             size = this.size
@@ -194,7 +194,7 @@ export class LandImpl<T extends ITerrain> implements Land<T> {
 
     updateTerrain(
         terrain: T
-    ) : Land<T> {
+    ) : ILand<T> {
         this.terrainsObserver_.publish(terrain)
         return this
     }
@@ -203,6 +203,6 @@ export class LandImpl<T extends ITerrain> implements Land<T> {
 export function createLand<T extends ITerrain>(
     scene: IScene,
     landConfig: LandConfig<T>,
-): Land<T> {
+): ILand<T> {
     return new LandImpl(scene, landConfig)
 }

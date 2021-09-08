@@ -4,7 +4,7 @@ import { imageSet, palette } from "@/dune2/data"
 import { RGBA } from "@/graphics/color"
 
 import { Image } from "@/engine"
-import { AbstractTerrain, Land, Neighborhood, TerrainGenerator } from "@/engine/land"
+import { AbstractTerrain, ILand, Neighborhood, TerrainGenerator } from "@/engine/land"
 
 import { createNoise2DGenerator, createRangeMapper, IRectangularCoordinates } from "@/maths"
 
@@ -14,7 +14,7 @@ export class Terrain extends AbstractTerrain {
     spice = 0
     type = TerrainType.Dunes
 
-    constructor(land: Land<Terrain>, position: IRectangularCoordinates) {
+    constructor(land: ILand<Terrain>, position: IRectangularCoordinates) {
         super(land, position)
         this.position_ = position
     }

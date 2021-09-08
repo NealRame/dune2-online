@@ -1,4 +1,4 @@
-import { Land, Neighborhood, ITerrain } from "./types"
+import { ILand, Neighborhood, ITerrain } from "./types"
 
 import { Image } from "@/engine"
 import { Color } from "@/graphics"
@@ -6,11 +6,11 @@ import { IRectangularCoordinates } from "@/maths"
 
 export abstract class AbstractTerrain implements ITerrain {
     protected position_: IRectangularCoordinates
-    private land_: Land<this>
+    private land_: ILand<this>
     private revealed_ = false
 
-    constructor(land: Land, position: IRectangularCoordinates) {
-        this.land_ = land as Land<this>
+    constructor(land: ILand, position: IRectangularCoordinates) {
+        this.land_ = land as ILand<this>
         this.position_ = position
         this.revealed_ = !land.fogOfWar
     }

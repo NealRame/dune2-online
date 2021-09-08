@@ -21,16 +21,16 @@ export interface ITerrain {
     update(): ITerrain
 }
 
-export type TerrainGenerator<T extends ITerrain> = (l: Land<T>, p: IRectangularCoordinates) => T
+export type TerrainGenerator<T extends ITerrain> = (l: ILand<T>, p: IRectangularCoordinates) => T
 
-export interface Land<T extends ITerrain = ITerrain> extends ISceneLayer {
+export interface ILand<T extends ITerrain = ITerrain> extends ISceneLayer {
     readonly size: ISize
     readonly fogOfWar: boolean
-    reveal(position?: IRectangularCoordinates, size?: ISize): Land<T>
+    reveal(position?: IRectangularCoordinates, size?: ISize): ILand<T>
     terrain(position: IRectangularCoordinates): T|null
     terrains(rect?: Rect): Generator<ITerrain>
     onTerrainChanged(callback: (terrain: T) => void): () => void
-    updateTerrain(terrain: T): Land<T>
+    updateTerrain(terrain: T): ILand<T>
 }
 
 export type LandConfig<T extends ITerrain> = {
