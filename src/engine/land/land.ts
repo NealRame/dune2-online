@@ -1,4 +1,4 @@
-import { ILand, LandConfig, ITerrain, TerrainGenerator } from "./types"
+import { ILand, ILandConfig, ITerrain, TerrainGenerator } from "./types"
 import { createPositionToZoneConverter } from "./utils"
 import { ChunkItem } from "./chunkItem"
 
@@ -12,8 +12,8 @@ import { chain, isNil, remove } from "lodash"
 import { TerrainItem } from "./terrainItem"
 
 export function ensureLandConfiguration<T extends ITerrain>(
-    config: LandConfig<T>,
-): Required<LandConfig<T>> {
+    config: ILandConfig<T>,
+): Required<ILandConfig<T>> {
     return Object.assign({
         chunkEnabled: true,
         chunkSize: { width: 32, height: 32 },
@@ -78,7 +78,7 @@ export function generateLandChunkItems(
 
 export function generateLandItems<T extends ITerrain>(
     land: ILand<T>,
-    config: Required<LandConfig<T>>
+    config: Required<ILandConfig<T>>
 ): Array<ISceneItem> {
     return config.chunkEnabled
         ? generateLandChunkItems(land, config.chunkSize)
@@ -95,7 +95,7 @@ export class LandImpl<T extends ITerrain> implements ILand<T> {
 
     constructor(
         scene: IScene,
-        config: LandConfig<T>,
+        config: ILandConfig<T>,
     ) {
         this.fogOfWar_ = config.fogOfWarEnabled ?? true
         this.positionToTerrainIndex_ = createPositionToZoneConverter(scene.size)
@@ -202,7 +202,7 @@ export class LandImpl<T extends ITerrain> implements ILand<T> {
 
 export function createLand<T extends ITerrain>(
     scene: IScene,
-    landConfig: LandConfig<T>,
+    landConfig: ILandConfig<T>,
 ): ILand<T> {
     return new LandImpl(scene, landConfig)
 }

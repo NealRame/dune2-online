@@ -33,7 +33,7 @@ export interface ILand<T extends ITerrain = ITerrain> extends ISceneLayer {
     updateTerrain(terrain: T): ILand<T>
 }
 
-export type LandConfig<T extends ITerrain> = {
+export type ILandConfig<T extends ITerrain> = {
     generateTerrain: TerrainGenerator<T>
     chunkSize?: ISize,
     chunkEnabled?: boolean,
