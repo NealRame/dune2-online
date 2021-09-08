@@ -14,8 +14,8 @@ export interface IScene {
     readonly gridSpacing: number
     readonly rect: Rect
     scale: ScaleFactor
-    addLayer(layer: string|SceneLayer): SceneLayer
-    getLayer(layer: string|number): SceneLayer|null
+    addLayer(layer: string|ISceneLayer): ISceneLayer
+    getLayer(layer: string|number): ISceneLayer|null
     clear(): IScene
     render(): IScene
     update(): IScene
@@ -23,15 +23,15 @@ export interface IScene {
     zoomOut(): IScene
 }
 
-export interface SceneLayer {
+export interface ISceneLayer {
     name: string
     readonly scene: IScene
     readonly size: ISize
     readonly rect: Rect
-    addItem(item: SceneItem): SceneLayer
+    addItem(item: SceneItem): ISceneLayer
     items(): Generator<SceneItem>
-    render(painter: Painter): SceneLayer
-    update(): SceneLayer
+    render(painter: Painter): ISceneLayer
+    update(): ISceneLayer
 }
 
 export interface SceneItem {

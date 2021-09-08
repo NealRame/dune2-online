@@ -1,6 +1,6 @@
 import { Rect, IRectangularCoordinates, ISize } from "@/maths"
 
-import { Image, SceneLayer } from "@/engine"
+import { Image, ISceneLayer } from "@/engine"
 import { Color } from "@/graphics"
 
 export type Neighborhood<T extends Terrain> = [T|null, T|null, T|null, T|null]
@@ -23,7 +23,7 @@ export interface Terrain {
 
 export type TerrainGenerator<T extends Terrain> = (l: Land<T>, p: IRectangularCoordinates) => T
 
-export interface Land<T extends Terrain = Terrain> extends SceneLayer {
+export interface Land<T extends Terrain = Terrain> extends ISceneLayer {
     readonly size: ISize
     readonly fogOfWar: boolean
     reveal(position?: IRectangularCoordinates, size?: ISize): Land<T>

@@ -1,5 +1,5 @@
 import { SceneLayerImpl } from "./layer"
-import { IScene, SceneLayer } from "./types"
+import { IScene, ISceneLayer } from "./types"
 
 import { cssHex } from "@/graphics/color"
 import { Brush, Painter } from "@/graphics/painter"
@@ -14,7 +14,7 @@ import { isNil, matches } from "lodash"
 type SceneState = {
     backgroundColor: Brush
     gridUnit: 16
-    layers: SceneLayer[]
+    layers: ISceneLayer[]
     rect: Rect
     scaleFactor: ScaleFactor
     viewport: IViewport
@@ -84,7 +84,7 @@ export function createScene(size: ISize, painter: Painter): IScene {
         get viewport(): IViewport {
             return state.viewport
         },
-        addLayer(layer: string|SceneLayer): SceneLayer {
+        addLayer(layer: string|ISceneLayer): ISceneLayer {
             if (typeof layer === "string") {
                 layer = new SceneLayerImpl(this, layer)
             }
@@ -98,7 +98,7 @@ export function createScene(size: ISize, painter: Painter): IScene {
 
             return layer
         },
-        getLayer(layer: string|number): SceneLayer|null {
+        getLayer(layer: string|number): ISceneLayer|null {
             if (typeof layer === "string") {
                 return state.layers.find(matches({ name: layer })) ?? null
             } else {

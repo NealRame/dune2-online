@@ -1,4 +1,4 @@
-import { IScene, SceneItem, SceneLayer } from "./scene"
+import { IScene, SceneItem, ISceneLayer } from "./scene"
 
 import { Color, Painter } from "@/graphics"
 import { Rect, ISize } from "@/maths"
@@ -8,7 +8,7 @@ export interface GridConfig {
     color?: Color.RGBA,
 }
 
-export interface Grid extends SceneLayer {
+export interface Grid extends ISceneLayer {
     space: number,
     color: Color.RGBA,
 }

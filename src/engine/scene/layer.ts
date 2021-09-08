@@ -1,9 +1,9 @@
-import { IScene, SceneItem, SceneLayer } from "./types"
+import { IScene, SceneItem, ISceneLayer } from "./types"
 
 import { Painter } from "@/graphics"
 import { Rect, ISize } from "@/maths"
 
-export class SceneLayerImpl implements SceneLayer {
+export class SceneLayerImpl implements ISceneLayer {
     private items_: SceneItem[] = []
     private scene_: IScene
     name: string
@@ -29,7 +29,7 @@ export class SceneLayerImpl implements SceneLayer {
     }
 
     addItem(item: SceneItem)
-        : SceneLayer {
+        : ISceneLayer {
         this.items_.push(item)
         return this
     }
@@ -42,7 +42,7 @@ export class SceneLayerImpl implements SceneLayer {
     }
 
     render(painter: Painter)
-        : SceneLayer {
+        : ISceneLayer {
         const viewportRect = this.scene_.viewport.rect
         for (const item of this.items_) {
             item.render(painter, viewportRect)
@@ -51,7 +51,7 @@ export class SceneLayerImpl implements SceneLayer {
     }
 
     update()
-        : SceneLayer {
+        : ISceneLayer {
         for (const item of this.items_) {
             item.update()
         }

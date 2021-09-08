@@ -26,7 +26,7 @@ import TilePalette from "@/components/TilePalette.vue"
 import { ImageLib, ImageSet } from "@/dune2/types"
 import { Data } from "@/dune2"
 
-import { createGrid, createScene, createTile, Image, ScaleFactor, IScene, SceneLayer, screenToSceneCoordinate } from "@/engine"
+import { createGrid, createScene, createTile, Image, ScaleFactor, IScene, ISceneLayer, screenToSceneCoordinate } from "@/engine"
 import { IPaintDevice } from "@/graphics"
 
 import { defineComponent, onMounted, ref, unref } from "vue"
@@ -47,7 +47,7 @@ export default defineComponent({
         const currentItem = ref<number | null>(null)
 
         let scene: IScene|null = null
-        let tilesLayer: SceneLayer|null = null
+        let tilesLayer: ISceneLayer|null = null
 
         // handle window resize event
         const resize = debounce(() => {
