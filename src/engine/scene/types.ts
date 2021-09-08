@@ -5,7 +5,7 @@ import { Rect, ISize, Vector } from "@/maths"
 
 export type Image = Record<ScaleFactor, ImageBitmap>
 
-export interface Scene {
+export interface IScene {
     readonly size: ISize
     readonly viewport: IViewport
     readonly width: number
@@ -16,16 +16,16 @@ export interface Scene {
     scale: ScaleFactor
     addLayer(layer: string|SceneLayer): SceneLayer
     getLayer(layer: string|number): SceneLayer|null
-    clear(): Scene
-    render(): Scene
-    update(): Scene
-    zoomIn(): Scene
-    zoomOut(): Scene
+    clear(): IScene
+    render(): IScene
+    update(): IScene
+    zoomIn(): IScene
+    zoomOut(): IScene
 }
 
 export interface SceneLayer {
     name: string
-    readonly scene: Scene
+    readonly scene: IScene
     readonly size: ISize
     readonly rect: Rect
     addItem(item: SceneItem): SceneLayer
@@ -35,7 +35,7 @@ export interface SceneLayer {
 }
 
 export interface SceneItem {
-    readonly scene: Scene
+    readonly scene: IScene
     readonly width: number
     readonly height: number
     readonly size: ISize

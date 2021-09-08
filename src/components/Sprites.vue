@@ -17,7 +17,7 @@ canvas {
 import Screen from "@/components/Screen.vue"
 
 import { Units } from "@/dune2/game"
-import { createGrid, createScene, ScaleFactor, Scene } from "@/engine"
+import { createGrid, createScene, ScaleFactor, IScene } from "@/engine"
 import { Direction } from "@/maths"
 
 import { IPaintDevice } from "@/graphics"
@@ -32,7 +32,7 @@ export default defineComponent({
         const screenWidth = ref(0)
         const screenHeight = ref(0)
         const scale = ref<ScaleFactor>(4)
-        let scene: Scene|null = null
+        let scene: IScene|null = null
 
         // handle window resize event
         const resize = debounce(() => {

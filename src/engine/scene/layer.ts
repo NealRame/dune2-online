@@ -1,14 +1,14 @@
-import { Scene, SceneItem, SceneLayer } from "./types"
+import { IScene, SceneItem, SceneLayer } from "./types"
 
 import { Painter } from "@/graphics"
 import { Rect, ISize } from "@/maths"
 
 export class SceneLayerImpl implements SceneLayer {
     private items_: SceneItem[] = []
-    private scene_: Scene
+    private scene_: IScene
     name: string
 
-    constructor(scene: Scene, name = "") {
+    constructor(scene: IScene, name = "") {
         this.scene_ = scene
         this.name = name
     }
@@ -24,7 +24,7 @@ export class SceneLayerImpl implements SceneLayer {
     }
 
     get scene()
-        : Scene {
+        : IScene {
         return this.scene_
     }
 

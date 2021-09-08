@@ -1,7 +1,7 @@
 import { Terrain } from "./types"
 
 import { ScaleFactors } from "@/engine/scale"
-import { AbstractSceneItem, Image, Scene } from "@/engine/scene"
+import { AbstractSceneItem, Image, IScene } from "@/engine/scene"
 
 import { Painter } from "@/graphics"
 
@@ -13,7 +13,7 @@ export class ChunkItem extends AbstractSceneItem {
     private image_: Partial<Image> = {}
     private redraw_: [IRectangularCoordinates, Image[]][] = []
 
-    constructor(scene: Scene, rect: Rect) {
+    constructor(scene: IScene, rect: Rect) {
         super(scene)
         this.x = rect.x
         this.y = rect.y

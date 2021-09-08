@@ -147,7 +147,7 @@ import ProgressBar from "@/components/ProgressBar.vue"
 import Screen, { ScreenMouseMotionEvent } from "@/components/Screen.vue"
 
 import { createTerrainGenerator } from "@/dune2/land"
-import { createLand, createScene, Scene, screenToSceneCoordinate } from "@/engine"
+import { createLand, createScene, IScene, screenToSceneCoordinate } from "@/engine"
 import { IPaintDevice } from "@/graphics"
 import { IRectangularCoordinates, Vector } from "@/maths"
 
@@ -184,7 +184,7 @@ export default defineComponent({
         const spiceDetails = ref(1)
 
         let seed: number = Date.now()
-        let scene: Scene|null = null
+        let scene: IScene|null = null
         let animationRequestId = 0
 
         const runAnimationLoop = () => {

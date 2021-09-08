@@ -1,6 +1,6 @@
 import { AbstractSceneItem } from "./item"
 import { Tile } from "./tile"
-import { Image, Scene } from "./types"
+import { Image, IScene } from "./types"
 
 import { Painter } from "@/graphics"
 import { Rect, IRectangularCoordinates, ISize, IShape, Vector } from "@/maths"
@@ -14,7 +14,7 @@ export class Sprite extends AbstractSceneItem {
     private frameIndex_: number
 
     constructor(
-        scene: Scene,
+        scene: IScene,
         position: IRectangularCoordinates,
     ) {
         super(scene)
@@ -80,7 +80,7 @@ export type SpriteConfig = {
     onUpdate?: SpriteUpdateDelegate,
 }
 
-export function createSprite(scene: Scene, config: SpriteConfig): Sprite {
+export function createSprite(scene: IScene, config: SpriteConfig): Sprite {
     const position = config.position ?? { x: 0, y: 0 }
     const sprite = isNil(config.onUpdate)
         ? new Sprite(scene, position)

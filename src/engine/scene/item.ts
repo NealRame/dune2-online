@@ -1,20 +1,20 @@
-import { Scene, SceneItem } from "./types"
+import { IScene, SceneItem } from "./types"
 
 import { Painter } from "@/graphics"
 import { Rect, IRectangularCoordinates, ISize, Vector } from "@/maths"
 
 export abstract class AbstractSceneItem implements SceneItem {
-    private scene_: Scene
+    private scene_: IScene
     protected width_ = 0
     protected height_ = 0
     x = 0
     y = 0
 
-    constructor(scene: Scene) {
+    constructor(scene: IScene) {
         this.scene_ = scene
     }
 
-    get scene(): Scene {
+    get scene(): IScene {
         return this.scene_
     }
 

@@ -1,4 +1,4 @@
-import { Scene, SceneItem, SceneLayer } from "./scene"
+import { IScene, SceneItem, SceneLayer } from "./scene"
 
 import { Color, Painter } from "@/graphics"
 import { Rect, ISize } from "@/maths"
@@ -14,7 +14,7 @@ export interface Grid extends SceneLayer {
 }
 
 export function createGrid(
-    scene: Scene,
+    scene: IScene,
     config?: GridConfig,
 ): Grid {
     const state: Required<GridConfig> = {
@@ -25,7 +25,7 @@ export function createGrid(
         get name(): string {
             return "grid"
         },
-        get scene(): Scene {
+        get scene(): IScene {
             return scene
         },
         get size(): ISize {

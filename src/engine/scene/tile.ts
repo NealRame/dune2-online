@@ -1,12 +1,12 @@
 import { AbstractSceneItem } from "./item"
-import { Image, Scene } from "./types"
+import { Image, IScene } from "./types"
 
 import { Painter } from "@/graphics"
 import { Rect, IRectangularCoordinates, IShape, ISize } from "@/maths"
 
 import { isMatch } from "lodash"
 
-function getImageSize(scene: Scene, image: Image): ISize {
+function getImageSize(scene: IScene, image: Image): ISize {
     const { width: w, height: h } = image[1]
     return {
         width: w/scene.gridUnit,
@@ -14,7 +14,7 @@ function getImageSize(scene: Scene, image: Image): ISize {
     }
 }
 
-function checkImages(scene: Scene, images: Image[]) {
+function checkImages(scene: IScene, images: Image[]) {
     const [head, ...tail] = images
     const size = getImageSize(scene, head)
     for (const image of tail) {
@@ -36,7 +36,7 @@ export class Tile extends AbstractSceneItem {
     private shape_: IShape
 
     constructor(
-        scene: Scene,
+        scene: IScene,
         position: IRectangularCoordinates,
         shape: IShape,
         images: Image[],
@@ -79,7 +79,7 @@ export type TileConfig = {
     images: Image[]
 }
 
-export function createTile(scene: Scene, config: TileConfig): Tile {
+export function createTile(scene: IScene, config: TileConfig): Tile {
     return new Tile(
         scene,
         config.position ?? { x: 0, y: 0 },

@@ -1,5 +1,5 @@
 import { SceneLayerImpl } from "./layer"
-import { Scene, SceneLayer } from "./types"
+import { IScene, SceneLayer } from "./types"
 
 import { cssHex } from "@/graphics/color"
 import { Brush, Painter } from "@/graphics/painter"
@@ -36,7 +36,7 @@ export class SceneExistingLayer extends Error {
     }
 }
 
-export function createScene(size: ISize, painter: Painter): Scene {
+export function createScene(size: ISize, painter: Painter): IScene {
     const state: SceneState = {
         backgroundColor: cssHex([0, 0, 0]),
         gridUnit: 16,
@@ -105,11 +105,11 @@ export function createScene(size: ISize, painter: Painter): Scene {
                 return state.layers[layer] ?? null
             }
         },
-        clear(): Scene {
+        clear(): IScene {
             state.layers = []
             return this
         },
-        render(): Scene {
+        render(): IScene {
             if (!isNil(painter)) {
                 painter.clear(state.backgroundColor)
                 // draw items
@@ -120,17 +120,17 @@ export function createScene(size: ISize, painter: Painter): Scene {
 
             return this
         },
-        update(): Scene {
+        update(): IScene {
             for (const layer of state.layers) {
                 layer.update()
             }
             return this
         },
-        zoomIn(): Scene {
+        zoomIn(): IScene {
             this.scale = scaleUp(this.scale)
             return this
         },
-        zoomOut(): Scene {
+        zoomOut(): IScene {
             this.scale = scaleDown(this.scale)
             return this
         }
@@ -138,21 +138,21 @@ export function createScene(size: ISize, painter: Painter): Scene {
 }
 
 export function screenToSceneScale(
-    scene: Scene,
+    scene: IScene,
     { x, y }: IRectangularCoordinates
 ): Vector {
     return (new Vector(x, y)).mul(1/scene.gridSpacing)
 }
 
 export function sceneToScreenScale(
-    scene: Scene,
+    scene: IScene,
     { x, y }: IRectangularCoordinates
 ): Vector {
     return (new Vector(x, y)).mul(scene.gridSpacing)
 }
 
 export function sceneToScreenCoordinate(
-    scene: Scene,
+    scene: IScene,
     { x, y }: IRectangularCoordinates
 ): Vector {
     const { gridSpacing, viewport } = scene
@@ -161,7 +161,7 @@ export function sceneToScreenCoordinate(
 }
 
 export function screenToSceneCoordinate(
-    scene: Scene,
+    scene: IScene,
     { x, y }: IRectangularCoordinates
 ): Vector {
     const { gridSpacing, viewport } = scene
@@ -169,7 +169,7 @@ export function screenToSceneCoordinate(
     return (new Vector(x, y)).mul(1/gridSpacing).add(topLeft)
 }
 
-export function sceneToScreenSize(scene: Scene, size: ISize)
+export function sceneToScreenSize(scene: IScene, size: ISize)
     : ISize {
     const gridSpacing = scene.gridSpacing
     return {
@@ -178,7 +178,7 @@ export function sceneToScreenSize(scene: Scene, size: ISize)
     }
 }
 
-export function screenToSceneSize(scene: Scene, size: ISize)
+export function screenToSceneSize(scene: IScene, size: ISize)
     : ISize {
     const { gridSpacing } = scene
     return {
@@ -187,14 +187,14 @@ export function screenToSceneSize(scene: Scene, size: ISize)
     }
 }
 
-export function sceneToScreenRect(scene: Scene, rect: Rect)
+export function sceneToScreenRect(scene: IScene, rect: Rect)
     : Rect {
     const { gridSpacing, viewport } = scene
     const topLeft = viewport.rect.topLeft()
     return rect.translated(topLeft.opposite).scale(gridSpacing)
 }
 
-export function screenToSceneRect(scene: Scene, rect: Rect)
+export function screenToSceneRect(scene: IScene, rect: Rect)
     : Rect {
     const { gridSpacing, viewport } = scene
     const topLeft = viewport.rect.topLeft()

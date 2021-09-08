@@ -4,7 +4,7 @@ import {
     Animation,
     createSequenceAnimation,
     createTransitionAnimation,
-    Scene,
+    IScene,
 } from "@/engine"
 import {
     Direction,
@@ -33,7 +33,7 @@ export class Unit extends Sprite {
     private moveObserver_: Observer<void>
     private animation_: Animation|null
 
-    constructor(scene: Scene, position: IRectangularCoordinates) {
+    constructor(scene: IScene, position: IRectangularCoordinates) {
         super(scene, position)
         this.hitPoints_ = 1
         this.speed_ = 1

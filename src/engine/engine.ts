@@ -1,4 +1,4 @@
-import { createScene, Scene } from "./scene"
+import { createScene, IScene } from "./scene"
 import { createLand, Land, Terrain, TerrainGenerator } from "./land"
 import { Unit } from "./unit"
 
@@ -9,7 +9,7 @@ import { isNil } from "lodash"
 
 interface State {
     animationRequestId: number
-    scene: Scene
+    scene: IScene
 }
 
 export interface Config<T extends Terrain = Terrain> {
@@ -20,7 +20,7 @@ export interface Config<T extends Terrain = Terrain> {
 
 export interface Engine<T extends Terrain = Terrain> {
     readonly land: Land<T>
-    readonly scene: Scene
+    readonly scene: IScene
     addUnit(unit: Unit): Engine<T>
     start(): Engine<T>
     stop(): Engine<T>

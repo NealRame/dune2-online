@@ -4,7 +4,7 @@ import { ChunkItem } from "./chunkItem"
 
 import { createObserver, Observer } from "@/utils"
 
-import { Scene, SceneItem } from "@/engine"
+import { IScene, SceneItem } from "@/engine"
 import { Painter } from "@/graphics"
 import { Rect, IRectangularCoordinates, ISize, Vector } from "@/maths"
 
@@ -89,12 +89,12 @@ export class LandImpl<T extends Terrain> implements Land<T> {
     private fogOfWar_: boolean
     private items_: SceneItem[]
     private positionToTerrainIndex_: (p: IRectangularCoordinates) => number
-    private scene_: Scene
+    private scene_: IScene
     private terrains_: T[]
     private terrainsObserver_: Observer<T>
 
     constructor(
-        scene: Scene,
+        scene: IScene,
         config: LandConfig<T>,
     ) {
         this.fogOfWar_ = config.fogOfWarEnabled ?? true
@@ -116,7 +116,7 @@ export class LandImpl<T extends Terrain> implements Land<T> {
         }
     }
 
-    get scene(): Scene {
+    get scene(): IScene {
         return this.scene_
     }
 
@@ -201,7 +201,7 @@ export class LandImpl<T extends Terrain> implements Land<T> {
 }
 
 export function createLand<T extends Terrain>(
-    scene: Scene,
+    scene: IScene,
     landConfig: LandConfig<T>,
 ): Land<T> {
     return new LandImpl(scene, landConfig)
