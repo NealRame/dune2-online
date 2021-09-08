@@ -1,9 +1,9 @@
-import { IScene, SceneItem } from "./types"
+import { IScene, ISceneItem } from "./types"
 
 import { Painter } from "@/graphics"
 import { Rect, IRectangularCoordinates, ISize, Vector } from "@/maths"
 
-export abstract class AbstractSceneItem implements SceneItem {
+export abstract class AbstractSceneItem implements ISceneItem {
     private scene_: IScene
     protected width_ = 0
     protected height_ = 0
@@ -46,7 +46,7 @@ export abstract class AbstractSceneItem implements SceneItem {
         return new Rect(this.position, this.size)
     }
 
-    abstract render(painter: Painter, viewport: Rect): SceneItem
+    abstract render(painter: Painter, viewport: Rect): ISceneItem
 
     update(): AbstractSceneItem {
         return this

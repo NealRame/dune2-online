@@ -28,19 +28,19 @@ export interface ISceneLayer {
     readonly scene: IScene
     readonly size: ISize
     readonly rect: Rect
-    addItem(item: SceneItem): ISceneLayer
-    items(): Generator<SceneItem>
+    addItem(item: ISceneItem): ISceneLayer
+    items(): Generator<ISceneItem>
     render(painter: Painter): ISceneLayer
     update(): ISceneLayer
 }
 
-export interface SceneItem {
+export interface ISceneItem {
     readonly scene: IScene
     readonly width: number
     readonly height: number
     readonly size: ISize
     readonly rect: Rect
     readonly position: Vector
-    render(painter: Painter, viewport: Rect): SceneItem
-    update(): SceneItem
+    render(painter: Painter, viewport: Rect): ISceneItem
+    update(): ISceneItem
 }

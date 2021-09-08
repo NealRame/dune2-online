@@ -1,10 +1,10 @@
-import { IScene, SceneItem, ISceneLayer } from "./types"
+import { IScene, ISceneItem, ISceneLayer } from "./types"
 
 import { Painter } from "@/graphics"
 import { Rect, ISize } from "@/maths"
 
 export class SceneLayerImpl implements ISceneLayer {
-    private items_: SceneItem[] = []
+    private items_: ISceneItem[] = []
     private scene_: IScene
     name: string
 
@@ -28,14 +28,14 @@ export class SceneLayerImpl implements ISceneLayer {
         return this.scene_
     }
 
-    addItem(item: SceneItem)
+    addItem(item: ISceneItem)
         : ISceneLayer {
         this.items_.push(item)
         return this
     }
 
     * items()
-        : Generator<SceneItem> {
+        : Generator<ISceneItem> {
         for (const item of this.items_) {
             yield item
         }

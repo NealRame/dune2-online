@@ -1,10 +1,10 @@
 import { Terrain } from "./types"
 
-import { IScene, SceneItem } from "@/engine"
+import { IScene, ISceneItem } from "@/engine"
 import { Painter } from "@/graphics"
 import { Rect, ISize, Vector } from "@/maths"
 
-export class TerrainItem implements SceneItem {
+export class TerrainItem implements ISceneItem {
     private scene_: IScene
     private terrain_: Terrain
 

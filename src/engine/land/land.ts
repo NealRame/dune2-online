@@ -4,7 +4,7 @@ import { ChunkItem } from "./chunkItem"
 
 import { createObserver, Observer } from "@/utils"
 
-import { IScene, SceneItem } from "@/engine"
+import { IScene, ISceneItem } from "@/engine"
 import { Painter } from "@/graphics"
 import { Rect, IRectangularCoordinates, ISize, Vector } from "@/maths"
 
@@ -34,7 +34,7 @@ export function generateLandTerrains<T extends Terrain>(
 
 export function generateLandTerrainItems(
     land: Land
-): Array<SceneItem> {
+): Array<ISceneItem> {
     const items: Array<TerrainItem> = []
     for (const terrain of land.terrains()) {
         items.push(new TerrainItem(land.scene, terrain))
@@ -45,7 +45,7 @@ export function generateLandTerrainItems(
 export function generateLandChunkItems(
     land: Land,
     chunkSize: ISize,
-): Array<SceneItem> {
+): Array<ISceneItem> {
     const chunks: ChunkItem[] = []
 
     for (const chunkRect of land.rect.partition(chunkSize)) {
@@ -79,7 +79,7 @@ export function generateLandChunkItems(
 export function generateLandItems<T extends Terrain>(
     land: Land<T>,
     config: Required<LandConfig<T>>
-): Array<SceneItem> {
+): Array<ISceneItem> {
     return config.chunkEnabled
         ? generateLandChunkItems(land, config.chunkSize)
         : generateLandTerrainItems(land)
@@ -87,7 +87,7 @@ export function generateLandItems<T extends Terrain>(
 
 export class LandImpl<T extends Terrain> implements Land<T> {
     private fogOfWar_: boolean
-    private items_: SceneItem[]
+    private items_: ISceneItem[]
     private positionToTerrainIndex_: (p: IRectangularCoordinates) => number
     private scene_: IScene
     private terrains_: T[]
@@ -110,7 +110,7 @@ export class LandImpl<T extends Terrain> implements Land<T> {
     }
 
     * items()
-        : Generator<SceneItem> {
+        : Generator<ISceneItem> {
         for (const zone of this.items_) {
             yield zone
         }

@@ -1,4 +1,4 @@
-import { IScene, SceneItem, ISceneLayer } from "./scene"
+import { IScene, ISceneItem, ISceneLayer } from "./scene"
 
 import { Color, Painter } from "@/graphics"
 import { Rect, ISize } from "@/maths"
@@ -49,7 +49,7 @@ export function createGrid(
         addItem(): Grid {
             return this
         },
-        * items(): Generator<SceneItem, void, undefined> {
+        * items(): Generator<ISceneItem, void, undefined> {
             yield * []
         },
         render(painter: Painter): Grid {
