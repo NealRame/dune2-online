@@ -1,12 +1,12 @@
 export type EventCallback<EventType> = (event: EventType) => void
 
-export interface Observer<EventType> {
+export interface IObserver<EventType> {
     publish(event: EventType): void,
     subscribe(callback: EventCallback<EventType>): () => void,
 }
 
 export function createObserver<EventType>()
-    : Observer<EventType> {
+    : IObserver<EventType> {
     let callbacks: EventCallback<EventType>[] = []
     return {
         publish(event: EventType) {

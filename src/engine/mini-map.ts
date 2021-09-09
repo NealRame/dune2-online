@@ -2,13 +2,13 @@ import { Engine } from "./engine"
 import { ITerrain } from "./land"
 
 import { Color } from "@/graphics"
-import { createObserver, Observer } from "@/utils"
+import { createObserver, IObserver } from "@/utils"
 
 import { isNil } from "lodash"
 
 export interface IMiniMap {
     readonly image: ImageBitmap|null
-    readonly onChanged: Observer<void> // TODO: should be an emitter
+    readonly onChanged: IObserver<void> // TODO: should be an emitter
 }
 
 export function createMiniMap<T extends ITerrain>(game: Engine<T>)

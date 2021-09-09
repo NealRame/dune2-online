@@ -1,10 +1,10 @@
 import { Rect, IVector2D, ISize } from "@/maths"
-import { createObserver, Observer } from "@/utils"
+import { createObserver, IObserver } from "@/utils"
 
 import { clamp } from "lodash"
 
 export interface IViewport {
-    readonly onChanged: Observer<Rect>
+    readonly onChanged: IObserver<Rect>
     readonly rect: Rect
     position: IVector2D
     size: ISize
@@ -27,7 +27,7 @@ export function createViewport(sceneSize: ISize): IViewport {
     }
 
     return {
-        get onChanged(): Observer<Rect> {
+        get onChanged(): IObserver<Rect> {
             return observer
         },
         get rect(): Rect {

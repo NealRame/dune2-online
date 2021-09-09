@@ -2,7 +2,7 @@ import { ILand, ILandConfig, ITerrain, TerrainGenerator } from "./types"
 import { createPositionToZoneConverter } from "./utils"
 import { ChunkItem } from "./chunkItem"
 
-import { createObserver, Observer } from "@/utils"
+import { createObserver, IObserver } from "@/utils"
 
 import { IScene, ISceneItem } from "@/engine"
 import { Painter } from "@/graphics"
@@ -91,7 +91,7 @@ export class LandImpl<T extends ITerrain> implements ILand<T> {
     private positionToTerrainIndex_: (p: IVector2D) => number
     private scene_: IScene
     private terrains_: T[]
-    private terrainsObserver_: Observer<T>
+    private terrainsObserver_: IObserver<T>
 
     constructor(
         scene: IScene,

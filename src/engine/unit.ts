@@ -13,7 +13,7 @@ import {
     IVector2D,
     Vector
 } from "@/maths"
-import { createObserver, EventCallback, Observer } from "@/utils"
+import { createObserver, EventCallback, IObserver } from "@/utils"
 
 import { clamp, isNil, times } from "lodash"
 
@@ -30,7 +30,7 @@ export class Unit extends Sprite {
     protected hitPoints_: number
     protected speed_: number
 
-    private moveObserver_: Observer<void>
+    private moveObserver_: IObserver<void>
     private animation_: Animation|null
 
     constructor(scene: IScene, position: IVector2D) {
