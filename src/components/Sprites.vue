@@ -40,11 +40,6 @@ export default defineComponent({
             screenHeight.value = window.innerHeight
         }, 60)
 
-        // const onMouseClick = (ev: ScreenMouseClickEvent) => {
-        //     const scenePos = screenToSceneCoordinate(scene, ev.position)
-        //     console.log(scenePos, scene.rect)
-        // }
-
         onMounted(async () => {
             scene = createScene({
                 width: 60,
@@ -100,7 +95,6 @@ export default defineComponent({
             screen,
             screenWidth,
             screenHeight,
-            // onMouseClick
         }
     }
 })
