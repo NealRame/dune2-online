@@ -82,14 +82,6 @@ export default defineComponent({
             resize()
         })
 
-        // const screenToSceneCoordinates = (position: RectangularCoordinates) => {
-        //     const gridSpacing = scene.gridSpacing
-        //     return {
-        //         x: Math.floor(position.x/gridSpacing),
-        //         y: Math.floor(position.y/gridSpacing)
-        //     }
-        // }
-
         const onMouseClick = (ev: ScreenMouseClickEvent) => {
             const image = unref(currentItem)
 
