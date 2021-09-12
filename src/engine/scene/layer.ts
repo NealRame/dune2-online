@@ -6,12 +6,13 @@ import { Rect, ISize, Vector } from "@/maths"
 export class SceneLayerImpl implements ISceneLayer {
     private items_: ISceneItem[] = []
     private scene_: IScene
+
     name: string
     visible = true
 
-    constructor(scene: IScene, name = "") {
+    constructor(scene: IScene, name?: string) {
         this.scene_ = scene
-        this.name = name
+        this.name = name ?? ""
     }
 
     get position()
