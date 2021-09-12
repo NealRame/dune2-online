@@ -31,12 +31,3 @@ export interface LandConfig {
     spiceThreshold?: number,             // clamped to [ 0, 1 ]
     spiceSaturationThreshold?: number    // clamped to [ spiceThreshold, 1 ]
 }
-
-export enum TerrainType {
-    Dunes = 0,
-    Sand,
-    SpiceField,
-    SaturatedSpiceField,
-    Rock,
-    Mountain,
-}

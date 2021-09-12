@@ -1,4 +1,4 @@
-import { LandConfig, TerrainType } from "@/dune2/types"
+import { LandConfig } from "@/dune2/types"
 import { imageSet, palette } from "@/dune2/data"
 
 import { RGBA } from "@/graphics/color"
@@ -9,6 +9,15 @@ import { AbstractTerrain, ILand, Neighborhood, TerrainGenerator } from "@/engine
 import { createNoise2DGenerator, createRangeMapper, IVector2D } from "@/maths"
 
 import { chain, clamp, flow, isNil } from "lodash"
+
+export enum TerrainType {
+    Dunes = 0,
+    Sand,
+    SpiceField,
+    SaturatedSpiceField,
+    Rock,
+    Mountain,
+}
 
 export class Terrain extends AbstractTerrain {
     spice = 0
