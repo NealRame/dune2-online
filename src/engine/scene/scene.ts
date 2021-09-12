@@ -15,25 +15,11 @@ type SceneState = {
     backgroundColor: Brush
     gridUnit: 16
     items: ISceneItem[]
-    rect: Rect
     scaleFactor: ScaleFactor
+    width: number
+    height: number
     viewport: IViewport
-}
-
-export class SceneExistingLayer extends Error {
-    private name_: string
-
-    constructor(name: string) {
-        super(`Layer '${name}' already exist`)
-        this.name_ = name
-
-        // restore prototype chain
-        Object.setPrototypeOf(this, new.target.prototype)
-    }
-
-    get name(): string {
-        return this.name_
-    }
+    visible: boolean
 }
 
 export function createScene(size: ISize, painter: Painter): IScene {
@@ -42,8 +28,10 @@ export function createScene(size: ISize, painter: Painter): IScene {
         gridUnit: 16,
         items: [],
         scaleFactor: 1,
-        rect: new Rect({ x: 0, y: 0 }, size),
+        width: size.width,
+        height: size.height,
         viewport: createViewport(size),
+        visible: true,
     }
 
     const getGridSpacing = () => state.scaleFactor*state.gridUnit
@@ -69,24 +57,47 @@ export function createScene(size: ISize, painter: Painter): IScene {
         get gridSpacing(): number {
             return getGridSpacing()
         },
+        get position(): Vector {
+            return Vector.Null
+        },
         get width(): number {
-            return state.rect.width
+            return state.width
         },
         get height(): number {
-            return state.rect.height
+            return state.height
         },
         get size(): ISize {
-            return state.rect.size
+            return {
+                width: state.width,
+                height: state.height
+            }
         },
         get rect(): Rect {
-            return state.rect.copy()
+            return new Rect({ x: 0, y: 0 }, this.size)
         },
         get viewport(): IViewport {
             return state.viewport
         },
+        get scene(): IScene {
+            return this
+        },
+        get visible(): boolean {
+            return state.visible
+        },
+        set visible(visible: boolean) {
+            state.visible = visible
+        },
+        get name(): string {
+            return ""
+        },
         addItem(item: ISceneItem): IScene {
             state.items.push(item)
             return this
+        },
+        * items() {
+            for (const item of state.items) {
+                yield item
+            }
         },
         clear(): IScene {
             state.items = []
@@ -102,7 +113,6 @@ export function createScene(size: ISize, painter: Painter): IScene {
                     }
                 }
             }
-
             return this
         },
         update(): IScene {

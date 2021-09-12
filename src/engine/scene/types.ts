@@ -5,16 +5,12 @@ import { Rect, ISize, Vector } from "@/maths"
 
 export type Image = Record<ScaleFactor, ImageBitmap>
 
-export interface IScene {
+export interface IScene extends ISceneLayer {
     readonly size: ISize
     readonly viewport: IViewport
-    readonly width: number
-    readonly height: number
     readonly gridUnit: number
     readonly gridSpacing: number
-    readonly rect: Rect
     scale: ScaleFactor
-    addItem(item: ISceneItem): IScene
     clear(): IScene
     render(): IScene
     update(): IScene
