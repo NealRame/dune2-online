@@ -114,7 +114,7 @@ export function createScene(size: ISize, painter: Painter): IScene {
                 painter.clear(state.backgroundColor)
                 // draw items
                 for (const layer of state.layers) {
-                    layer.render(painter)
+                    layer.render(painter, state.viewport.rect)
                 }
             }
 

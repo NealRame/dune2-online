@@ -1,7 +1,7 @@
 import { IScene, ISceneItem, ISceneLayer } from "./types"
 
 import { Painter } from "@/graphics"
-import { Rect, ISize } from "@/maths"
+import { Rect, ISize, Vector } from "@/maths"
 
 export class SceneLayerImpl implements ISceneLayer {
     private items_: ISceneItem[] = []
@@ -13,14 +13,29 @@ export class SceneLayerImpl implements ISceneLayer {
         this.name = name
     }
 
-    get rect()
-        : Rect {
-        return this.scene_.rect
+    get position()
+        : Vector {
+        return Vector.Null
+    }
+
+    get width()
+        : number {
+        return this.scene_.width
+    }
+
+    get height()
+        : number {
+        return this.scene_.height
     }
 
     get size()
         : ISize {
         return this.scene_.size
+    }
+
+    get rect()
+        : Rect {
+        return this.scene_.rect
     }
 
     get scene()
@@ -41,11 +56,12 @@ export class SceneLayerImpl implements ISceneLayer {
         }
     }
 
-    render(painter: Painter)
+    render(painter: Painter, viewport: Rect)
         : ISceneLayer {
-        const viewportRect = this.scene_.viewport.rect
         for (const item of this.items_) {
-            item.render(painter, viewportRect)
+            if (viewport.intersects(item.rect)) {
+                item.render(painter, viewport)
+            }
         }
         return this
     }

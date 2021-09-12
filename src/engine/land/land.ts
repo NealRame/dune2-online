@@ -124,6 +124,14 @@ export class LandImpl<T extends ITerrain> implements ILand<T> {
         return Vector.Null
     }
 
+    get width(): number {
+        return this.scene_.width
+    }
+
+    get height(): number {
+        return this.scene_.height
+    }
+
     get size(): ISize {
         return this.scene_.size
     }

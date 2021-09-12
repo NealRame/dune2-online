@@ -23,17 +23,6 @@ export interface IScene {
     zoomOut(): IScene
 }
 
-export interface ISceneLayer {
-    name: string
-    readonly scene: IScene
-    readonly size: ISize
-    readonly rect: Rect
-    addItem(item: ISceneItem): ISceneLayer
-    items(): Generator<ISceneItem>
-    render(painter: Painter): ISceneLayer
-    update(): ISceneLayer
-}
-
 export interface ISceneItem {
     readonly scene: IScene
     readonly width: number
@@ -43,4 +32,10 @@ export interface ISceneItem {
     readonly position: Vector
     render(painter: Painter, viewport: Rect): ISceneItem
     update(): ISceneItem
+}
+
+export interface ISceneLayer extends ISceneItem {
+    name: string
+    addItem(item: ISceneItem): ISceneLayer
+    items(): Generator<ISceneItem>
 }
