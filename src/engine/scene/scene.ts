@@ -1,5 +1,4 @@
-import { SceneLayerImpl } from "./layer"
-import { IScene, ISceneLayer } from "./types"
+import { IScene } from "./types"
 
 import { cssHex } from "@/graphics/color"
 import { Brush, Painter } from "@/graphics/painter"
@@ -9,12 +8,13 @@ import { createViewport, IViewport } from "@/engine/viewport"
 
 import { Rect, IVector2D, ISize, Vector } from "@/maths"
 
-import { isNil, matches } from "lodash"
+import { isNil } from "lodash"
+import { ISceneItem } from "."
 
 type SceneState = {
     backgroundColor: Brush
     gridUnit: 16
-    layers: ISceneLayer[]
+    items: ISceneItem[]
     rect: Rect
     scaleFactor: ScaleFactor
     viewport: IViewport
@@ -40,7 +40,7 @@ export function createScene(size: ISize, painter: Painter): IScene {
     const state: SceneState = {
         backgroundColor: cssHex([0, 0, 0]),
         gridUnit: 16,
-        layers: [],
+        items: [],
         scaleFactor: 1,
         rect: new Rect({ x: 0, y: 0 }, size),
         viewport: createViewport(size),
@@ -84,38 +84,21 @@ export function createScene(size: ISize, painter: Painter): IScene {
         get viewport(): IViewport {
             return state.viewport
         },
-        addLayer(layer: string|ISceneLayer): ISceneLayer {
-            if (typeof layer === "string") {
-                layer = new SceneLayerImpl(this, layer)
-            }
-
-            const { name } = layer
-            if (state.layers.some(matches({ name }))) {
-                throw new SceneExistingLayer(layer.name)
-            }
-
-            state.layers.push(layer)
-
-            return layer
-        },
-        getLayer(layer: string|number): ISceneLayer|null {
-            if (typeof layer === "string") {
-                return state.layers.find(matches({ name: layer })) ?? null
-            } else {
-                return state.layers[layer] ?? null
-            }
+        addItem(item: ISceneItem): IScene {
+            state.items.push(item)
+            return this
         },
         clear(): IScene {
-            state.layers = []
+            state.items = []
             return this
         },
         render(): IScene {
             if (!isNil(painter)) {
                 painter.clear(state.backgroundColor)
                 // draw items
-                for (const layer of state.layers) {
-                    if (layer.visible) {
-                        layer.render(painter, state.viewport.rect)
+                for (const item of state.items) {
+                    if (item.visible) {
+                        item.render(painter, state.viewport.rect)
                     }
                 }
             }
@@ -123,8 +106,8 @@ export function createScene(size: ISize, painter: Painter): IScene {
             return this
         },
         update(): IScene {
-            for (const layer of state.layers) {
-                layer.update()
+            for (const item of state.items) {
+                item.update()
             }
             return this
         },

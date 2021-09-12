@@ -1,16 +1,9 @@
-import { createScene, IScene } from "./scene"
+import { createScene, IScene, SceneLayer } from "./scene"
 import { createLand, ILand, ITerrain, TerrainGenerator } from "./land"
 import { Unit } from "./unit"
 
 import { Painter } from "@/graphics"
 import { ISize } from "@/maths"
-
-import { isNil } from "lodash"
-
-interface State {
-    animationRequestId: number
-    scene: IScene
-}
 
 export interface Config<T extends ITerrain = ITerrain> {
     painter: Painter
@@ -28,40 +21,40 @@ export interface Engine<T extends ITerrain = ITerrain> {
 
 export function create<T extends ITerrain>(config: Config<T>)
     : Engine<T> {
-    const state: State = {
-        animationRequestId: 0,
-        scene: createScene(config.size, config.painter),
-    }
+    const scene = createScene(config.size, config.painter)
+    const land = createLand(scene, config)
 
-    state.scene.addLayer(createLand(state.scene, config))
-    state.scene.addLayer("units")
+    const units = new SceneLayer(scene, "units")
+
+    let animationRequestId = 0
+
+    scene
+        .addItem(land)
+        .addItem(units)
 
     return {
         get land() {
-            return state.scene.getLayer("land") as ILand<T>
+            return land
         },
         get scene() {
-            return state.scene
+            return scene
         },
         addUnit(unit: Unit) {
-            const unitLayer = state.scene.getLayer("units")
-            if (!isNil(unitLayer)) {
-                unitLayer.addItem(unit)
-            }
+            units.addItem(unit)
             return this
         },
         start(): Engine<T> {
             (function animationLoop() {
-                state.scene
+                scene
                     .update()
                     .render()
-                state.animationRequestId = requestAnimationFrame(animationLoop)
+                animationRequestId = requestAnimationFrame(animationLoop)
             })()
             return this
         },
         stop(): Engine<T> {
-            cancelAnimationFrame(state.animationRequestId)
-            state.animationRequestId = 0
+            cancelAnimationFrame(animationRequestId)
+            animationRequestId = 0
             return this
         }
     }

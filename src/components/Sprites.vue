@@ -58,8 +58,8 @@ export default defineComponent({
 
             const unit = new Units.Trike(scene, { x: 8, y: 8 })
 
-            scene.addLayer(createGrid(scene))
-            scene.addLayer("units").addItem(unit)
+            scene.addItem(createGrid(scene))
+            scene.addItem(unit)
 
             window.addEventListener("resize", resize)
 

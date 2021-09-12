@@ -26,7 +26,7 @@ import TilePalette from "@/components/TilePalette.vue"
 import { ImageLib, ImageSet } from "@/dune2/types"
 import { Data } from "@/dune2"
 
-import { createGrid, createScene, createTile, Image, ScaleFactor, IScene, ISceneLayer, screenToSceneCoordinate } from "@/engine"
+import { createGrid, createScene, createTile, Image, ScaleFactor, IScene, screenToSceneCoordinate } from "@/engine"
 import { IPaintDevice } from "@/graphics"
 
 import { defineComponent, onMounted, ref, unref } from "vue"
@@ -47,7 +47,6 @@ export default defineComponent({
         const currentItem = ref<number | null>(null)
 
         let scene: IScene|null = null
-        let tilesLayer: ISceneLayer|null = null
 
         // handle window resize event
         const resize = debounce(() => {
@@ -64,9 +63,7 @@ export default defineComponent({
                 height: 60,
             }, (unref(screen) as IPaintDevice).painter)
             scene.scale = unref(scale)
-
-            tilesLayer = scene.addLayer("tiles")
-            scene.addLayer(createGrid(scene))
+            scene.addItem(createGrid(scene))
 
             window.addEventListener("resize", resize)
 
@@ -85,9 +82,9 @@ export default defineComponent({
         const onMouseClick = (ev: ScreenMouseClickEvent) => {
             const image = unref(currentItem)
 
-            if (isNil(image) || isNil(scene) || isNil(tilesLayer)) return
+            if (isNil(image) || isNil(scene)) return
 
-            tilesLayer.addItem(createTile(scene, {
+            scene.addItem(createTile(scene, {
                 position: screenToSceneCoordinate(scene, ev.position),
                 shape: { columns: 1, rows: 1 },
                 images: [Data.imageSet(props.set as keyof ImageLib)[image]]

@@ -1,4 +1,4 @@
-import { IScene, ISceneItem, ISceneLayer } from "./scene"
+import { IScene, ISceneItem } from "./scene"
 
 import { Color, Painter } from "@/graphics"
 import { Rect, ISize, Vector } from "@/maths"
@@ -9,7 +9,7 @@ export interface GridConfig {
     visible: boolean
 }
 
-export interface Grid extends ISceneLayer {
+export interface Grid extends ISceneItem {
     space: number,
     color: Color.RGBA,
 }
@@ -62,12 +62,6 @@ export function createGrid(
         },
         set visible(v: boolean) {
             state.visible = v
-        },
-        addItem(): Grid {
-            return this
-        },
-        * items(): Generator<ISceneItem, void, undefined> {
-            yield * []
         },
         render(painter: Painter): Grid {
             const { width, height } = painter.size

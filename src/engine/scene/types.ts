@@ -14,8 +14,7 @@ export interface IScene {
     readonly gridSpacing: number
     readonly rect: Rect
     scale: ScaleFactor
-    addLayer(layer: string|ISceneLayer): ISceneLayer
-    getLayer(layer: string|number): ISceneLayer|null
+    addItem(item: ISceneItem): IScene
     clear(): IScene
     render(): IScene
     update(): IScene
