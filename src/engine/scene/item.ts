@@ -1,18 +1,22 @@
 import { IScene, ISceneItem } from "./types"
 
 import { Painter } from "@/graphics"
-import { Rect, IVector2D, ISize, Vector } from "@/maths"
+import { Rect, ISize, Vector } from "@/maths"
 
 export abstract class AbstractSceneItem implements ISceneItem {
     private scene_: IScene
-    protected width_ = 0
-    protected height_ = 0
-    x = 0
-    y = 0
+    protected x_ = 0
+    protected y_ = 0
+    protected width_: number
+    protected height_: number
+    name: string
     visible = true
 
-    constructor(scene: IScene) {
+    constructor(scene: IScene, name?: string) {
         this.scene_ = scene
+        this.width_ = this.scene_.width
+        this.height_ = this.scene_.height
+        this.name = name ?? ""
     }
 
     get scene(): IScene {
@@ -20,12 +24,7 @@ export abstract class AbstractSceneItem implements ISceneItem {
     }
 
     get position(): Vector {
-        return new Vector(this.x, this.y)
-    }
-
-    set position({ x, y }: IVector2D) {
-        this.x = x
-        this.y = y
+        return new Vector(this.x_, this.y_)
     }
 
     get width(): number {

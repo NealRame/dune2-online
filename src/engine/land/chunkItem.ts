@@ -15,8 +15,8 @@ export class ChunkItem extends AbstractSceneItem {
 
     constructor(scene: IScene, rect: Rect) {
         super(scene)
-        this.x = rect.x
-        this.y = rect.y
+        this.x_ = rect.x
+        this.y_ = rect.y
         this.width_ = rect.width
         this.height_ = rect.height
     }
@@ -46,8 +46,8 @@ export class ChunkItem extends AbstractSceneItem {
                 for (const image of images) {
                     context.drawImage(
                         image[scale],
-                        gridSpacing*(position.x - this.x),
-                        gridSpacing*(position.y - this.y),
+                        gridSpacing*(position.x - this.x_),
+                        gridSpacing*(position.y - this.y_),
                     )
                 }
             }

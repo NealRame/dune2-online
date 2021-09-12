@@ -18,7 +18,8 @@ export class Sprite extends AbstractSceneItem {
         position: IVector2D,
     ) {
         super(scene)
-        this.position = position
+        this.x_ = position.x
+        this.y_ = position.y
         this.frames_ = []
         this.frameIndex_ = 0
     }

@@ -41,6 +41,15 @@ export class Unit extends Sprite {
         this.moveObserver_ = createObserver()
     }
 
+    get position(): Vector {
+        return super.position
+    }
+
+    set position({ x, y }: IVector2D) {
+        this.x_ = x
+        this.y_ = y
+    }
+
     get direction(): Direction {
         return this.frameIndex
     }

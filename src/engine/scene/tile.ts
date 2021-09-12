@@ -49,7 +49,8 @@ export class Tile extends AbstractSceneItem {
         this.imageSize_ = getImageSize(scene, images[0])
         this.images_ = images
         this.shape_ = shape
-        this.position = position
+        this.x_ = position.x
+        this.y_ = position.y
         this.width_ = shape.columns*this.imageSize_.width
         this.height_ = shape.rows*this.imageSize_.height
     }
