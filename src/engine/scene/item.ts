@@ -48,7 +48,7 @@ export abstract class AbstractSceneItem implements ISceneItem {
 
     abstract render(painter: Painter, viewport: Rect): ISceneItem
 
-    update(): AbstractSceneItem {
+    update(): ISceneItem {
         return this
     }
 }

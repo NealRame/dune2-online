@@ -9,6 +9,7 @@ export class TerrainItem implements ISceneItem {
     private terrain_: ITerrain
 
     visible = true
+    name = ""
 
     constructor(scene: IScene, terrain: ITerrain) {
         this.scene_ = scene

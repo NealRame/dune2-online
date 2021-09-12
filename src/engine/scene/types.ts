@@ -30,13 +30,13 @@ export interface ISceneItem {
     readonly size: ISize
     readonly rect: Rect
     readonly position: Vector
+    name: string
     visible: boolean
     render(painter: Painter, viewport: Rect): ISceneItem
     update(): ISceneItem
 }
 
 export interface ISceneLayer extends ISceneItem {
-    name: string
     addItem(item: ISceneItem): ISceneLayer
     items(): Generator<ISceneItem>
 }

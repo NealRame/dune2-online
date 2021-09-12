@@ -1,49 +1,11 @@
-import { IScene, ISceneItem, ISceneLayer } from "./types"
+import { ISceneItem, ISceneLayer } from "./types"
 
 import { Painter } from "@/graphics"
-import { Rect, ISize, Vector } from "@/maths"
+import { Rect } from "@/maths"
+import { AbstractSceneItem } from "."
 
-export class SceneLayerImpl implements ISceneLayer {
+export class SceneLayerImpl extends AbstractSceneItem {
     private items_: ISceneItem[] = []
-    private scene_: IScene
-
-    name: string
-    visible = true
-
-    constructor(scene: IScene, name?: string) {
-        this.scene_ = scene
-        this.name = name ?? ""
-    }
-
-    get position()
-        : Vector {
-        return Vector.Null
-    }
-
-    get width()
-        : number {
-        return this.scene_.width
-    }
-
-    get height()
-        : number {
-        return this.scene_.height
-    }
-
-    get size()
-        : ISize {
-        return this.scene_.size
-    }
-
-    get rect()
-        : Rect {
-        return this.scene_.rect
-    }
-
-    get scene()
-        : IScene {
-        return this.scene_
-    }
 
     addItem(item: ISceneItem)
         : ISceneLayer {
