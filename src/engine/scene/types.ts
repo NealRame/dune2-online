@@ -30,6 +30,7 @@ export interface ISceneItem {
     readonly size: ISize
     readonly rect: Rect
     readonly position: Vector
+    visible: boolean
     render(painter: Painter, viewport: Rect): ISceneItem
     update(): ISceneItem
 }

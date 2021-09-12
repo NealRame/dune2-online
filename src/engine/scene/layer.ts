@@ -7,6 +7,7 @@ export class SceneLayerImpl implements ISceneLayer {
     private items_: ISceneItem[] = []
     private scene_: IScene
     name: string
+    visible = true
 
     constructor(scene: IScene, name = "") {
         this.scene_ = scene
@@ -59,7 +60,7 @@ export class SceneLayerImpl implements ISceneLayer {
     render(painter: Painter, viewport: Rect)
         : ISceneLayer {
         for (const item of this.items_) {
-            if (viewport.intersects(item.rect)) {
+            if (item.visible && viewport.intersects(item.rect)) {
                 item.render(painter, viewport)
             }
         }

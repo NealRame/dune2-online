@@ -93,6 +93,8 @@ export class LandImpl<T extends ITerrain> implements ILand<T> {
     private terrains_: T[]
     private terrainsObserver_: IObserver<T>
 
+    visible = true
+
     constructor(
         scene: IScene,
         config: ILandConfig<T>,

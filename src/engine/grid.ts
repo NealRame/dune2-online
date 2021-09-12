@@ -6,6 +6,7 @@ import { Rect, ISize, Vector } from "@/maths"
 export interface GridConfig {
     space?: number,
     color?: Color.RGBA,
+    visible: boolean
 }
 
 export interface Grid extends ISceneLayer {
@@ -20,6 +21,7 @@ export function createGrid(
     const state: Required<GridConfig> = {
         space: config?.space ?? scene.gridSpacing,
         color: config?.color ?? Color.rgb(34, 34, 34),
+        visible: true
     }
     return {
         get name(): string {
@@ -54,6 +56,12 @@ export function createGrid(
         },
         set color(color: Color.RGBA) {
             state.color = color
+        },
+        get visible() {
+            return state.visible
+        },
+        set visible(v: boolean) {
+            state.visible = v
         },
         addItem(): Grid {
             return this

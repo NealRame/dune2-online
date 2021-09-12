@@ -9,6 +9,7 @@ export abstract class AbstractSceneItem implements ISceneItem {
     protected height_ = 0
     x = 0
     y = 0
+    visible = true
 
     constructor(scene: IScene) {
         this.scene_ = scene

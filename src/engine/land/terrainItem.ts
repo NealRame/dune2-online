@@ -8,6 +8,8 @@ export class TerrainItem implements ISceneItem {
     private scene_: IScene
     private terrain_: ITerrain
 
+    visible = true
+
     constructor(scene: IScene, terrain: ITerrain) {
         this.scene_ = scene
         this.terrain_ = terrain
