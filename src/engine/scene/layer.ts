@@ -13,6 +13,15 @@ export class SceneLayer extends AbstractSceneItem implements ISceneLayer {
         return this
     }
 
+    removeItem(item: ISceneItem)
+        : ISceneLayer {
+        const index = this.items_.indexOf(item)
+        if (index >= 0) {
+            this.items_.splice(index, 1)
+        }
+        return this
+    }
+
     clear()
         : ISceneLayer {
         this.items_ = []

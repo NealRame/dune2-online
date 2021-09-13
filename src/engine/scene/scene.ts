@@ -94,6 +94,14 @@ class Scene extends Entity implements IScene {
         return this
     }
 
+    removeItem(item: ISceneItem): this {
+        const index = this.items_.indexOf(item)
+        if (index >= 0) {
+            this.items_.splice(index, 1)
+        }
+        return this
+    }
+
     * items() {
         for (const item of this.items_) {
             yield item

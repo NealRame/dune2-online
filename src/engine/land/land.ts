@@ -137,7 +137,11 @@ export class LandImpl<T extends ITerrain> extends Entity implements ILand<T> {
         return this.fogOfWar_
     }
 
-    addItem(): ILand<T> {
+    addItem(): this {
+        return this
+    }
+
+    removeItem(): this {
         return this
     }
 

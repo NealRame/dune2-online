@@ -29,6 +29,7 @@ export interface ISceneItem extends IEntity {
 
 export interface ISceneLayer extends ISceneItem {
     addItem(item: ISceneItem): ISceneLayer
+    removeItem(item: ISceneItem): ISceneLayer
     clear(): ISceneLayer
     items(): Generator<ISceneItem>
 }
