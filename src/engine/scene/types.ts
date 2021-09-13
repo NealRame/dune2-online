@@ -6,13 +6,10 @@ import { Rect, ISize, Vector } from "@/maths"
 export type Image = Record<ScaleFactor, ImageBitmap>
 
 export interface IScene extends ISceneLayer {
-    readonly size: ISize
     readonly viewport: IViewport
     readonly gridUnit: number
     readonly gridSpacing: number
     scale: ScaleFactor
-    render(): IScene
-    update(): IScene
     zoomIn(): IScene
     zoomOut(): IScene
 }
@@ -26,7 +23,7 @@ export interface ISceneItem {
     readonly position: Vector
     name: string
     visible: boolean
-    render(painter: Painter, viewport: Rect): ISceneItem
+    render(painter?: Painter, viewport?: Rect): ISceneItem
     update(): ISceneItem
 }
 

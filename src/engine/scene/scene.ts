@@ -106,10 +106,12 @@ export function createScene(size: ISize, painter: Painter): IScene {
         render(): IScene {
             if (!isNil(painter)) {
                 painter.clear(state.backgroundColor)
-                // draw items
-                for (const item of state.items) {
-                    if (item.visible) {
-                        item.render(painter, state.viewport.rect)
+                if (state.visible) {
+                    // draw items
+                    for (const item of state.items) {
+                        if (item.visible) {
+                            item.render(painter, state.viewport.rect)
+                        }
                     }
                 }
             }

@@ -160,11 +160,11 @@ export class LandImpl<T extends ITerrain> implements ILand<T> {
 
     render(
         painter: Painter,
+        viewport: Rect,
     ): this {
-        const viewport = this.scene_.viewport.rect
-        for (const chunk of this.items_) {
-            if (viewport.intersects(chunk.rect)) {
-                chunk.render(painter, viewport)
+        for (const item of this.items_) {
+            if (viewport.intersects(item.rect)) {
+                item.render(painter, viewport)
             }
         }
         return this
