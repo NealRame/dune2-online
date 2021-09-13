@@ -1,5 +1,6 @@
-import { ScaleFactor } from "@/engine/scale"
+import { IEntity } from "@/engine/entity"
 import { IViewport } from "@/engine/viewport"
+import { ScaleFactor } from "@/engine/scale"
 import { Painter } from "@/graphics"
 import { Rect, ISize, Vector } from "@/maths"
 
@@ -14,14 +15,13 @@ export interface IScene extends ISceneLayer {
     zoomOut(): IScene
 }
 
-export interface ISceneItem {
+export interface ISceneItem extends IEntity {
     readonly scene: IScene
     readonly width: number
     readonly height: number
     readonly size: ISize
     readonly rect: Rect
     readonly position: Vector
-    name: string
     visible: boolean
     render(painter?: Painter, viewport?: Rect): ISceneItem
     update(): ISceneItem

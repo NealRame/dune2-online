@@ -10,6 +10,7 @@ import { Rect, IVector2D, ISize, Vector } from "@/maths"
 
 import { chain, isNil, remove } from "lodash"
 import { TerrainItem } from "./terrainItem"
+import { Entity } from "../entity"
 
 export function ensureLandConfiguration<T extends ITerrain>(
     config: ILandConfig<T>,
@@ -85,7 +86,7 @@ export function generateLandItems<T extends ITerrain>(
         : generateLandTerrainItems(land)
 }
 
-export class LandImpl<T extends ITerrain> implements ILand<T> {
+export class LandImpl<T extends ITerrain> extends Entity implements ILand<T> {
     private fogOfWar_: boolean
     private items_: ISceneItem[]
     private positionToTerrainIndex_: (p: IVector2D) => number
@@ -99,16 +100,13 @@ export class LandImpl<T extends ITerrain> implements ILand<T> {
         scene: IScene,
         config: ILandConfig<T>,
     ) {
+        super()
         this.fogOfWar_ = config.fogOfWarEnabled ?? true
         this.positionToTerrainIndex_ = createPositionToZoneConverter(scene.size)
         this.scene_ = scene
         this.terrainsObserver_ = createObserver()
         this.terrains_ = generateLandTerrains(this, config.generateTerrain)
         this.items_ = generateLandItems(this, ensureLandConfiguration(config))
-    }
-
-    get name(): string {
-        return "land"
     }
 
     get scene(): IScene {

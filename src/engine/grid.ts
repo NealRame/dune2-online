@@ -1,97 +1,44 @@
-import { IScene, ISceneItem } from "./scene"
+import { AbstractSceneItem, IScene } from "./scene"
 
 import { Color, Painter } from "@/graphics"
-import { Rect, ISize, Vector } from "@/maths"
+import { Rect } from "@/maths"
 
-export interface GridConfig {
-    space?: number,
-    color?: Color.RGBA,
-    visible: boolean
-}
+export class Grid extends AbstractSceneItem {
+    // space: number
+    color: Color.RGBA = Color.rgb(34, 34, 34)
 
-export interface Grid extends ISceneItem {
-    space: number,
-    color: Color.RGBA,
+    render(painter: Painter, viewport: Rect): Grid {
+        const { width, height } = painter.size
+        const offset = viewport.topLeft()
+        const gridSpace = this.scene.gridSpacing
+
+        painter.pen = {
+            lineWidth: 1,
+            strokeStyle: Color.cssRGBA(this.color),
+        }
+
+        // Draw vertical grid lines
+        for (let x = 0.5 + offset.x%gridSpace; x < width; x += gridSpace) {
+            painter.drawLine(
+                { x, y: 0 },
+                { x, y: height }
+            )
+        }
+
+        // Draw horizontal grid lines
+        for (let y = 0.5 + offset.y%gridSpace; y < height; y += gridSpace) {
+            painter.drawLine(
+                { y, x: 0 },
+                { y, x: width }
+            )
+        }
+
+        return this
+    }
 }
 
 export function createGrid(
     scene: IScene,
-    config?: GridConfig,
 ): Grid {
-    const state: Required<GridConfig> = {
-        space: config?.space ?? scene.gridSpacing,
-        color: config?.color ?? Color.rgb(34, 34, 34),
-        visible: true
-    }
-    return {
-        get name(): string {
-            return "grid"
-        },
-        get scene(): IScene {
-            return scene
-        },
-        get position(): Vector {
-            return Vector.Null
-        },
-        get width(): number {
-            return scene.width
-        },
-        get height(): number {
-            return scene.height
-        },
-        get size(): ISize {
-            return scene.size
-        },
-        get rect(): Rect {
-            return scene.rect
-        },
-        get space(): number {
-            return state.space
-        },
-        set space(space: number) {
-            state.space = space
-        },
-        get color(): Color.RGBA {
-            return state.color
-        },
-        set color(color: Color.RGBA) {
-            state.color = color
-        },
-        get visible() {
-            return state.visible
-        },
-        set visible(v: boolean) {
-            state.visible = v
-        },
-        render(painter: Painter): Grid {
-            const { width, height } = painter.size
-            const offset = scene.viewport.rect.topLeft()
-
-            painter.pen = {
-                lineWidth: 1,
-                strokeStyle: Color.cssRGBA(state.color),
-            }
-
-            // Draw vertical grid lines
-            for (let x = 0.5 + offset.x%state.space; x < width; x += state.space) {
-                painter.drawLine(
-                    { x, y: 0 },
-                    { x, y: height }
-                )
-            }
-
-            // Draw horizontal grid lines
-            for (let y = 0.5 + offset.y%state.space; y < height; y += state.space) {
-                painter.drawLine(
-                    { y, x: 0 },
-                    { y, x: width }
-                )
-            }
-
-            return this
-        },
-        update(): Grid {
-            return this
-        }
-    }
+    return new Grid(scene)
 }

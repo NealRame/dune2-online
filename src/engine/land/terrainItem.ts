@@ -1,17 +1,19 @@
 import { ITerrain } from "./types"
 
 import { IScene, ISceneItem } from "@/engine"
+import { Entity } from "@/engine/entity"
+
 import { Painter } from "@/graphics"
 import { Rect, ISize, Vector } from "@/maths"
 
-export class TerrainItem implements ISceneItem {
+export class TerrainItem extends Entity implements ISceneItem {
     private scene_: IScene
     private terrain_: ITerrain
 
     visible = true
-    name = ""
 
     constructor(scene: IScene, terrain: ITerrain) {
+        super()
         this.scene_ = scene
         this.terrain_ = terrain
     }

@@ -1,137 +1,145 @@
-import { IScene } from "./types"
+import { IScene, ISceneItem } from "./types"
 
 import { cssHex } from "@/graphics/color"
 import { Brush, Painter } from "@/graphics/painter"
 
+import { Entity } from "@/engine/entity"
 import { scaleDown, ScaleFactor, scaleUp } from "@/engine/scale"
 import { createViewport, IViewport } from "@/engine/viewport"
 
 import { Rect, IVector2D, ISize, Vector } from "@/maths"
 
 import { isNil } from "lodash"
-import { ISceneItem } from "."
 
-type SceneState = {
-    backgroundColor: Brush
-    gridUnit: 16
-    items: ISceneItem[]
-    scaleFactor: ScaleFactor
-    width: number
-    height: number
-    viewport: IViewport
-    visible: boolean
-}
+class Scene extends Entity implements IScene {
+    private backgroundColor_: Brush
+    private gridUnit_ = 16
+    private scale_: ScaleFactor
+    private width_: number
+    private height_: number
+    private viewport_: IViewport
+    private painter_: Painter
+    private items_: Array<ISceneItem> = []
 
-export function createScene(size: ISize, painter: Painter): IScene {
-    const state: SceneState = {
-        backgroundColor: cssHex([0, 0, 0]),
-        gridUnit: 16,
-        items: [],
-        scaleFactor: 1,
-        width: size.width,
-        height: size.height,
-        viewport: createViewport(size),
-        visible: true,
+    visible = true
+
+    private updateViewport_() {
+        this.viewport_.size = this.painter_.rect.scaled(1/this.gridSpacing).size
     }
 
-    const getGridSpacing = () => state.scaleFactor*state.gridUnit
-    const updateViewport = () => {
-        state.viewport.size = painter.rect.scaled(1/getGridSpacing()).size
+    constructor(size: ISize, painter: Painter) {
+        super()
+        this.backgroundColor_ = cssHex([0, 0, 0])
+        this.width_ = size.width
+        this.height_ = size.height
+        this.scale_ = 3
+        this.painter_ = painter
+        this.viewport_ = createViewport(size)
+
+        this.updateViewport_()
     }
 
-    updateViewport()
+    get scale(): ScaleFactor {
+        return this.scale_
+    }
 
-    return {
-        get scale(): ScaleFactor {
-            return state.scaleFactor
-        },
-        set scale(f: ScaleFactor) {
-            if (state.scaleFactor !== f) {
-                state.scaleFactor = f
-                updateViewport()
-            }
-        },
-        get gridUnit(): number {
-            return state.gridUnit
-        },
-        get gridSpacing(): number {
-            return getGridSpacing()
-        },
-        get position(): Vector {
-            return Vector.Null
-        },
-        get width(): number {
-            return state.width
-        },
-        get height(): number {
-            return state.height
-        },
-        get size(): ISize {
-            return {
-                width: state.width,
-                height: state.height
-            }
-        },
-        get rect(): Rect {
-            return new Rect({ x: 0, y: 0 }, this.size)
-        },
-        get viewport(): IViewport {
-            return state.viewport
-        },
-        get scene(): IScene {
-            return this
-        },
-        get visible(): boolean {
-            return state.visible
-        },
-        set visible(visible: boolean) {
-            state.visible = visible
-        },
-        get name(): string {
-            return ""
-        },
-        addItem(item: ISceneItem): IScene {
-            state.items.push(item)
-            return this
-        },
-        * items() {
-            for (const item of state.items) {
-                yield item
-            }
-        },
-        clear(): IScene {
-            state.items = []
-            return this
-        },
-        render(): IScene {
-            if (!isNil(painter)) {
-                painter.clear(state.backgroundColor)
-                if (state.visible) {
-                    // draw items
-                    for (const item of state.items) {
-                        if (item.visible) {
-                            item.render(painter, state.viewport.rect)
-                        }
+    set scale(f: ScaleFactor) {
+        if (this.scale_ !== f) {
+            this.scale_ = f
+            this.updateViewport_()
+        }
+    }
+
+    get gridUnit(): number {
+        return this.gridUnit_
+    }
+
+    get gridSpacing(): number {
+        return this.scale_*this.gridUnit_
+    }
+
+    get position(): Vector {
+        return Vector.Null
+    }
+
+    get width(): number {
+        return this.width_
+    }
+
+    get height(): number {
+        return this.height_
+    }
+
+    get size(): ISize {
+        return {
+            width: this.width_,
+            height: this.height_,
+        }
+    }
+
+    get rect(): Rect {
+        return new Rect({ x: 0, y: 0 }, this.size)
+    }
+
+    get viewport(): IViewport {
+        return this.viewport_
+    }
+
+    get scene(): this {
+        return this
+    }
+
+    addItem(item: ISceneItem): this {
+        this.items_.push(item)
+        return this
+    }
+
+    * items() {
+        for (const item of this.items_) {
+            yield item
+        }
+    }
+
+    clear(): this {
+        this.items_ = []
+        return this
+    }
+
+    render(): IScene {
+        if (!isNil(this.painter_)) {
+            this.painter_.clear(this.backgroundColor_)
+            if (this.visible) {
+                // draw items
+                for (const item of this.items_) {
+                    if (item.visible) {
+                        item.render(this.painter_, this.viewport_.rect)
                     }
                 }
             }
-            return this
-        },
-        update(): IScene {
-            for (const item of state.items) {
-                item.update()
-            }
-            return this
-        },
-        zoomIn(): IScene {
-            this.scale = scaleUp(this.scale)
-            return this
-        },
-        zoomOut(): IScene {
-            this.scale = scaleDown(this.scale)
-            return this
         }
+        return this
     }
+
+    update(): IScene {
+        for (const item of this.items_) {
+            item.update()
+        }
+        return this
+    }
+
+    zoomIn(): IScene {
+        this.scale_ = scaleUp(this.scale_)
+        return this
+    }
+
+    zoomOut(): IScene {
+        this.scale = scaleDown(this.scale)
+        return this
+    }
+}
+
+export function createScene(size: ISize, painter: Painter): IScene {
+    return new Scene(size, painter)
 }
 
 export function screenToSceneScale(
