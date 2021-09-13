@@ -1,4 +1,9 @@
-let entityNextID = 0
+export const entityId = (function * () {
+    let id = 0
+    while (true) {
+        yield ++id
+    }
+})()
 
 export interface IEntity {
     readonly id: number
@@ -10,7 +15,7 @@ export class Entity implements IEntity {
     name: string
 
     constructor(name?: string) {
-        this.id_ = entityNextID++
+        this.id_ = entityId.next().value
         this.name = name ?? `#${this.id_}`
     }
 
