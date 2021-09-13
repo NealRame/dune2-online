@@ -5,11 +5,17 @@ import { Painter } from "@/graphics"
 import { Rect } from "@/maths"
 
 export class SceneLayer extends AbstractSceneItem implements ISceneLayer {
-    private items_: ISceneItem[] = []
+    private items_: Array<ISceneItem> = []
 
     addItem(item: ISceneItem)
         : ISceneLayer {
         this.items_.push(item)
+        return this
+    }
+
+    clear()
+        : ISceneLayer {
+        this.items_ = []
         return this
     }
 

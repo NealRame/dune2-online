@@ -111,13 +111,6 @@ export class LandImpl<T extends ITerrain> implements ILand<T> {
         return "land"
     }
 
-    * items()
-        : Generator<ISceneItem> {
-        for (const zone of this.items_) {
-            yield zone
-        }
-    }
-
     get scene(): IScene {
         return this.scene_
     }
@@ -148,6 +141,17 @@ export class LandImpl<T extends ITerrain> implements ILand<T> {
 
     addItem(): ILand<T> {
         return this
+    }
+
+    clear(): this {
+        return this
+    }
+
+    * items()
+        : Generator<ISceneItem> {
+        for (const zone of this.items_) {
+            yield zone
+        }
     }
 
     update(): ILand<T> {

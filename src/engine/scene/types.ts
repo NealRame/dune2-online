@@ -11,7 +11,6 @@ export interface IScene extends ISceneLayer {
     readonly gridUnit: number
     readonly gridSpacing: number
     scale: ScaleFactor
-    clear(): IScene
     render(): IScene
     update(): IScene
     zoomIn(): IScene
@@ -33,5 +32,6 @@ export interface ISceneItem {
 
 export interface ISceneLayer extends ISceneItem {
     addItem(item: ISceneItem): ISceneLayer
+    clear(): ISceneLayer
     items(): Generator<ISceneItem>
 }
