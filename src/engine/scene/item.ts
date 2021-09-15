@@ -1,8 +1,8 @@
 import { IScene, ISceneItem } from "./types"
 
+import { Entity } from "@/engine"
 import { Painter } from "@/graphics"
 import { Rect, ISize, Vector } from "@/maths"
-import { Entity } from "../entity"
 
 export abstract class AbstractSceneItem extends Entity implements ISceneItem {
     private scene_: IScene
