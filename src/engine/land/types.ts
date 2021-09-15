@@ -1,41 +1,37 @@
+import { IScene, ISceneItem } from "@/engine/scene"
 import { Rect, IVector2D, ISize } from "@/maths"
 
-import { Image, ISceneLayer } from "@/engine"
-import { Color } from "@/graphics"
+export interface ITerrainData {
+    revealed: boolean
+}
 
-export type Neighborhood<T extends ITerrain> = [T|null, T|null, T|null, T|null]
+export type Neighborhood<Data extends ITerrainData> = [
+    ITerrain<Data>|null,
+    ITerrain<Data>|null,
+    ITerrain<Data>|null,
+    ITerrain<Data>|null
+]
 
-export interface ITerrain {
-    readonly x: number
-    readonly y: number
-
+export interface ITerrain<Data extends ITerrainData> {
+    readonly data: Data
     readonly position: IVector2D
-    readonly revealed: boolean
 
-    readonly neighbors: Neighborhood<ITerrain>
-
-    readonly color: Color.RGBA
-
-    image(): Image[]
-    reveal(): ITerrain
-    update(): ITerrain
+    update(data: Partial<Data>): ITerrain<Data>
 }
 
-export type TerrainGenerator<T extends ITerrain> = (l: ILand<T>, p: IVector2D) => T
-
-export interface ILand<T extends ITerrain = ITerrain> extends ISceneLayer {
-    readonly size: ISize
-    readonly fogOfWar: boolean
-    reveal(position?: IVector2D, size?: ISize): ILand<T>
-    terrain(position: IVector2D): T|null
-    terrains(rect?: Rect): Generator<ITerrain>
-    onTerrainChanged(callback: (terrain: T) => void): () => void
-    updateTerrain(terrain: T): ILand<T>
+export interface ILand<Data extends ITerrainData = ITerrainData> extends ISceneItem {
+    reveal(position?: IVector2D, size?: ISize): ILand<Data>
+    terrain(position: IVector2D): ITerrain<Data>|null
+    neighborhood(position: IVector2D): Neighborhood<Data>
+    terrains(rect?: Rect): Generator<ITerrain<Data>>
+    onTerrainChanged(callback: (terrain: ITerrain<Data>) => void): () => void
 }
 
-export type ILandConfig<T extends ITerrain> = {
-    generateTerrain: TerrainGenerator<T>
-    chunkSize?: ISize,
-    chunkEnabled?: boolean,
-    fogOfWarEnabled?: boolean,
-}
+export type LandDataGenerator<Data extends ITerrainData>
+    = (p: IVector2D) => Data
+
+export type LandInitialData<Data extends ITerrainData>
+    = Array<Data> | LandDataGenerator<Data>
+
+export type LandConstructor<Data extends ITerrainData>
+    = new (scene: IScene, data: LandInitialData<Data>) => ILand<Data>

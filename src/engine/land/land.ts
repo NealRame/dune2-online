@@ -1,202 +1,146 @@
-import { ILand, ILandConfig, ITerrain, TerrainGenerator } from "./types"
-import { createPositionToZoneConverter } from "./utils"
-import { ChunkItem } from "./chunkItem"
+import { Terrain } from "./terrain"
+import { ILand, ITerrainData, ITerrain, Neighborhood, LandInitialData } from "./types"
+import { renderImage } from "./workers"
 
+import { AbstractSceneItem, Image, IScene } from "@/engine/scene"
+
+import { Painter } from "@/graphics"
+import { ISize, IVector2D, Rect } from "@/maths"
 import { createObserver, IObserver } from "@/utils"
 
-import { IScene, ISceneItem } from "@/engine"
-import { Painter } from "@/graphics"
-import { Rect, IVector2D, ISize, Vector } from "@/maths"
+import { chain, isNil, remove, times } from "lodash"
 
-import { chain, isNil, remove } from "lodash"
-import { TerrainItem } from "./terrainItem"
-import { Entity } from "../entity"
+export abstract class Land<TerrainData extends ITerrainData> extends AbstractSceneItem implements ILand<TerrainData> {
+    private fogOfWar_ = false
+    private image_: Partial<Image> = {}
+    private redraw_: Record<number, [IVector2D, Array<Image>]> = {}
 
-export function ensureLandConfiguration<T extends ITerrain>(
-    config: ILandConfig<T>,
-): Required<ILandConfig<T>> {
-    return Object.assign({
-        chunkEnabled: true,
-        chunkSize: { width: 32, height: 32 },
-        fogOfWarEnabled: true,
-    }, config)
-}
+    private terrains_: Array<Terrain<TerrainData>> = []
+    private terrainsObserver_: IObserver<ITerrain<TerrainData>>
 
-export function generateLandTerrains<T extends ITerrain>(
-    land: ILand<T>,
-    generateTerrain: TerrainGenerator<T>,
-): T[] {
-    const terrains: T[] = []
-    for (const { x, y } of land.rect.partition()) {
-        terrains.push(generateTerrain(land, { x, y }))
-    }
-    return terrains
-}
-
-export function generateLandTerrainItems(
-    land: ILand
-): Array<ISceneItem> {
-    const items: Array<TerrainItem> = []
-    for (const terrain of land.terrains()) {
-        items.push(new TerrainItem(land.scene, terrain))
-    }
-    return items
-}
-
-export function generateLandChunkItems(
-    land: ILand,
-    chunkSize: ISize,
-): Array<ISceneItem> {
-    const chunks: ChunkItem[] = []
-
-    for (const chunkRect of land.rect.partition(chunkSize)) {
-        const chunk = new ChunkItem(land.scene, chunkRect)
-        for (const terrain of land.terrains(chunkRect)) {
-            chunk.refresh(terrain)
+    private positionToIndex_({ x, y }: IVector2D): number {
+        if ((x >= 0 && x < this.width) && (y >= 0 && y < this.height)) {
+            return this.width*y + x
         }
-        chunk.update()
-        chunks.push(chunk)
+        return -1
     }
 
-    const positionToChunkIndex = createPositionToZoneConverter(land.size, chunkSize)
+    private indexToPosition_(index: number): IVector2D {
+        return {
+            x: index%this.width,
+            y: Math.floor(index/this.width)
+        }
+    }
 
-    land.onTerrainChanged(terrain => {
-        chain(terrain.neighbors as Array<ITerrain>)
+    private onTerrainChanged_(terrain: ITerrain<TerrainData>) {
+        const neighbors = this.neighborhood(terrain.position)
+
+        chain(neighbors as Array<ITerrain<TerrainData>>)
             .tap(terrains => remove(terrains, isNil))
             .tap(terrains => terrains.push(terrain))
-            .map(terrain => {
-                const chunk = chunks[positionToChunkIndex(terrain.position)]
-                chunk.refresh(terrain)
-                return chunk
+            .forEach(terrain => {
+                const position = terrain.position
+                const neighbors = this.neighborhood(position)
+
+                const images: Array<Image> = [
+                    this.terrainImage_(terrain, neighbors)
+                ]
+
+                const fogImage = this.fogImage_(terrain, neighbors)
+                if (!isNil(fogImage)) {
+                    images.push(fogImage)
+                }
+
+                this.redraw_[this.positionToIndex_(position)] = [
+                    position,
+                    images,
+                ]
             })
-            .uniq()
-            .forEach(chunk => chunk.update())
             .value()
-    })
+    }
 
-    return chunks
-}
-
-export function generateLandItems<T extends ITerrain>(
-    land: ILand<T>,
-    config: Required<ILandConfig<T>>
-): Array<ISceneItem> {
-    return config.chunkEnabled
-        ? generateLandChunkItems(land, config.chunkSize)
-        : generateLandTerrainItems(land)
-}
-
-export class LandImpl<T extends ITerrain> extends Entity implements ILand<T> {
-    private fogOfWar_: boolean
-    private items_: ISceneItem[]
-    private positionToTerrainIndex_: (p: IVector2D) => number
-    private scene_: IScene
-    private terrains_: T[]
-    private terrainsObserver_: IObserver<T>
-
-    visible = true
+    protected abstract terrainImage_(t: ITerrain<TerrainData>, n: Neighborhood<TerrainData>): Image
+    protected abstract fogImage_(t: ITerrain<TerrainData>, n: Neighborhood<TerrainData>): Image|null
 
     constructor(
         scene: IScene,
-        config: ILandConfig<T>,
+        landData: LandInitialData<TerrainData>,
     ) {
-        super()
-        this.fogOfWar_ = config.fogOfWarEnabled ?? true
-        this.positionToTerrainIndex_ = createPositionToZoneConverter(scene.size)
-        this.scene_ = scene
-        this.terrainsObserver_ = createObserver()
-        this.terrains_ = generateLandTerrains(this, config.generateTerrain)
-        this.items_ = generateLandItems(this, ensureLandConfiguration(config))
+        super(scene)
+
+        this.terrainsObserver_ = createObserver<ITerrain<TerrainData>>()
+        this.terrainsObserver_.subscribe(terrain => {
+            this.onTerrainChanged_(terrain)
+        })
+
+        this.terrains_ = times(this.width*this.height, index => {
+            const position = this.indexToPosition_(index)
+            const data = (typeof landData === "function")
+                ? landData(position)
+                : landData[index]
+
+            return new Terrain(position, data, this.terrainsObserver_.publish)
+        })
     }
 
-    get scene(): IScene {
-        return this.scene_
-    }
-
-    get position(): Vector {
-        return Vector.Null
-    }
-
-    get width(): number {
-        return this.scene_.width
-    }
-
-    get height(): number {
-        return this.scene_.height
-    }
-
-    get size(): ISize {
-        return this.scene_.size
-    }
-
-    get rect(): Rect {
-        return this.scene_.rect
-    }
-
-    get fogOfWar(): boolean {
-        return this.fogOfWar_
-    }
-
-    addItem(): this {
-        return this
-    }
-
-    removeItem(): this {
-        return this
-    }
-
-    clear(): this {
-        return this
-    }
-
-    * items()
-        : Generator<ISceneItem> {
-        for (const zone of this.items_) {
-            yield zone
-        }
-    }
-
-    update(): ILand<T> {
-        return this
-    }
-
-    render(
-        painter: Painter,
-        viewport: Rect,
-    ): this {
-        for (const item of this.items_) {
-            if (viewport.intersects(item.rect)) {
-                item.render(painter, viewport)
-            }
+    render(painter: Painter, viewport: Rect): ILand<TerrainData> {
+        const bitmap = this.image_[this.scene.scale]
+        if (!isNil(bitmap)) {
+            painter.drawImageBitmap(
+                bitmap,
+                { x: 0, y: 0 },
+                viewport.scaled(this.scene.gridSpacing)
+            )
         }
         return this
     }
 
-    reveal(position?: IVector2D, size?: ISize): ILand<T> {
-        if (isNil(position)) {
-            position = { x: 0, y: 0 }
-            size = this.size
-        } else {
-            size = size ?? { width: 1, height: 1 }
+    update(): ILand<TerrainData> {
+        const tiles = Object.values(this.redraw_)
+        this.redraw_ = {}
+        if (tiles.length > 0) {
+            renderImage({
+                size: this.size,
+                gridUnit: this.scene.gridUnit,
+                image: this.image_,
+                tiles,
+            }).then(image => {
+                this.image_ = image
+            })
         }
+        return this
+    }
+
+    reveal(position: IVector2D, size?: ISize): this {
+        size = size ?? { width: 1, height: 1 }
         for (const terrain of this.terrains(new Rect(position, size))) {
-            terrain.reveal()
+            terrain.update({ revealed: true } as Partial<TerrainData>)
         }
         return this
     }
 
-    terrain(position: IVector2D): T|null {
-        return this.terrains_[this.positionToTerrainIndex_(position)] as T
+    terrain(position: IVector2D)
+        : ITerrain<TerrainData>|null {
+        return this.terrains_[this.positionToIndex_(position)] ?? null
     }
 
-    * terrains(
-        zone?: Rect,
-    ): Generator<T, void, undefined> {
+    neighborhood({ x, y }: IVector2D)
+        : Neighborhood<TerrainData> {
+        return [
+            this.terrain({ x, y: y - 1 }),
+            this.terrain({ x: x + 1, y }),
+            this.terrain({ x, y: y + 1 }),
+            this.terrain({ x: x - 1, y }),
+        ]
+    }
+
+    * terrains(zone?: Rect)
+        : Generator<ITerrain<TerrainData>, void, undefined> {
         if (!isNil(zone)) {
-            const rect = this.scene_.rect.intersected(zone)
+            const rect = this.rect.intersected(zone)
             if (!isNil(rect)) {
                 for (const { x, y } of rect.partition()) {
-                    yield this.terrain({ x, y }) as T
+                    yield this.terrain({ x, y }) as ITerrain<TerrainData>
                 }
             }
         } else {
@@ -204,21 +148,8 @@ export class LandImpl<T extends ITerrain> extends Entity implements ILand<T> {
         }
     }
 
-    onTerrainChanged(callback: (t: T) => void): () => void {
+    onTerrainChanged(callback: (t: ITerrain<TerrainData>) => void)
+        : () => void {
         return this.terrainsObserver_.subscribe(callback)
     }
-
-    updateTerrain(
-        terrain: T
-    ) : ILand<T> {
-        this.terrainsObserver_.publish(terrain)
-        return this
-    }
-}
-
-export function createLand<T extends ITerrain>(
-    scene: IScene,
-    landConfig: ILandConfig<T>,
-): ILand<T> {
-    return new LandImpl(scene, landConfig)
 }

@@ -1,5 +1,5 @@
-import { createTerrainGenerator, Terrain } from "./land"
 import { LandConfig } from "./types"
+import { createLandDataGenerator, ITerrainData, Land } from "./land"
 
 import { Harvester } from "./units/harvester"
 import { Quad } from "./units/quad"
@@ -27,50 +27,51 @@ export interface GameConfig {
 }
 
 export interface Game {
-    readonly engine: Engine.Engine<Terrain>
-    readonly miniMap: Engine.IMiniMap
-    createUnit: UnitFactory
+    readonly engine: Engine.Engine<ITerrainData>
+    // readonly miniMap: Engine.IMiniMap
+    // createUnit: UnitFactory
     initialize: () => void
 }
 
-function createUnitFactory(game: Engine.Engine<Terrain>)
-    : UnitFactory {
-    return (type: UnitType, position: IVector2D) => {
-        const unit = new Units[type](game.scene, position)
-        game.addUnit(unit)
-        return unit
-    }
-}
+// function createUnitFactory(game: Engine.Engine<Terrain>)
+//     : UnitFactory {
+//     return (type: UnitType, position: IVector2D) => {
+//         const unit = new Units[type](game.scene, position)
+//         game.addUnit(unit)
+//         return unit
+//     }
+// }
 
-function setupStartLocation(engine: Engine.Engine<Terrain>): void {
-    const { land, scene } = engine
-    const x = Math.floor(land.size.width/2)
-    const y = Math.floor(land.size.height/2)
+// function setupStartLocation(engine: Engine.Engine<Terrain>): void {
+//     const { land, scene } = engine
+//     const x = Math.floor(land.size.width/2)
+//     const y = Math.floor(land.size.height/2)
 
-    land.reveal({ x: x - 3, y: y - 2 }, { width: 5, height: 3 })
-    land.reveal({ x: x - 2, y: y - 3 }, { width: 3, height: 5 })
-    scene.viewport.position = {
-        x: x - scene.viewport.size.width/2,
-        y: y - scene.viewport.size.height/2,
-    }
-}
+//     land.reveal({ x: x - 3, y: y - 2 }, { width: 5, height: 3 })
+//     land.reveal({ x: x - 2, y: y - 3 }, { width: 3, height: 5 })
+//     scene.viewport.position = {
+//         x: x - scene.viewport.size.width/2,
+//         y: y - scene.viewport.size.height/2,
+//     }
+// }
 
 export function createGame(config: GameConfig): Game {
     const { painter, size } = config
-    const engine = Engine.create<Terrain>({
+    const engine = Engine.create({
         painter,
         size,
-        generateTerrain: createTerrainGenerator(config.land ?? {}),
+        Land,
+        landData: createLandDataGenerator()
     })
-    const miniMap = Engine.createMiniMap(engine)
-    const createUnit = createUnitFactory(engine)
+    // const miniMap = Engine.createMiniMap(engine)
+    // const createUnit = createUnitFactory(engine)
 
     return {
         get engine() { return engine },
-        get miniMap() { return miniMap },
-        createUnit,
+        // get miniMap() { return miniMap },
+        // createUnit,
         initialize: once(() => {
-            setupStartLocation(engine)
+            // setupStartLocation(engine)
             engine.start()
         })
     }

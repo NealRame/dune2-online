@@ -1,47 +1,40 @@
-import { createScene, IScene, SceneLayer } from "./scene"
-import { createLand, ILand, ITerrain, TerrainGenerator } from "./land"
-import { Unit } from "./unit"
+import { Scene } from "./scene"
+import { ILand, ITerrainData, LandConstructor, LandInitialData } from "./land"
 
 import { Painter } from "@/graphics"
 import { ISize } from "@/maths"
 
-export interface Config<T extends ITerrain = ITerrain> {
+export interface Config<T extends ITerrainData> {
     painter: Painter
     size: ISize
-    generateTerrain: TerrainGenerator<T>
+    Land: LandConstructor<T>
+    landData: LandInitialData<T>
 }
 
-export interface Engine<T extends ITerrain = ITerrain> {
+export interface Engine<T extends ITerrainData> {
+    readonly scene: Scene
     readonly land: ILand<T>
-    readonly scene: IScene
-    addUnit(unit: Unit): Engine<T>
     start(): Engine<T>
     stop(): Engine<T>
 }
 
-export function create<T extends ITerrain>(config: Config<T>)
-    : Engine<T> {
-    const scene = createScene(config.size, config.painter)
-    const land = createLand(scene, config)
-
-    const units = new SceneLayer(scene, "units")
+export function create<T extends ITerrainData>(
+    config: Config<T>
+): Engine<T> {
+    const scene = new Scene(config.size, config.painter)
+    const land = new config.Land(scene, config.landData)
 
     let animationRequestId = 0
 
-    scene
-        .addItem(land)
-        .addItem(units)
+    land.name = "land"
+    scene.addItem(land)
 
     return {
-        get land() {
-            return land
-        },
         get scene() {
             return scene
         },
-        addUnit(unit: Unit) {
-            units.addItem(unit)
-            return this
+        get land() {
+            return land
         },
         start(): Engine<T> {
             (function animationLoop() {

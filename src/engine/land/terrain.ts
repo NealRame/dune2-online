@@ -1,59 +1,35 @@
-import { ILand, Neighborhood, ITerrain } from "./types"
+import { ITerrain, ITerrainData } from "./types"
 
-import { Image } from "@/engine"
-import { Color } from "@/graphics"
 import { IVector2D } from "@/maths"
 
-export abstract class AbstractTerrain implements ITerrain {
-    protected position_: IVector2D
-    private land_: ILand<this>
-    private revealed_ = false
+type ChangesNotifier<Data extends ITerrainData> = (t: ITerrain<Data>) => void
 
-    constructor(land: ILand, position: IVector2D) {
-        this.land_ = land as ILand<this>
+export class Terrain<Data extends ITerrainData> implements ITerrain<Data> {
+    private position_: IVector2D
+    private data_: Data
+    private notify_: ChangesNotifier<Data>
+
+    constructor(
+        position: IVector2D,
+        data: Data,
+        notify: ChangesNotifier<Data>
+    ) {
         this.position_ = position
-        this.revealed_ = !land.fogOfWar
+        this.data_ = data
+        this.notify_ = notify
     }
 
-    get x(): number {
-        return this.position_.x
-    }
-
-    get y(): number {
-        return this.position_.y
+    get data(): Data {
+        return this.data_
     }
 
     get position(): IVector2D {
         return this.position_
     }
 
-    get revealed(): boolean {
-        return this.revealed_
-    }
-
-    get neighbors(): Neighborhood<this> {
-        const { x, y } = this.position_
-        return [
-            this.land_.terrain({ x, y: y - 1 }),
-            this.land_.terrain({ x: x + 1, y }),
-            this.land_.terrain({ x, y: y + 1 }),
-            this.land_.terrain({ x: x - 1, y }),
-        ]
-    }
-
-    abstract get color(): Color.RGBA
-    abstract image(): Image[]
-
-    reveal(): ITerrain {
-        if (!this.revealed) {
-            this.revealed_ = true
-            this.update()
-        }
-        return this
-    }
-
-    update(): ITerrain {
-        this.land_.updateTerrain(this)
+    update(data: Partial<Data>): this {
+        Object.assign(this.data_, data)
+        this.notify_(this)
         return this
     }
 }

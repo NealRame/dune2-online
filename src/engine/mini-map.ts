@@ -1,5 +1,5 @@
 import { Engine } from "./engine"
-import { ITerrain } from "./land"
+import { ITerrain } from "./__land"
 
 import { Color } from "@/graphics"
 import { createObserver, IObserver } from "@/utils"

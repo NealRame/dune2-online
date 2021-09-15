@@ -1,5 +1,8 @@
 import { Palette, ImageSet } from "@/dune2/types"
-import { Image, ScaleFactors } from "@/engine"
+
+import { ScaleFactors } from "@/engine/scale"
+import { Image } from "@/engine/scene"
+
 import { base64ToByteArray } from "@/utils"
 
 import { isNil } from "lodash"

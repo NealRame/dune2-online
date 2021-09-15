@@ -11,7 +11,7 @@ import { Rect, IVector2D, ISize, Vector } from "@/maths"
 
 import { isNil } from "lodash"
 
-class Scene extends Entity implements IScene {
+export class Scene extends Entity implements IScene {
     private backgroundColor_: Brush
     private gridUnit_ = 16
     private scale_: ScaleFactor
@@ -102,7 +102,7 @@ class Scene extends Entity implements IScene {
         return this
     }
 
-    * items() {
+    * items(): Generator<ISceneItem, void, undefined> {
         for (const item of this.items_) {
             yield item
         }
@@ -144,10 +144,6 @@ class Scene extends Entity implements IScene {
         this.scale = scaleDown(this.scale)
         return this
     }
-}
-
-export function createScene(size: ISize, painter: Painter): IScene {
-    return new Scene(size, painter)
 }
 
 export function screenToSceneScale(
