@@ -4,7 +4,7 @@ import { Entity } from "@/engine"
 import { Painter } from "@/graphics"
 import { Rect, ISize, Vector } from "@/maths"
 
-export abstract class AbstractSceneItem extends Entity implements ISceneItem {
+export abstract class SceneItem extends Entity implements ISceneItem {
     private scene_: IScene
 
     protected x_ = 0

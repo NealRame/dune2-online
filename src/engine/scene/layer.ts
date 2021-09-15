@@ -1,10 +1,10 @@
-import { AbstractSceneItem } from "./item"
+import { SceneItem } from "./item"
 import { ISceneItem, ISceneLayer } from "./types"
 
 import { Painter } from "@/graphics"
 import { Rect } from "@/maths"
 
-export class SceneLayer extends AbstractSceneItem implements ISceneLayer {
+export class SceneLayer extends SceneItem implements ISceneLayer {
     private items_: Array<ISceneItem> = []
 
     addItem(item: ISceneItem)

@@ -1,9 +1,9 @@
-import { AbstractSceneItem, IScene } from "./scene"
+import { SceneItem, IScene } from "./scene"
 
 import { Color, Painter } from "@/graphics"
 import { Rect } from "@/maths"
 
-export class Grid extends AbstractSceneItem {
+export class Grid extends SceneItem {
     // space: number
     color: Color.RGBA = Color.rgb(34, 34, 34)
 

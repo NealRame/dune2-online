@@ -2,7 +2,7 @@ import { Terrain } from "./terrain"
 import { ILand, ITerrainData, ITerrain, Neighborhood, LandInitialData } from "./types"
 import { renderImage } from "./workers"
 
-import { AbstractSceneItem, Image, IScene } from "@/engine/scene"
+import { SceneItem, Image, IScene } from "@/engine/scene"
 
 import { Painter } from "@/graphics"
 import { ISize, IVector2D, Rect } from "@/maths"
@@ -17,7 +17,7 @@ export class LandDataError extends Error {
     }
 }
 
-export abstract class Land<TerrainData extends ITerrainData> extends AbstractSceneItem implements ILand<TerrainData> {
+export abstract class Land<TerrainData extends ITerrainData> extends SceneItem implements ILand<TerrainData> {
     private fogOfWar_ = false
     private image_: Partial<Image> = {}
     private redraw_: Record<number, [IVector2D, Array<Image>]> = {}

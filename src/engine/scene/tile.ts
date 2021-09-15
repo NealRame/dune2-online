@@ -1,4 +1,4 @@
-import { AbstractSceneItem } from "./item"
+import { SceneItem } from "./item"
 import { Image, IScene } from "./types"
 
 import { Painter } from "@/graphics"
@@ -30,7 +30,7 @@ function checkShape({ columns, rows }: IShape, images: Image[]) {
     }
 }
 
-export class Tile extends AbstractSceneItem {
+export class Tile extends SceneItem {
     private imageSize_: ISize
     private images_: Image[]
     private shape_: IShape

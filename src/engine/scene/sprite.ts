@@ -1,4 +1,4 @@
-import { AbstractSceneItem } from "./item"
+import { SceneItem } from "./item"
 import { Tile } from "./tile"
 import { Image, IScene } from "./types"
 
@@ -9,7 +9,7 @@ import { isNil } from "lodash"
 
 type SpriteUpdateDelegate = () => void
 
-export class Sprite extends AbstractSceneItem {
+export class Sprite extends SceneItem {
     private frames_: Tile[]
     private frameIndex_: number
 
