@@ -160,7 +160,7 @@ export function sceneToScreenScale(
     return (new Vector(x, y)).mul(scene.gridSpacing)
 }
 
-export function sceneToScreenCoordinate(
+export function sceneToScreenPosition(
     scene: IScene,
     { x, y }: IVector2D
 ): Vector {
@@ -169,7 +169,7 @@ export function sceneToScreenCoordinate(
     return (new Vector(x, y)).sub(topLeft).mul(gridSpacing)
 }
 
-export function screenToSceneCoordinate(
+export function screenToScenePosition(
     scene: IScene,
     { x, y }: IVector2D
 ): Vector {
