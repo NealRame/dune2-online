@@ -10,6 +10,13 @@ import { createObserver, IObserver } from "@/utils"
 
 import { chain, isNil, remove, times } from "lodash"
 
+export class LandDataError extends Error {
+    constructor(m: string) {
+        super(m)
+        Object.setPrototypeOf(this, LandDataError.prototype)
+    }
+}
+
 export abstract class Land<TerrainData extends ITerrainData> extends AbstractSceneItem implements ILand<TerrainData> {
     private fogOfWar_ = false
     private image_: Partial<Image> = {}
@@ -79,6 +86,9 @@ export abstract class Land<TerrainData extends ITerrainData> extends AbstractSce
                 ? landData(position)
                 : landData[index]
 
+            if (isNil(data)) {
+                throw new LandDataError("Not enougth data to cover land area!")
+            }
             return new Terrain(position, data, this.terrainsObserver_.publish)
         })
     }
