@@ -8,7 +8,7 @@ export type Palette = readonly Color.RGBA[]
 // Image set
 export const ImageSets = ["misc", "terrain", "units"] as const
 export type ImageSet = typeof ImageSets[number]
-export type ImageLib = Record<ImageSet, readonly Image[]>
+export type ImageLib = Record<ImageSet, Image[]>
 
 // Tile descriptor
 export type TileDescriptor = {

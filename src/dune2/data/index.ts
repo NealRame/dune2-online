@@ -3,7 +3,6 @@ import * as Workers from "./workers"
 import { ImageLib, ImageSet, Palette, TileDescriptor } from "@/dune2/types"
 
 import { Image } from "@/engine"
-
 import { fetchData } from "@/utils"
 
 import { isNil } from "lodash"
@@ -87,7 +86,7 @@ export function palette(): Palette {
     return checkGameData().palette
 }
 
-export function imageSet(set: keyof ImageLib): readonly Image[] {
+export function imageSet(set: keyof ImageLib): Image[] {
     return checkGameData().images[set]
 }
 

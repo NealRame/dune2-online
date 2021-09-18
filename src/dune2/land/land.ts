@@ -82,43 +82,43 @@ export function terrainColor(terrain: ITerrain)
 }
 
 export class Land extends Engine.Land<ITerrainData> {
+    protected tiles_ = imageSet("terrain")
+
     protected terrainImage_(
         terrain: ITerrain,
         neighbors: Engine.Neighborhood<ITerrainData>
-    ): Engine.Image {
-        const lib = imageSet("terrain")
+    ): number {
         const topoImageOffset = terrainTopoMask(terrain, neighbors)
 
         switch (terrain.data.type) {
         case TerrainType.Rock:
-            return lib[128 + topoImageOffset]
+            return 128 + topoImageOffset
 
         case TerrainType.Dunes:
-            return lib[144 + topoImageOffset]
+            return 144 + topoImageOffset
 
         case TerrainType.Mountain:
-            return lib[160 + topoImageOffset]
+            return 160 + topoImageOffset
 
         case TerrainType.SpiceField:
-            return lib[176 + topoImageOffset]
+            return 176 + topoImageOffset
 
         case TerrainType.SaturatedSpiceField:
-            return lib[192 + topoImageOffset]
+            return 192 + topoImageOffset
 
         default:
-            return lib[127]
+            return 127
         }
     }
 
     protected fogImage_(
         terrain: ITerrain,
         neighbors: Engine.Neighborhood<ITerrainData>
-    ): Engine.Image|null {
-        const lib = imageSet("terrain")
+    ): number {
         const revealMaskImageOffset = terrainRevealMask(terrain, neighbors)
         if (revealMaskImageOffset > 0) {
-            return lib[123 - revealMaskImageOffset]
+            return 123 - revealMaskImageOffset
         }
-        return null
+        return -1
     }
 }

@@ -28,9 +28,7 @@ export class LandDataError extends Error {
     }
 }
 
-export abstract class Land<TerrainData extends ITerrainData> extends SceneItem implements ILand<TerrainData> {
-    private fogOfWar_ = false
-
+export class Land<TerrainData extends ITerrainData> extends SceneItem implements ILand<TerrainData> {
     private terrains_: Array<Terrain<TerrainData>> = []
     private terrainsObserver_: IObserver<ITerrain<TerrainData>>
 
@@ -51,26 +49,42 @@ export abstract class Land<TerrainData extends ITerrainData> extends SceneItem i
             .forEach(terrain => {
                 const position = terrain.position
                 const neighbors = this.neighborhood(position)
-                const images: Array<Image> = [
-                    this.terrainImage_(terrain, neighbors)
-                ]
+                const tiles: Array<Image> = []
 
-                const fogImage = this.fogImage_(terrain, neighbors)
-                if (!isNil(fogImage)) {
-                    images.push(fogImage)
+                const terrainTile = this.tiles_[this.terrainImage_(terrain, neighbors)]
+                if (!isNil(terrainTile)) {
+                    tiles.push(terrainTile)
                 }
 
-                const chunk = this.chunks_[this.positionToChunkIndex_(position)]
-                chunk.refresh({
-                    x: position.x - chunk.x,
-                    y: position.y - chunk.y,
-                }, images)
+                const fogTile = this.tiles_[this.fogImage_(terrain, neighbors)]
+                if (!isNil(fogTile)) {
+                    tiles.push(fogTile)
+                }
+
+                if (tiles.length > 0) {
+                    const chunk = this.chunks_[this.positionToChunkIndex_(position)]
+                    chunk.refresh({
+                        x: position.x - chunk.x,
+                        y: position.y - chunk.y,
+                    }, tiles)
+                }
             })
             .value()
     }
 
-    protected abstract terrainImage_(t: ITerrain<TerrainData>, n: Neighborhood<TerrainData>): Image
-    protected abstract fogImage_(t: ITerrain<TerrainData>, n: Neighborhood<TerrainData>): Image|null
+    protected tiles_: Array<Image> = []
+
+    /* eslint-disable @typescript-eslint/no-unused-vars */
+    protected terrainImage_(
+        terrain: ITerrain<TerrainData>,
+        neighbors: Neighborhood<TerrainData>
+    ): number { return -1 }
+
+    protected fogImage_(
+        terrain: ITerrain<TerrainData>,
+        neighbors: Neighborhood<TerrainData>
+    ): number { return -1 }
+    /* eslint-enable @typescript-eslint/no-unused-vars */
 
     constructor(
         scene: IScene,
