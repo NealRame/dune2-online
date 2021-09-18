@@ -93,7 +93,7 @@ export default defineComponent({
     props: ["game"],
     setup(props: Data) {
         const gameRef = toRef(props, "game")
-        const scaleRef = ref<Engine.ScaleFactor>(3)
+        const scaleRef = ref<Engine.ScaleFactor>(2)
         const screenRef = ref<IPaintDevice | null>(null)
 
         let miniMap: Engine.IMiniMap|null = null

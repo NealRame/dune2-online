@@ -1,47 +1,57 @@
 import { Engine } from "./engine"
-import { ITerrain } from "./__land"
+import { ITerrain, ITerrainData } from "./land"
 
 import { Color } from "@/graphics"
 import { createObserver, IObserver } from "@/utils"
 
-import { isNil } from "lodash"
+import { constant, isNil } from "lodash"
+
+export type TerrainColorGetter<TerrainData extends ITerrainData>
+    = (t: ITerrain<TerrainData>) => Color.RGBA
 
 export interface IMiniMap {
     readonly image: ImageBitmap|null
     readonly onChanged: IObserver<void> // TODO: should be an emitter
 }
 
-export function createMiniMap<T extends ITerrain>(game: Engine<T>)
-    : IMiniMap {
-    const observer = createObserver<void>()
-    const { width, height } = game.scene.size
+export class MiniMap<TerrainData extends ITerrainData> implements IMiniMap {
+    private observer_: IObserver<void>
+    private bitmap_: ImageBitmap | null
+    private canvas_: OffscreenCanvas
+    private context_: OffscreenCanvasRenderingContext2D
 
-    const canvas = new OffscreenCanvas(width, height)
-    const context = canvas.getContext("2d") as OffscreenCanvasRenderingContext2D
+    protected terrainColor_: TerrainColorGetter<TerrainData> = constant([0, 0, 0, 0])
 
-    let image: ImageBitmap|null = null
+    constructor(game: Engine<TerrainData>) {
+        const { width, height } = game.land.size
 
-    game.land.onTerrainChanged(terrain => {
-        if (!isNil(image)) {
-            context.drawImage(image, 0, 0)
-        }
+        this.bitmap_ = null
+        this.canvas_ = new OffscreenCanvas(width, height)
+        this.context_ = this.canvas_.getContext("2d") as OffscreenCanvasRenderingContext2D
 
-        const color = terrain.color
+        this.observer_ = createObserver<void>()
 
-        context.fillStyle = Color.cssRGB(color)
-        context.fillRect(terrain.x, terrain.y, 1, 1)
+        game.land.onTerrainChanged(terrain => {
+            if (!isNil(this.bitmap_)) {
+                this.context_.drawImage(this.bitmap_, 0, 0)
+            }
 
-        image = canvas.transferToImageBitmap()
+            const { x, y } = terrain.position
 
-        observer.publish()
-    })
+            this.context_.fillStyle = Color.cssRGB(this.terrainColor_(terrain))
+            this.context_.fillRect(x, y, 1, 1)
+            this.bitmap_ = this.canvas_.transferToImageBitmap()
+            this.observer_.publish()
+        })
+    }
 
-    return {
-        get image() {
-            return image
-        },
-        get onChanged() {
-            return observer
-        },
+    get image()
+        : ImageBitmap | null {
+        return this.bitmap_
+    }
+
+    get onChanged()
+        : IObserver<void> {
+        return this.observer_
     }
 }
