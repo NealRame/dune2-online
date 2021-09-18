@@ -19,7 +19,7 @@ import { Painter } from "@/graphics"
 import { ISize, IVector2D, Rect } from "@/maths"
 import { createObserver, IObserver } from "@/utils"
 
-import { chain, isNil, remove, times } from "lodash"
+import { chain, constant, isNil, remove, times } from "lodash"
 
 export class LandDataError extends Error {
     constructor(m: string) {
@@ -27,6 +27,9 @@ export class LandDataError extends Error {
         Object.setPrototypeOf(this, LandDataError.prototype)
     }
 }
+
+export type TileIndexGetter<TerrainData extends ITerrainData>
+    = (t: ITerrain<TerrainData>, n: Neighborhood<TerrainData>) => number
 
 export class Land<TerrainData extends ITerrainData> extends SceneItem implements ILand<TerrainData> {
     private terrains_: Array<Terrain<TerrainData>> = []
@@ -72,19 +75,9 @@ export class Land<TerrainData extends ITerrainData> extends SceneItem implements
             .value()
     }
 
+    protected fogImage_: TileIndexGetter<TerrainData> = constant(-1)
+    protected terrainImage_: TileIndexGetter<TerrainData> = constant(-1)
     protected tiles_: Array<Image> = []
-
-    /* eslint-disable @typescript-eslint/no-unused-vars */
-    protected terrainImage_(
-        terrain: ITerrain<TerrainData>,
-        neighbors: Neighborhood<TerrainData>
-    ): number { return -1 }
-
-    protected fogImage_(
-        terrain: ITerrain<TerrainData>,
-        neighbors: Neighborhood<TerrainData>
-    ): number { return -1 }
-    /* eslint-enable @typescript-eslint/no-unused-vars */
 
     constructor(
         scene: IScene,

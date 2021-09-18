@@ -81,44 +81,43 @@ export function terrainColor(terrain: ITerrain)
     return [0, 0, 0, 0]
 }
 
+export function terrainTileIndex(
+    terrain: ITerrain,
+    neighbors: Engine.Neighborhood<ITerrainData>,
+): number {
+    const topoImageOffset = terrainTopoMask(terrain, neighbors)
+
+    switch (terrain.data.type) {
+    case TerrainType.Rock:
+        return 128 + topoImageOffset
+
+    case TerrainType.Dunes:
+        return 144 + topoImageOffset
+
+    case TerrainType.Mountain:
+        return 160 + topoImageOffset
+
+    case TerrainType.SpiceField:
+        return 176 + topoImageOffset
+
+    case TerrainType.SaturatedSpiceField:
+        return 192 + topoImageOffset
+
+    default:
+        return 127
+    }
+}
+
+export function fogTileIndex(
+    terrain: ITerrain,
+    neighbors: Engine.Neighborhood<ITerrainData>
+): number {
+    const revealMaskImageOffset = terrainRevealMask(terrain, neighbors)
+    return revealMaskImageOffset > 0 ? 123 - revealMaskImageOffset : -1
+}
+
 export class Land extends Engine.Land<ITerrainData> {
     protected tiles_ = imageSet("terrain")
-
-    protected terrainImage_(
-        terrain: ITerrain,
-        neighbors: Engine.Neighborhood<ITerrainData>
-    ): number {
-        const topoImageOffset = terrainTopoMask(terrain, neighbors)
-
-        switch (terrain.data.type) {
-        case TerrainType.Rock:
-            return 128 + topoImageOffset
-
-        case TerrainType.Dunes:
-            return 144 + topoImageOffset
-
-        case TerrainType.Mountain:
-            return 160 + topoImageOffset
-
-        case TerrainType.SpiceField:
-            return 176 + topoImageOffset
-
-        case TerrainType.SaturatedSpiceField:
-            return 192 + topoImageOffset
-
-        default:
-            return 127
-        }
-    }
-
-    protected fogImage_(
-        terrain: ITerrain,
-        neighbors: Engine.Neighborhood<ITerrainData>
-    ): number {
-        const revealMaskImageOffset = terrainRevealMask(terrain, neighbors)
-        if (revealMaskImageOffset > 0) {
-            return 123 - revealMaskImageOffset
-        }
-        return -1
-    }
+    protected terrainImage_ = terrainTileIndex
+    protected fogImage_ = fogTileIndex
 }
