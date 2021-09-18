@@ -1,5 +1,11 @@
 import { Terrain } from "./terrain"
 import { ILand, ITerrainData, ITerrain, Neighborhood, LandInitialData } from "./types"
+import {
+    createPositionToIndexConverter,
+    createIndexToPositionConverter,
+    PositionToIndexConverter,
+    IndexToPositionConverter,
+} from "./utils"
 import { renderImage } from "./workers"
 
 import { SceneItem, Image, IScene } from "@/engine/scene"
@@ -25,19 +31,8 @@ export abstract class Land<TerrainData extends ITerrainData> extends SceneItem i
     private terrains_: Array<Terrain<TerrainData>> = []
     private terrainsObserver_: IObserver<ITerrain<TerrainData>>
 
-    private positionToIndex_({ x, y }: IVector2D): number {
-        if ((x >= 0 && x < this.width) && (y >= 0 && y < this.height)) {
-            return this.width*y + x
-        }
-        return -1
-    }
-
-    private indexToPosition_(index: number): IVector2D {
-        return {
-            x: index%this.width,
-            y: Math.floor(index/this.width)
-        }
-    }
+    private positionToIndex_: PositionToIndexConverter
+    private indexToPosition_: IndexToPositionConverter
 
     private onTerrainChanged_(terrain: ITerrain<TerrainData>) {
         const neighbors = this.neighborhood(terrain.position)
@@ -74,6 +69,9 @@ export abstract class Land<TerrainData extends ITerrainData> extends SceneItem i
         landData: LandInitialData<TerrainData>,
     ) {
         super(scene)
+
+        this.indexToPosition_ = createIndexToPositionConverter(this.size)
+        this.positionToIndex_ = createPositionToIndexConverter(this.size)
 
         this.terrainsObserver_ = createObserver<ITerrain<TerrainData>>()
         this.terrainsObserver_.subscribe(terrain => {
