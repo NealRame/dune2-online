@@ -62,6 +62,14 @@ export class Scene extends Entity implements IScene {
         return Vector.Null
     }
 
+    get x(): number {
+        return 0
+    }
+
+    get y(): number {
+        return 0
+    }
+
     get width(): number {
         return this.width_
     }

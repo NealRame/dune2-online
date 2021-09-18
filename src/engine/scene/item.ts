@@ -38,6 +38,14 @@ export abstract class SceneItem extends Entity implements ISceneItem {
         return this.height_
     }
 
+    get x(): number {
+        return this.x_
+    }
+
+    get y(): number {
+        return this.y_
+    }
+
     get size(): ISize {
         return {
             width: this.width_,

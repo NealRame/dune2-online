@@ -22,6 +22,8 @@ export interface ISceneItem extends IEntity {
     readonly size: ISize
     readonly rect: Rect
     readonly position: Vector
+    readonly x: number
+    readonly y: number
     visible: boolean
     render(painter?: Painter, viewport?: Rect): ISceneItem
     update(): ISceneItem

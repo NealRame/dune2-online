@@ -1,15 +1,20 @@
+import { Chunk } from "./chunk"
 import { Terrain } from "./terrain"
-import { ILand, ITerrainData, ITerrain, Neighborhood, LandInitialData } from "./types"
+import {
+    ILand,
+    ITerrainData,
+    ITerrain,
+    Neighborhood,
+    LandInitialData
+} from "./types"
 import {
     createPositionToIndexConverter,
     createIndexToPositionConverter,
     PositionToIndexConverter,
     IndexToPositionConverter,
 } from "./utils"
-import { renderImage } from "./workers"
 
 import { SceneItem, Image, IScene } from "@/engine/scene"
-
 import { Painter } from "@/graphics"
 import { ISize, IVector2D, Rect } from "@/maths"
 import { createObserver, IObserver } from "@/utils"
@@ -25,14 +30,17 @@ export class LandDataError extends Error {
 
 export abstract class Land<TerrainData extends ITerrainData> extends SceneItem implements ILand<TerrainData> {
     private fogOfWar_ = false
-    private image_: Partial<Image> = {}
-    private redraw_: Record<number, [IVector2D, Array<Image>]> = {}
 
     private terrains_: Array<Terrain<TerrainData>> = []
     private terrainsObserver_: IObserver<ITerrain<TerrainData>>
 
-    private positionToIndex_: PositionToIndexConverter
     private indexToPosition_: IndexToPositionConverter
+    private positionToIndex_: PositionToIndexConverter
+
+    private chunkSize_ = { width: 16, height: 16 }
+    private chunks_: Array<Chunk> = []
+
+    private positionToChunkIndex_: PositionToIndexConverter
 
     private onTerrainChanged_(terrain: ITerrain<TerrainData>) {
         const neighbors = this.neighborhood(terrain.position)
@@ -43,7 +51,6 @@ export abstract class Land<TerrainData extends ITerrainData> extends SceneItem i
             .forEach(terrain => {
                 const position = terrain.position
                 const neighbors = this.neighborhood(position)
-
                 const images: Array<Image> = [
                     this.terrainImage_(terrain, neighbors)
                 ]
@@ -53,10 +60,11 @@ export abstract class Land<TerrainData extends ITerrainData> extends SceneItem i
                     images.push(fogImage)
                 }
 
-                this.redraw_[this.positionToIndex_(position)] = [
-                    position,
-                    images,
-                ]
+                const chunk = this.chunks_[this.positionToChunkIndex_(position)]
+                chunk.refresh({
+                    x: position.x - chunk.x,
+                    y: position.y - chunk.y,
+                }, images)
             })
             .value()
     }
@@ -89,32 +97,26 @@ export abstract class Land<TerrainData extends ITerrainData> extends SceneItem i
             }
             return new Terrain(position, data, this.terrainsObserver_.publish)
         })
+
+        this.positionToChunkIndex_ = createPositionToIndexConverter(this.size, this.chunkSize_)
+
+        for (const chunkRect of this.rect.partition(this.chunkSize_)) {
+            this.chunks_.push(new Chunk(this.scene, chunkRect))
+        }
     }
 
     render(painter: Painter, viewport: Rect): ILand<TerrainData> {
-        const bitmap = this.image_[this.scene.scale]
-        if (!isNil(bitmap)) {
-            painter.drawImageBitmap(
-                bitmap,
-                { x: 0, y: 0 },
-                viewport.scaled(this.scene.gridSpacing)
-            )
+        for (const item of this.chunks_) {
+            if (viewport.intersects(item.rect)) {
+                item.render(painter, viewport)
+            }
         }
         return this
     }
 
     update(): ILand<TerrainData> {
-        const tiles = Object.values(this.redraw_)
-        this.redraw_ = {}
-        if (tiles.length > 0) {
-            renderImage({
-                size: this.size,
-                gridUnit: this.scene.gridUnit,
-                image: this.image_,
-                tiles,
-            }).then(image => {
-                this.image_ = image
-            })
+        for (const chunk of this.chunks_) {
+            chunk.update()
         }
         return this
     }
