@@ -31,18 +31,18 @@ export interface GameConfig {
 export interface Game {
     readonly engine: Engine.Engine<ITerrainData>
     readonly miniMap: IMiniMap
-    // createUnit: UnitFactory
+    createUnit: UnitFactory
     initialize: () => void
 }
 
-// function createUnitFactory(engine: Engine.Engine<ITerrainData>)
-//     : UnitFactory {
-//     return (type: UnitType, position: IVector2D) => {
-//         const unit = new Units[type](engine.scene, position)
-//         engine.addUnit(unit)
-//         return unit
-//     }
-// }
+function createUnitFactory(engine: Engine.Engine<ITerrainData>)
+    : UnitFactory {
+    return (type: UnitType, position: IVector2D) => {
+        const unit = new Units[type](engine.scene, position)
+        engine.addUnit(unit)
+        return unit
+    }
+}
 
 function setupStartLocation(engine: Engine.Engine<ITerrainData>): void {
     const { land, scene } = engine
@@ -70,7 +70,7 @@ export function createGame(config: GameConfig): Game {
     return {
         get engine() { return engine },
         get miniMap() { return miniMap },
-        // createUnit: createUnitFactory(engine),
+        createUnit: createUnitFactory(engine),
         initialize: once(() => {
             setupStartLocation(engine)
             engine.start()

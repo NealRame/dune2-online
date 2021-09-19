@@ -1,5 +1,6 @@
-import { Scene } from "./scene"
+import { Scene, SceneLayer } from "./scene"
 import { ILand, ITerrainData, LandConstructor, LandInitialData } from "./land"
+import { Unit } from "./unit"
 
 import { Painter } from "@/graphics"
 import { ISize } from "@/maths"
@@ -14,6 +15,7 @@ export interface Config<T extends ITerrainData> {
 export interface Engine<T extends ITerrainData> {
     readonly scene: Scene
     readonly land: ILand<T>
+    addUnit(unit: Unit): Engine<T>
     start(): Engine<T>
     stop(): Engine<T>
 }
@@ -23,11 +25,14 @@ export function create<T extends ITerrainData>(
 ): Engine<T> {
     const scene = new Scene(config.size, config.painter)
     const land = new config.Land(scene, config.landData)
+    const units = new SceneLayer(scene, "units")
 
     let animationRequestId = 0
 
     land.name = "land"
-    scene.addItem(land)
+    scene
+        .addItem(land)
+        .addItem(units)
 
     return {
         get scene() {
@@ -35,6 +40,10 @@ export function create<T extends ITerrainData>(
         },
         get land() {
             return land
+        },
+        addUnit(unit: Unit): Engine<T> {
+            units.addItem(unit)
+            return this
         },
         start(): Engine<T> {
             (function animationLoop() {
