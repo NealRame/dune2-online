@@ -9,16 +9,31 @@ export interface Pen {
 
 export type Brush = string | CanvasGradient | CanvasPattern
 
+export class PainterError extends Error {
+    constructor(m: string) {
+        super(m)
+        Object.setPrototypeOf(this, PainterError.prototype)
+    }
+}
+
 export class Painter {
-    private canvas_: HTMLCanvasElement
-    private context_: CanvasRenderingContext2D
+    private canvas_: HTMLCanvasElement | OffscreenCanvas
+    private context_: CanvasRenderingContext2D | OffscreenCanvasRenderingContext2D
 
     /**
      * @param paintDevice
      */
-    constructor(canvas: HTMLCanvasElement) {
+    constructor(
+        canvas: HTMLCanvasElement | OffscreenCanvas
+    ) {
         this.canvas_ = canvas
-        this.context_ = canvas.getContext("2d") as CanvasRenderingContext2D
+        if (canvas instanceof HTMLCanvasElement) {
+            this.context_ = canvas.getContext("2d") as CanvasRenderingContext2D
+        } else if (canvas instanceof OffscreenCanvas) {
+            this.context_ = canvas.getContext("2d") as OffscreenCanvasRenderingContext2D
+        } else {
+            throw new PainterError("Unsupported canvas")
+        }
     }
 
     get size(): ISize {
