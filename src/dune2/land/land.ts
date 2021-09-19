@@ -1,9 +1,7 @@
 import { ITerrain, ITerrainData, TerrainType } from "./types"
 
-import { imageSet, palette } from "../data"
-
+import { imageSet } from "@/dune2/data"
 import * as Engine from "@/engine"
-import { Color } from "@/graphics"
 
 import { reduceRight } from "lodash"
 
