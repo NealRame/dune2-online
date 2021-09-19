@@ -1,7 +1,7 @@
 import { Painter } from "./painter"
-import { Rect } from "@/maths"
+import { ISize } from "@/maths"
 
 export interface IPaintDevice {
     readonly painter: Painter,
-    readonly rect: Rect,
+    readonly size: ISize,
 }
