@@ -144,7 +144,7 @@ export class Scene extends Entity implements IScene {
     }
 
     zoomIn(): IScene {
-        this.scale_ = scaleUp(this.scale_)
+        this.scale = scaleUp(this.scale_)
         return this
     }
 
