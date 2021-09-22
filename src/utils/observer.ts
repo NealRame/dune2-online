@@ -1,20 +1,15 @@
-export type EventCallback<EventType> = (event: EventType) => void
-
-export interface IObserver<EventType> {
-    publish(event: EventType): void,
-    subscribe(callback: EventCallback<EventType>): () => void,
-}
+import { EventListenerCallback, IObserver } from "./event"
 
 export function createObserver<EventType>()
     : IObserver<EventType> {
-    let callbacks: EventCallback<EventType>[] = []
+    let callbacks: EventListenerCallback<EventType>[] = []
     return {
         publish(event: EventType) {
             for (const callback of callbacks) {
                 callback(event)
             }
         },
-        subscribe(callback: EventCallback<EventType>) {
+        subscribe(callback: EventListenerCallback<EventType>) {
             callbacks.push(callback)
             return () => {
                 callbacks = callbacks.filter(l => l !== callback)
