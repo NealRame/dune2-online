@@ -13,7 +13,11 @@ import {
     IVector2D,
     Vector
 } from "@/maths"
-import { createObserver, EventCallback, IObserver } from "@/utils"
+import {
+    createObserver,
+    EventListenerCallback,
+    IObserver
+} from "@/utils"
 
 import { clamp, isNil, times } from "lodash"
 
@@ -87,7 +91,7 @@ export class Unit extends Sprite {
         return this
     }
 
-    onDestinationReached(listener: EventCallback<void>): () => void {
+    onDestinationReached(listener: EventListenerCallback<void>): () => void {
         return this.moveObserver_.subscribe(listener)
     }
 
