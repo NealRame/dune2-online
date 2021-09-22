@@ -2,7 +2,6 @@ import { Scene, SceneLayer } from "./scene"
 import { ILand, ITerrainData, LandConstructor, LandInitialData } from "./land"
 import { Unit } from "./unit"
 
-import { Entity } from "@/engine/entity"
 import { Painter } from "@/graphics"
 import { ISize } from "@/maths"
 
@@ -25,7 +24,7 @@ export function create<T extends ITerrainData>(
     config: Config<T>
 ): Engine<T> {
     const scene = new Scene(config.size, config.painter)
-    const land = new config.Land(new Entity(), scene, config.landData)
+    const land = new config.Land(scene, config.landData)
     const units = new SceneLayer(scene)
 
     let animationRequestId = 0

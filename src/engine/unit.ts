@@ -4,7 +4,6 @@ import {
     Animation,
     createSequenceAnimation,
     createTransitionAnimation,
-    IEntity,
     IScene,
 } from "@/engine"
 import {
@@ -38,8 +37,8 @@ export class Unit extends Sprite {
     private moveObserver_: IObserver<void>
     private animation_: Animation|null
 
-    constructor(entity: IEntity, scene: IScene, position: IVector2D) {
-        super(entity, scene, position)
+    constructor(scene: IScene, position: IVector2D) {
+        super(scene, position)
         this.hitPoints_ = 1
         this.speed_ = 1
         this.animation_ = null

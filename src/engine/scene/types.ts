@@ -15,7 +15,6 @@ export interface IScene extends ISceneLayer {
 }
 
 export interface ISceneItem {
-    readonly id: number
     readonly scene: IScene
     readonly width: number
     readonly height: number

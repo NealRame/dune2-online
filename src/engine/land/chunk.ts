@@ -9,7 +9,6 @@ import { Painter } from "@/graphics"
 import { IVector2D, Rect } from "@/maths"
 
 import { isNil } from "lodash"
-import { IEntity } from ".."
 
 export class Chunk extends SceneItem {
     private image_: Partial<Image> = {}
@@ -18,11 +17,10 @@ export class Chunk extends SceneItem {
     private positionToIndex_: PositionToIndexConverter
 
     constructor(
-        entity: IEntity,
         scene: IScene,
         rect: Rect,
     ) {
-        super(entity, scene)
+        super(scene)
         this.x_ = rect.x
         this.y_ = rect.y
         this.width_ = rect.width

@@ -1,4 +1,3 @@
-import { IEntity } from "@/engine/entity"
 import { IScene, ISceneItem } from "@/engine/scene"
 import { Rect, IVector2D, ISize } from "@/maths"
 
@@ -35,4 +34,4 @@ export type LandInitialData<Data extends ITerrainData>
     = Array<Data> | LandDataGenerator<Data>
 
 export type LandConstructor<Data extends ITerrainData>
-    = new (entity: IEntity, scene: IScene, data: LandInitialData<Data>) => ILand<Data>
+    = new (scene: IScene, data: LandInitialData<Data>) => ILand<Data>

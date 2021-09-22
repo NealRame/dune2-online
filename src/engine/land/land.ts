@@ -14,7 +14,6 @@ import {
     IndexToPositionConverter,
 } from "./utils"
 
-import { IEntity } from "@/engine/entity"
 import { SceneItem, Image, IScene } from "@/engine/scene"
 import { Painter } from "@/graphics"
 import { ISize, IVector2D, Rect } from "@/maths"
@@ -81,11 +80,10 @@ export class Land<TerrainData extends ITerrainData> extends SceneItem implements
     protected tiles_: Array<Image> = []
 
     constructor(
-        entity: IEntity,
         scene: IScene,
         landData: LandInitialData<TerrainData>,
     ) {
-        super(entity, scene)
+        super(scene)
 
         this.indexToPosition_ = createIndexToPositionConverter(this.size)
         this.positionToIndex_ = createPositionToIndexConverter(this.size)
@@ -110,7 +108,7 @@ export class Land<TerrainData extends ITerrainData> extends SceneItem implements
         this.positionToChunkIndex_ = createPositionToIndexConverter(this.size, this.chunkSize_)
 
         for (const chunkRect of this.rect.partition(this.chunkSize_)) {
-            this.chunks_.push(new Chunk(this.entity_, this.scene, chunkRect))
+            this.chunks_.push(new Chunk(this.scene, chunkRect))
         }
     }
 
