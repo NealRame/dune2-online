@@ -1,4 +1,3 @@
-import { IEntity } from "@/engine/entity"
 import { IViewport } from "@/engine/viewport"
 import { ScaleFactor } from "@/engine/scale"
 import { Painter } from "@/graphics"
@@ -15,7 +14,8 @@ export interface IScene extends ISceneLayer {
     zoomOut(): IScene
 }
 
-export interface ISceneItem extends IEntity {
+export interface ISceneItem {
+    readonly id: number
     readonly scene: IScene
     readonly width: number
     readonly height: number

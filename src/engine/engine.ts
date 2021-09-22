@@ -29,7 +29,6 @@ export function create<T extends ITerrainData>(
 
     let animationRequestId = 0
 
-    land.name = "land"
     scene
         .addItem(land)
         .addItem(units)
