@@ -73,18 +73,3 @@ export class Tile extends SceneItem {
         return this
     }
 }
-
-export type TileConfig = {
-    position?: IVector2D,
-    shape: IShape,
-    images: Image[]
-}
-
-export function createTile(scene: IScene, config: TileConfig): Tile {
-    return new Tile(
-        scene,
-        config.position ?? { x: 0, y: 0 },
-        config.shape,
-        config.images,
-    )
-}

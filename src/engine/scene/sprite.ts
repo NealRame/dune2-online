@@ -5,10 +5,6 @@ import { Image, IScene } from "./types"
 import { Painter } from "@/graphics"
 import { Rect, IVector2D, ISize, IShape, Vector } from "@/maths"
 
-import { isNil } from "lodash"
-
-type SpriteUpdateDelegate = () => void
-
 export class Sprite extends SceneItem {
     private frames_: Tile[]
     private frameIndex_: number
@@ -74,22 +70,4 @@ export class Sprite extends SceneItem {
     update(): Sprite {
         return this
     }
-}
-
-export type SpriteConfig = {
-    position?: IVector2D,
-    onUpdate?: SpriteUpdateDelegate,
-}
-
-export function createSprite(scene: IScene, config: SpriteConfig): Sprite {
-    const position = config.position ?? { x: 0, y: 0 }
-    const sprite = isNil(config.onUpdate)
-        ? new Sprite(scene, position)
-        : new (class extends Sprite {
-            update() {
-                (config.onUpdate as SpriteUpdateDelegate).call(this)
-                return this
-            }
-        })(scene, position)
-    return sprite
 }
