@@ -1,10 +1,10 @@
 import { imageSet } from "@/dune2/data"
-import { Unit, IScene } from "@/engine"
+import { Entity, IScene, Unit } from "@/engine"
 import { IVector2D } from "@/maths"
 
 export class Trike extends Unit {
     constructor(scene: IScene, position: IVector2D) {
-        super(scene, position)
+        super(new Entity(), scene, position)
 
         const images = imageSet("units")
         const shape = { columns: 1, rows: 1 }

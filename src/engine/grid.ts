@@ -1,4 +1,4 @@
-import { SceneItem, IScene } from "./scene"
+import { SceneItem } from "./scene"
 
 import { Color, Painter } from "@/graphics"
 import { Rect } from "@/maths"
@@ -35,10 +35,4 @@ export class Grid extends SceneItem {
 
         return this
     }
-}
-
-export function createGrid(
-    scene: IScene,
-): Grid {
-    return new Grid(scene)
 }

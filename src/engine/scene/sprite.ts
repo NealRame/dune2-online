@@ -2,6 +2,7 @@ import { SceneItem } from "./item"
 import { Tile } from "./tile"
 import { Image, IScene } from "./types"
 
+import { IEntity } from "@/engine/entity"
 import { Painter } from "@/graphics"
 import { Rect, IVector2D, ISize, IShape, Vector } from "@/maths"
 
@@ -10,10 +11,11 @@ export class Sprite extends SceneItem {
     private frameIndex_: number
 
     constructor(
+        entity: IEntity,
         scene: IScene,
         position: IVector2D,
     ) {
-        super(scene)
+        super(entity, scene)
         this.x_ = position.x
         this.y_ = position.y
         this.frames_ = []
@@ -41,6 +43,7 @@ export class Sprite extends SceneItem {
 
     addFrame(shape: IShape, images: Image[]): Sprite {
         this.frames_.push(new Tile(
+            this.entity_,
             this.scene,
             { x: 0, y: 0 },
             shape,

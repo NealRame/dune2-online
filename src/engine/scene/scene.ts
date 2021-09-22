@@ -3,7 +3,7 @@ import { IScene, ISceneItem } from "./types"
 import { cssHex } from "@/graphics/color"
 import { Brush, Painter } from "@/graphics/painter"
 
-import { Entity } from "@/engine/entity"
+import { Entity, IEntity } from "@/engine/entity"
 import { scaleDown, ScaleFactor, scaleUp } from "@/engine/scale"
 import { createViewport, IViewport } from "@/engine/viewport"
 
@@ -11,7 +11,7 @@ import { Rect, IVector2D, ISize, Vector } from "@/maths"
 
 import { isNil } from "lodash"
 
-export class Scene extends Entity implements IScene {
+export class Scene implements IScene {
     private backgroundColor_: Brush
     private gridUnit_ = 16
     private scale_: ScaleFactor
@@ -20,6 +20,7 @@ export class Scene extends Entity implements IScene {
     private viewport_: IViewport
     private painter_: Painter
     private items_: Array<ISceneItem> = []
+    private entity_: IEntity
 
     visible = true
 
@@ -27,8 +28,8 @@ export class Scene extends Entity implements IScene {
         this.viewport_.size = this.painter_.rect.scaled(1/this.gridSpacing).size
     }
 
-    constructor(size: ISize, painter: Painter) {
-        super()
+    constructor(size: ISize, painter: Painter, name?: string) {
+        this.entity_ = new Entity(name ?? "scene")
         this.backgroundColor_ = cssHex([0, 0, 0])
         this.width_ = size.width
         this.height_ = size.height
@@ -37,6 +38,10 @@ export class Scene extends Entity implements IScene {
         this.viewport_ = createViewport(size)
 
         this.updateViewport_()
+    }
+
+    get id(): number {
+        return this.entity_.id
     }
 
     get scale(): ScaleFactor {

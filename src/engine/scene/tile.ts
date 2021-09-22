@@ -1,6 +1,7 @@
 import { SceneItem } from "./item"
 import { Image, IScene } from "./types"
 
+import { IEntity } from "@/engine/entity"
 import { Painter } from "@/graphics"
 import { Rect, IVector2D, IShape, ISize } from "@/maths"
 
@@ -31,17 +32,18 @@ function checkShape({ columns, rows }: IShape, images: Image[]) {
 }
 
 export class Tile extends SceneItem {
-    private imageSize_: ISize
-    private images_: Image[]
-    private shape_: IShape
+    protected imageSize_: ISize
+    protected images_: Image[]
+    protected shape_: IShape
 
     constructor(
+        entity: IEntity,
         scene: IScene,
         position: IVector2D,
         shape: IShape,
         images: Image[],
     ) {
-        super(scene)
+        super(entity, scene)
 
         checkImages(scene, images)
         checkShape(shape, images)

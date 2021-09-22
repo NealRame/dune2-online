@@ -1,11 +1,13 @@
 import { IScene, ISceneItem } from "./types"
 
-import { Entity } from "@/engine"
+import { IEntity } from "@/engine/entity"
 import { Painter } from "@/graphics"
 import { Rect, ISize, Vector } from "@/maths"
 
-export abstract class SceneItem extends Entity implements ISceneItem {
+export abstract class SceneItem implements ISceneItem {
     private scene_: IScene
+
+    protected entity_: IEntity
 
     protected x_ = 0
     protected y_ = 0
@@ -14,12 +16,18 @@ export abstract class SceneItem extends Entity implements ISceneItem {
 
     visible = true
 
-    constructor(scene: IScene, name?: string) {
-        super(name)
+    constructor(
+        entity: IEntity,
+        scene: IScene,
+    ) {
         this.scene_ = scene
+        this.entity_ = entity
         this.width_ = this.scene_.width
         this.height_ = this.scene_.height
-        this.name = name ?? ""
+    }
+
+    get id(): number {
+        return this.entity_.id
     }
 
     get scene(): IScene {
