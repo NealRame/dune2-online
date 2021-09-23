@@ -1,22 +1,21 @@
+import { Land } from "./land"
 import { ITerrain, ITerrainData } from "./types"
 
 import { IVector2D } from "@/maths"
 
-type ChangesNotifier<Data extends ITerrainData> = (t: ITerrain<Data>) => void
-
 export class Terrain<Data extends ITerrainData> implements ITerrain<Data> {
+    private land_: Land<Data>
     private position_: IVector2D
     private data_: Data
-    private notify_: ChangesNotifier<Data>
 
     constructor(
         position: IVector2D,
         data: Data,
-        notify: ChangesNotifier<Data>
+        land: Land<Data>,
     ) {
         this.position_ = position
         this.data_ = data
-        this.notify_ = notify
+        this.land_ = land
     }
 
     get data(): Data {
@@ -29,7 +28,7 @@ export class Terrain<Data extends ITerrainData> implements ITerrain<Data> {
 
     update(data: Partial<Data>): this {
         Object.assign(this.data_, data)
-        this.notify_(this)
+        this.land_.emit("terrainChanged", this)
         return this
     }
 }

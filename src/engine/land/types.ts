@@ -1,4 +1,6 @@
-import { IScene, ISceneItem } from "@/engine/scene"
+import { IEntity } from "@/engine/entity"
+import { IScene } from "@/engine/scene"
+
 import { Rect, IVector2D, ISize } from "@/maths"
 
 export interface ITerrainData {
@@ -19,12 +21,19 @@ export interface ITerrain<Data extends ITerrainData> {
     update(data: Partial<Data>): ITerrain<Data>
 }
 
-export interface ILand<Data extends ITerrainData = ITerrainData> extends ISceneItem {
+export type TileIndexGetter<Data extends ITerrainData>
+    = (t: ITerrain<Data>, n: Neighborhood<Data>) => number
+
+export interface ILandEvent<Data extends ITerrainData> {
+    terrainChanged: ITerrain<Data>
+}
+
+export interface ILand<Data extends ITerrainData = ITerrainData> extends IEntity<ILandEvent<Data>> {
+    readonly size: ISize
     reveal(position?: IVector2D, size?: ISize): ILand<Data>
     terrain(position: IVector2D): ITerrain<Data>|null
     neighborhood(position: IVector2D): Neighborhood<Data>
     terrains(rect?: Rect): Generator<ITerrain<Data>>
-    onTerrainChanged(callback: (terrain: ITerrain<Data>) => void): () => void
 }
 
 export type LandDataGenerator<Data extends ITerrainData>

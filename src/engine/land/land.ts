@@ -1,11 +1,12 @@
-import { Chunk } from "./chunk"
 import { Terrain } from "./terrain"
 import {
     ILand,
+    ILandEvent,
     ITerrainData,
     ITerrain,
     Neighborhood,
-    LandInitialData
+    LandInitialData,
+    TileIndexGetter
 } from "./types"
 import {
     createPositionToIndexConverter,
@@ -13,13 +14,14 @@ import {
     PositionToIndexConverter,
     IndexToPositionConverter,
 } from "./utils"
+import { LandView } from "./view"
 
-import { SceneItem, Image, IScene } from "@/engine/scene"
-import { Painter } from "@/graphics"
+import { Entity } from "@/engine/entity"
+import { Image, IScene, ISceneItem } from "@/engine/scene"
+
 import { ISize, IVector2D, Rect } from "@/maths"
-import { createObserver, IObserver } from "@/utils"
 
-import { chain, constant, isNil, remove, times } from "lodash"
+import { constant, isNil, times } from "lodash"
 
 export class LandDataError extends Error {
     constructor(m: string) {
@@ -28,72 +30,30 @@ export class LandDataError extends Error {
     }
 }
 
-export type TileIndexGetter<TerrainData extends ITerrainData>
-    = (t: ITerrain<TerrainData>, n: Neighborhood<TerrainData>) => number
-
-export class Land<TerrainData extends ITerrainData> extends SceneItem implements ILand<TerrainData> {
+export class Land<TerrainData extends ITerrainData> extends Entity<ILandEvent<TerrainData>> implements ILand<TerrainData> {
     private terrains_: Array<Terrain<TerrainData>> = []
-    private terrainsObserver_: IObserver<ITerrain<TerrainData>>
+    private view_: LandView<TerrainData>
 
+    private size_: ISize
     private indexToPosition_: IndexToPositionConverter
     private positionToIndex_: PositionToIndexConverter
 
-    private chunkSize_ = { width: 16, height: 16 }
-    private chunks_: Array<Chunk> = []
-
-    private positionToChunkIndex_: PositionToIndexConverter
-
-    private onTerrainChanged_(terrain: ITerrain<TerrainData>) {
-        const neighbors = this.neighborhood(terrain.position)
-
-        chain(neighbors as Array<ITerrain<TerrainData>>)
-            .tap(terrains => remove(terrains, isNil))
-            .tap(terrains => terrains.push(terrain))
-            .forEach(terrain => {
-                const position = terrain.position
-                const neighbors = this.neighborhood(position)
-                const tiles: Array<Image> = []
-
-                const terrainTile = this.tiles_[this.terrainImage_(terrain, neighbors)]
-                if (!isNil(terrainTile)) {
-                    tiles.push(terrainTile)
-                }
-
-                const fogTile = this.tiles_[this.fogImage_(terrain, neighbors)]
-                if (!isNil(fogTile)) {
-                    tiles.push(fogTile)
-                }
-
-                if (tiles.length > 0) {
-                    const chunk = this.chunks_[this.positionToChunkIndex_(position)]
-                    chunk.refresh({
-                        x: position.x - chunk.x,
-                        y: position.y - chunk.y,
-                    }, tiles)
-                }
-            })
-            .value()
-    }
-
-    protected fogImage_: TileIndexGetter<TerrainData> = constant(-1)
-    protected terrainImage_: TileIndexGetter<TerrainData> = constant(-1)
-    protected tiles_: Array<Image> = []
+    chunkSize = { width: 16, height: 16 }
+    fogImage: TileIndexGetter<TerrainData> = constant(-1)
+    terrainImage: TileIndexGetter<TerrainData> = constant(-1)
+    tiles: Array<Image> = []
 
     constructor(
         scene: IScene,
         landData: LandInitialData<TerrainData>,
     ) {
-        super(scene)
+        super()
 
-        this.indexToPosition_ = createIndexToPositionConverter(this.size)
-        this.positionToIndex_ = createPositionToIndexConverter(this.size)
+        this.size_ = scene.size
+        this.indexToPosition_ = createIndexToPositionConverter(this.size_)
+        this.positionToIndex_ = createPositionToIndexConverter(this.size_)
 
-        this.terrainsObserver_ = createObserver<ITerrain<TerrainData>>()
-        this.terrainsObserver_.subscribe(terrain => {
-            this.onTerrainChanged_(terrain)
-        })
-
-        this.terrains_ = times(this.width*this.height, index => {
+        this.terrains_ = times(this.size_.width*this.size_.height, index => {
             const position = this.indexToPosition_(index)
             const data = (typeof landData === "function")
                 ? landData(position)
@@ -102,30 +62,17 @@ export class Land<TerrainData extends ITerrainData> extends SceneItem implements
             if (isNil(data)) {
                 throw new LandDataError("Not enougth data to cover land area!")
             }
-            return new Terrain(position, data, this.terrainsObserver_.publish)
+            return new Terrain(position, data, this)
         })
-
-        this.positionToChunkIndex_ = createPositionToIndexConverter(this.size, this.chunkSize_)
-
-        for (const chunkRect of this.rect.partition(this.chunkSize_)) {
-            this.chunks_.push(new Chunk(this.scene, chunkRect))
-        }
+        this.view_ = new LandView(this, scene)
     }
 
-    render(painter: Painter, viewport: Rect): ILand<TerrainData> {
-        for (const item of this.chunks_) {
-            if (viewport.intersects(item.rect)) {
-                item.render(painter, viewport)
-            }
-        }
-        return this
+    get size(): ISize {
+        return this.size_
     }
 
-    update(): ILand<TerrainData> {
-        for (const chunk of this.chunks_) {
-            chunk.update()
-        }
-        return this
+    get view(): ISceneItem {
+        return this.view_
     }
 
     reveal(position: IVector2D, size?: ISize): this {
@@ -154,7 +101,7 @@ export class Land<TerrainData extends ITerrainData> extends SceneItem implements
     * terrains(zone?: Rect)
         : Generator<ITerrain<TerrainData>, void, undefined> {
         if (!isNil(zone)) {
-            const rect = this.rect.intersected(zone)
+            const rect = this.view.rect.intersected(zone)
             if (!isNil(rect)) {
                 for (const { x, y } of rect.partition()) {
                     yield this.terrain({ x, y }) as ITerrain<TerrainData>
@@ -163,10 +110,5 @@ export class Land<TerrainData extends ITerrainData> extends SceneItem implements
         } else {
             yield * this.terrains_
         }
-    }
-
-    onTerrainChanged(callback: (t: ITerrain<TerrainData>) => void)
-        : () => void {
-        return this.terrainsObserver_.subscribe(callback)
     }
 }

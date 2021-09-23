@@ -30,7 +30,7 @@ export function create<T extends ITerrainData>(
     let animationRequestId = 0
 
     scene
-        .addItem(land)
+        .addItem(land.view)
         .addItem(units)
 
     return {

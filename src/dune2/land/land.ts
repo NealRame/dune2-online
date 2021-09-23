@@ -87,7 +87,7 @@ export function fogTileIndex(
 }
 
 export class Land extends Engine.Land<ITerrainData> {
-    protected tiles_ = imageSet("terrain")
-    protected terrainImage_ = terrainTileIndex
-    protected fogImage_ = fogTileIndex
+    tiles = imageSet("terrain")
+    terrainImage = terrainTileIndex
+    fogImage = fogTileIndex
 }

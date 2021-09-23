@@ -16,7 +16,7 @@ export class EventEmitter<T extends EventMap> implements IEmitter<T> {
         }
     } = {}
 
-    protected emit_<K extends EventKey<T>>(
+    emit<K extends EventKey<T>>(
         eventName: K,
         data: T[K]
     ): EventEmitter<T> {
