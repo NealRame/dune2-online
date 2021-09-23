@@ -33,5 +33,5 @@ export function terrainColor(terrain: ITerrain)
 }
 
 export class MiniMap extends Engine.MiniMap<ITerrainData> {
-    protected terrainColor_ = terrainColor
+    terrainColor = terrainColor
 }

@@ -22,7 +22,7 @@ export class MiniMap<TerrainData extends ITerrainData> extends EventEmitter<IMin
     private canvas_: OffscreenCanvas
     private context_: OffscreenCanvasRenderingContext2D
 
-    protected terrainColor_: TerrainColorGetter<TerrainData> = constant([0, 0, 0, 0])
+    terrainColor: TerrainColorGetter<TerrainData> = constant([0, 0, 0, 0])
 
     constructor(game: Engine<TerrainData>) {
         super()
@@ -40,7 +40,7 @@ export class MiniMap<TerrainData extends ITerrainData> extends EventEmitter<IMin
 
             const { x, y } = terrain.position
 
-            this.context_.fillStyle = Color.cssRGB(this.terrainColor_(terrain))
+            this.context_.fillStyle = Color.cssRGB(this.terrainColor(terrain))
             this.context_.fillRect(x, y, 1, 1)
             this.bitmap_ = this.canvas_.transferToImageBitmap()
             this.emit("changed", null)
