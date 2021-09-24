@@ -24,9 +24,9 @@ module.exports = {
         "key-spacing": ["error", { "mode": "minimum" }],
         "space-infix-ops": ["off"],
         "operator-linebreak": ["off"],
-        "no-multi-spaces": ["off"],
         "no-console": process.env.NODE_ENV === "production" ? "warn" : "off",
         "no-debugger": process.env.NODE_ENV === "production" ? "warn" : "off",
+        "no-multi-spaces": ["off"],
         "quotes": ["warn", "double"],
         "no-use-before-define": "off",
         "@typescript-eslint/no-use-before-define": ["error"]
