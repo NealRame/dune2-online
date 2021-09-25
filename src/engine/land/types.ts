@@ -18,7 +18,7 @@ export interface ITerrain<Data extends ITerrainData> {
     readonly data: Data
     readonly position: IVector2D
 
-    update(data: Partial<Data>): ITerrain<Data>
+    set(data: Partial<Data>): ITerrain<Data>
 }
 
 export type TileIndexGetter<Data extends ITerrainData>

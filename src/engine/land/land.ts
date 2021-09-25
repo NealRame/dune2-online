@@ -78,7 +78,7 @@ export class Land<TerrainData extends ITerrainData> extends Entity<ILandEvent<Te
     reveal(position: IVector2D, size?: ISize): this {
         size = size ?? { width: 1, height: 1 }
         for (const terrain of this.terrains(new Rect(position, size))) {
-            terrain.update({ revealed: true } as Partial<TerrainData>)
+            terrain.set({ revealed: true } as Partial<TerrainData>)
         }
         return this
     }

@@ -26,7 +26,7 @@ export class Terrain<Data extends ITerrainData> implements ITerrain<Data> {
         return this.position_
     }
 
-    update(data: Partial<Data>): this {
+    set(data: Partial<Data>): this {
         Object.assign(this.data_, data)
         this.land_.emit("terrainChanged", this)
         return this
