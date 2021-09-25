@@ -3,11 +3,11 @@ import { Tile } from "./tile"
 import { Image, IScene } from "./types"
 
 import { Painter } from "@/graphics"
-import { Rect, IVector2D, ISize, IShape, Vector } from "@/maths"
+import { IShape, ISize, IVector2D, Rect, Vector } from "@/maths"
 
 export class Sprite extends SceneItem {
-    private frames_: Tile[]
-    private frameIndex_: number
+    private frameIndex_ = 0
+    private frames_: Array<Tile> = []
 
     constructor(
         scene: IScene,
@@ -16,8 +16,6 @@ export class Sprite extends SceneItem {
         super(scene)
         this.x_ = position.x
         this.y_ = position.y
-        this.frames_ = []
-        this.frameIndex_ = 0
     }
 
     get frameCount(): number {
@@ -39,7 +37,7 @@ export class Sprite extends SceneItem {
         }
     }
 
-    addFrame(shape: IShape, images: Image[]): Sprite {
+    addFrame(shape: IShape, images: Array<Image>): Sprite {
         this.frames_.push(new Tile(
             this.scene,
             { x: 0, y: 0 },
