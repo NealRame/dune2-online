@@ -75,6 +75,16 @@ export class Land<TerrainData extends ITerrainData> extends Entity<ILandEvent<Te
         return this.view_
     }
 
+    neighborhood({ x, y }: IVector2D)
+        : Neighborhood<TerrainData> {
+        return [
+            this.terrain({ x, y: y - 1 }),
+            this.terrain({ x: x + 1, y }),
+            this.terrain({ x, y: y + 1 }),
+            this.terrain({ x: x - 1, y }),
+        ]
+    }
+
     reveal(position: IVector2D, size?: ISize): this {
         size = size ?? { width: 1, height: 1 }
         for (const terrain of this.terrains(new Rect(position, size))) {
@@ -86,16 +96,6 @@ export class Land<TerrainData extends ITerrainData> extends Entity<ILandEvent<Te
     terrain(position: IVector2D)
         : ITerrain<TerrainData>|null {
         return this.terrains_[this.positionToIndex_(position)] ?? null
-    }
-
-    neighborhood({ x, y }: IVector2D)
-        : Neighborhood<TerrainData> {
-        return [
-            this.terrain({ x, y: y - 1 }),
-            this.terrain({ x: x + 1, y }),
-            this.terrain({ x, y: y + 1 }),
-            this.terrain({ x: x - 1, y }),
-        ]
     }
 
     * terrains(zone?: Rect)
@@ -110,5 +110,9 @@ export class Land<TerrainData extends ITerrainData> extends Entity<ILandEvent<Te
         } else {
             yield * this.terrains_
         }
+    }
+
+    update(): void {
+        this.view_.update()
     }
 }

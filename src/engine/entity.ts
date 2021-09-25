@@ -11,9 +11,10 @@ export const entityId = (function * () {
 export interface IEntity<
     Events extends EventMap = Record<string, unknown>
 > extends IEmitter<Events> {
-    readonly id: number
     name: string
+    readonly id: number
     readonly view: ISceneItem
+    update(): void
 }
 
 export abstract class Entity<
@@ -33,4 +34,7 @@ export abstract class Entity<
     }
 
     abstract get view(): ISceneItem
+
+    // eslint-disable-next-line @typescript-eslint/no-empty-function
+    update(): void { }
 }

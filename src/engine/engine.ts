@@ -46,9 +46,8 @@ export function create<T extends ITerrainData>(
         },
         start(): Engine<T> {
             (function animationLoop() {
-                scene
-                    .update()
-                    .render()
+                scene.render()
+                land.update()
                 animationRequestId = requestAnimationFrame(animationLoop)
             })()
             return this
