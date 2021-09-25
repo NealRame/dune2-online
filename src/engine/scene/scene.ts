@@ -134,13 +134,6 @@ export class Scene implements IScene {
         return this
     }
 
-    update(): IScene {
-        for (const item of this.items_) {
-            item.update()
-        }
-        return this
-    }
-
     zoomIn(): IScene {
         this.scale = scaleUp(this.scale_)
         return this

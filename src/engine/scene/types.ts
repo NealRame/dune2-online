@@ -25,7 +25,6 @@ export interface ISceneItem {
     readonly y: number
     visible: boolean
     render(painter?: Painter, viewport?: Rect): ISceneItem
-    update(): ISceneItem
 }
 
 export interface ISceneLayer extends ISceneItem {

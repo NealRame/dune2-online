@@ -44,12 +44,4 @@ export class SceneLayer extends SceneItem implements ISceneLayer {
         }
         return this
     }
-
-    update()
-        : ISceneLayer {
-        for (const item of this.items_) {
-            item.update()
-        }
-        return this
-    }
 }
