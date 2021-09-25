@@ -61,6 +61,9 @@ export class LandView<
     ) {
         super(scene)
 
+        this.width_ = scene.width
+        this.height_ = scene.height
+
         this.land_ = land
         this.land_.listen("terrainChanged", terrain => {
             this.onTerrainChanged_(terrain)

@@ -1,5 +1,5 @@
 import { SceneItem } from "./item"
-import { ISceneItem, ISceneLayer } from "./types"
+import { IScene, ISceneItem, ISceneLayer } from "./types"
 
 import { Painter } from "@/graphics"
 import { Rect } from "@/maths"
@@ -7,14 +7,18 @@ import { Rect } from "@/maths"
 export class SceneLayer extends SceneItem implements ISceneLayer {
     private items_: Array<ISceneItem> = []
 
-    addItem(item: ISceneItem)
-        : ISceneLayer {
+    constructor(scene: IScene) {
+        super(scene)
+        this.width_ = scene.width
+        this.height_ = scene.height
+    }
+
+    addItem(item: ISceneItem): this {
         this.items_.push(item)
         return this
     }
 
-    removeItem(item: ISceneItem)
-        : ISceneLayer {
+    removeItem(item: ISceneItem): this {
         const index = this.items_.indexOf(item)
         if (index >= 0) {
             this.items_.splice(index, 1)
@@ -23,7 +27,7 @@ export class SceneLayer extends SceneItem implements ISceneLayer {
     }
 
     clear()
-        : ISceneLayer {
+        : this {
         this.items_ = []
         return this
     }
@@ -36,7 +40,7 @@ export class SceneLayer extends SceneItem implements ISceneLayer {
     }
 
     render(painter: Painter, viewport: Rect)
-        : ISceneLayer {
+        : this {
         for (const item of this.items_) {
             if (item.visible && viewport.intersects(item.rect)) {
                 item.render(painter, viewport)

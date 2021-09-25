@@ -8,15 +8,13 @@ export abstract class SceneItem implements ISceneItem {
 
     protected x_ = 0
     protected y_ = 0
-    protected width_: number
-    protected height_: number
+    protected width_ = 0
+    protected height_ = 0
 
     visible = true
 
     constructor(scene: IScene) {
         this.scene_ = scene
-        this.width_ = this.scene_.width
-        this.height_ = this.scene_.height
     }
 
     get scene(): IScene {
@@ -55,8 +53,4 @@ export abstract class SceneItem implements ISceneItem {
     }
 
     abstract render(painter: Painter, viewport: Rect): ISceneItem
-
-    update(): ISceneItem {
-        return this
-    }
 }
