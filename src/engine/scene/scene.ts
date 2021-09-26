@@ -3,6 +3,7 @@ import { IScene, ISceneItem } from "./types"
 import { cssHex } from "@/graphics/color"
 import { Brush, Painter } from "@/graphics/painter"
 
+import { IEntity } from "@/engine/entity"
 import { scaleDown, ScaleFactor, scaleUp } from "@/engine/scale"
 import { createViewport, IViewport } from "@/engine/viewport"
 
@@ -35,6 +36,10 @@ export class Scene implements IScene {
         this.viewport_ = createViewport(size)
 
         this.updateViewport_()
+    }
+
+    get entity(): IEntity | null {
+        return null
     }
 
     get scale(): ScaleFactor {

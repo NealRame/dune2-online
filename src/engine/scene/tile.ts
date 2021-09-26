@@ -49,10 +49,14 @@ export class Tile extends SceneItem {
         this.imageSize_ = getImageSize(scene, images[0])
         this.images_ = images
         this.shape_ = shape
-        this.x_ = position.x
-        this.y_ = position.y
-        this.width_ = shape.columns*this.imageSize_.width
-        this.height_ = shape.rows*this.imageSize_.height
+    }
+
+    get width(): number {
+        return this.shape_.columns*this.imageSize_.width
+    }
+
+    get height(): number {
+        return this.shape_.rows*this.imageSize_.height
     }
 
     render(painter: Painter, viewport: Rect): Tile {

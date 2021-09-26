@@ -2,6 +2,7 @@ import { IViewport } from "@/engine/viewport"
 import { ScaleFactor } from "@/engine/scale"
 import { Painter } from "@/graphics"
 import { Rect, ISize, Vector } from "@/maths"
+import { IEntity } from ".."
 
 export type Image = Record<ScaleFactor, ImageBitmap>
 
@@ -15,6 +16,7 @@ export interface IScene extends ISceneLayer {
 }
 
 export interface ISceneItem {
+    readonly entity: IEntity | null
     readonly scene: IScene
     readonly width: number
     readonly height: number

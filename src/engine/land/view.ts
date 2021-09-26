@@ -61,9 +61,6 @@ export class LandView<
     ) {
         super(scene)
 
-        this.width_ = scene.width
-        this.height_ = scene.height
-
         this.land_ = land
         this.land_.listen("terrainChanged", terrain => {
             this.onTerrainChanged_(terrain)
@@ -77,6 +74,14 @@ export class LandView<
         for (const chunkRect of this.rect.partition(land.chunkSize)) {
             this.chunks_.push(new Chunk(this.scene, chunkRect))
         }
+    }
+
+    get width(): number {
+        return this.scene.width
+    }
+
+    get height(): number {
+        return this.scene.height
     }
 
     render(painter: Painter, viewport: Rect)

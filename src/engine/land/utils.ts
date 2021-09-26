@@ -20,12 +20,6 @@ export function createPositionToIndexConverter(
         }
         return -1
     }
-    //     return ({ x, y }) => {
-    //     if ((x >= 0 && x < width) && (y >= 0 && y < height)) {
-    //         return width*y + x
-    //     }
-    //     return -1
-    // }
 }
 
 export type IndexToPositionConverter = (i: number) => IVector2D

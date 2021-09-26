@@ -1,15 +1,11 @@
 import { IScene, ISceneItem } from "./types"
 
+import { IEntity } from "@/engine/entity"
 import { Painter } from "@/graphics"
 import { Rect, ISize, Vector } from "@/maths"
 
 export abstract class SceneItem implements ISceneItem {
     private scene_: IScene
-
-    protected x_ = 0
-    protected y_ = 0
-    protected width_ = 0
-    protected height_ = 0
 
     visible = true
 
@@ -17,34 +13,38 @@ export abstract class SceneItem implements ISceneItem {
         this.scene_ = scene
     }
 
+    get entity(): IEntity | null {
+        return null
+    }
+
     get scene(): IScene {
         return this.scene_
     }
 
-    get position(): Vector {
-        return new Vector(this.x_, this.y_)
-    }
-
-    get width(): number {
-        return this.width_
-    }
-
-    get height(): number {
-        return this.height_
-    }
-
     get x(): number {
-        return this.x_
+        return this.entity?.x ?? 0
     }
 
     get y(): number {
-        return this.y_
+        return this.entity?.y ?? 0
+    }
+
+    get width(): number {
+        return this.entity?.width ?? 0
+    }
+
+    get height(): number {
+        return this.entity?.height ?? 0
+    }
+
+    get position(): Vector {
+        return new Vector(this.x, this.y)
     }
 
     get size(): ISize {
         return {
-            width: this.width_,
-            height: this.height_,
+            width: this.width,
+            height: this.height,
         }
     }
 

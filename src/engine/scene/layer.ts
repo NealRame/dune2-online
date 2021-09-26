@@ -1,5 +1,5 @@
 import { SceneItem } from "./item"
-import { IScene, ISceneItem, ISceneLayer } from "./types"
+import { ISceneItem, ISceneLayer } from "./types"
 
 import { Painter } from "@/graphics"
 import { Rect } from "@/maths"
@@ -7,10 +7,12 @@ import { Rect } from "@/maths"
 export class SceneLayer extends SceneItem implements ISceneLayer {
     private items_: Array<ISceneItem> = []
 
-    constructor(scene: IScene) {
-        super(scene)
-        this.width_ = scene.width
-        this.height_ = scene.height
+    get width(): number {
+        return this.scene.width
+    }
+
+    get height(): number {
+        return this.scene.height
     }
 
     addItem(item: ISceneItem): this {

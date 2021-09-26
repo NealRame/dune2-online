@@ -11,6 +11,7 @@ import { IVector2D, Rect } from "@/maths"
 import { isNil } from "lodash"
 
 export class Chunk extends SceneItem {
+    private rect_: Rect
     private image_: Partial<Image> = {}
     private refresh_: Record<number, [IVector2D, Array<Image>]> = {}
 
@@ -21,11 +22,24 @@ export class Chunk extends SceneItem {
         rect: Rect,
     ) {
         super(scene)
-        this.x_ = rect.x
-        this.y_ = rect.y
-        this.width_ = rect.width
-        this.height_ = rect.height
+        this.rect_ = rect
         this.positionToIndex_ = createPositionToIndexConverter(this.size)
+    }
+
+    get x(): number {
+        return this.rect_.x
+    }
+
+    get y(): number {
+        return this.rect_.y
+    }
+
+    get width(): number {
+        return this.rect_.width
+    }
+
+    get height(): number {
+        return this.rect_.height
     }
 
     refresh(position: IVector2D, images: Array<Image>): void {
