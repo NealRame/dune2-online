@@ -10,6 +10,7 @@ export interface IUnitData {
 export interface IUnitEvent<Data extends IUnitData> {
     changed: IUnit<Data>
     destroyed: IUnit<Data>
+    directionChanged: IUnit<Data>
     destinationReached: IUnit<Data>
 }
 

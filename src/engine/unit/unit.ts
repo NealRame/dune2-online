@@ -78,7 +78,11 @@ export abstract class Unit<Data extends IUnitData = IUnitData> extends Entity im
                     frames: Math.floor(30/this.data_.speed)*directions.length,
                     easing: Easing.step(directions.length),
                     set: t => {
-                        this.direction_ = directions[clamp(Math.floor(t*directions.length), 0, directions.length - 1)]
+                        const direction = directions[clamp(Math.floor(t*directions.length), 0, directions.length - 1)]
+                        if (this.direction_ !== direction) {
+                            this.direction_ = direction
+                            this.events_.emit("directionChanged", this)
+                        }
                     }
                 }),
                 createTransitionAnimation({
