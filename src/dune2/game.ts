@@ -1,28 +1,16 @@
 import * as Data from "./data"
+import * as Unit from "./units"
 import { LandConfig } from "./types"
 import { createLandDataGenerator, ITerrainData, Land } from "./land"
 import { MiniMap } from "./mini-map"
 
-// import { Harvester } from "./units/harvester"
-import { Quad } from "./units/quad"
-// import { Trike } from "./units/trike"
-
 import * as Engine from "@/engine"
-// import { IMiniMap } from "@/engine"
-
 import { Painter } from "@/graphics"
 import { ISize, IVector2D } from "@/maths"
 
 import { once } from "lodash"
 
-export const Units = {
-    // Harvester,
-    Quad,
-    // Trike,
-} as const
-
-export type UnitType = keyof typeof Units
-export type UnitFactory = (t: UnitType, p: IVector2D) => Engine.Unit
+export type UnitFactory = (t: Unit.UnitType, p: IVector2D) => Engine.Unit
 
 export interface GameConfig {
     painter: Painter,
@@ -40,8 +28,8 @@ export interface Game {
 
 function createUnitFactory(engine: Engine.Engine<ITerrainData>)
     : UnitFactory {
-    return (type: UnitType, position: IVector2D) => {
-        const unit = new Units[type](engine.scene, position)
+    return (type: Unit.UnitType, position: IVector2D) => {
+        const unit = Unit.create(engine.scene, type, position)
         engine.addUnit(unit)
         return unit
     }
