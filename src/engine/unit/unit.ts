@@ -16,6 +16,7 @@ import {
 } from "@/maths"
 
 import { clamp, isNil, times } from "lodash"
+import { EventEmitter, IEmitter } from "@/utils"
 
 function directionRotationSequence(from: Direction, to: Direction) {
     const d = (from <= to ? to : to + DirectionCount) - from
@@ -26,8 +27,10 @@ function directionRotationSequence(from: Direction, to: Direction) {
     })
 }
 
-export abstract class Unit<Data extends IUnitData = IUnitData> extends Entity<IUnitEvent<Data>> implements IUnit<Data> {
+export abstract class Unit<Data extends IUnitData = IUnitData> extends Entity implements IUnit<Data> {
     private animation_: Animation|null = null
+
+    private events_: EventEmitter<IUnitEvent<Data>>
 
     protected data_: Data
 
@@ -38,10 +41,16 @@ export abstract class Unit<Data extends IUnitData = IUnitData> extends Entity<IU
     constructor(scene: IScene, unitData: Data) {
         super()
         this.data_ = unitData
+        this.events_ = new EventEmitter<IUnitEvent<Data>>()
     }
 
     get data(): Data {
         return Object.assign({}, this.data_)
+    }
+
+    get events()
+        : IEmitter<IUnitEvent<Data>> {
+        return this.events_
     }
 
     get x(): number {
@@ -81,14 +90,14 @@ export abstract class Unit<Data extends IUnitData = IUnitData> extends Entity<IU
                     }
                 })
             ],
-            done: () => this.emit("destinationReached", this)
+            done: () => this.events_.emit("destinationReached", this)
         })
         return this
     }
 
     set(data: Partial<Data>): IUnit<Data> {
         Object.assign(this.data_, data)
-        this.emit("changed", this)
+        this.events_.emit("changed", this)
         return this
     }
 

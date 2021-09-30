@@ -22,6 +22,7 @@ import { Image, IScene, ISceneItem } from "@/engine/scene"
 import { ISize, IVector2D, Rect } from "@/maths"
 
 import { constant, isNil, times } from "lodash"
+import { EventEmitter, IEmitter } from "@/utils"
 
 export class LandDataError extends Error {
     constructor(m: string) {
@@ -30,13 +31,14 @@ export class LandDataError extends Error {
     }
 }
 
-export class Land<TerrainData extends ITerrainData> extends Entity<ILandEvent<TerrainData>> implements ILand<TerrainData> {
-    private terrains_: Array<Terrain<TerrainData>> = []
-    private view_: LandView<TerrainData>
-
+export class Land<TerrainData extends ITerrainData> extends Entity implements ILand<TerrainData> {
     private size_: ISize
     private indexToPosition_: IndexToPositionConverter
     private positionToIndex_: PositionToIndexConverter
+
+    private events_: EventEmitter<ILandEvent<TerrainData>>
+    private terrains_: Array<Terrain<TerrainData>> = []
+    private view_: LandView<TerrainData>
 
     chunkSize = { width: 16, height: 16 }
     fogImage: TileIndexGetter<TerrainData> = constant(-1)
@@ -53,6 +55,8 @@ export class Land<TerrainData extends ITerrainData> extends Entity<ILandEvent<Te
         this.indexToPosition_ = createIndexToPositionConverter(this.size_)
         this.positionToIndex_ = createPositionToIndexConverter(this.size_)
 
+        this.events_ = new EventEmitter<ILandEvent<TerrainData>>()
+
         this.terrains_ = times(this.size_.width*this.size_.height, index => {
             const position = this.indexToPosition_(index)
             const data = (typeof landData === "function")
@@ -65,6 +69,11 @@ export class Land<TerrainData extends ITerrainData> extends Entity<ILandEvent<Te
             return new Terrain(position, data, this)
         })
         this.view_ = new LandView(this, scene)
+    }
+
+    get events()
+        : IEmitter<ILandEvent<TerrainData>> {
+        return this.events_
     }
 
     get size(): ISize {

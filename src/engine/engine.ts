@@ -4,7 +4,6 @@ import { Unit } from "./unit"
 
 import { Painter } from "@/graphics"
 import { ISize } from "@/maths"
-import { Entity } from "."
 
 export interface Config<T extends ITerrainData> {
     painter: Painter

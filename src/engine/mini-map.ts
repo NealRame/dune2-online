@@ -33,7 +33,7 @@ export class MiniMap<TerrainData extends ITerrainData> extends EventEmitter<IMin
         this.canvas_ = new OffscreenCanvas(width, height)
         this.context_ = this.canvas_.getContext("2d") as OffscreenCanvasRenderingContext2D
 
-        game.land.listen("terrainChanged", terrain => {
+        game.land.events.listen("terrainChanged", terrain => {
             if (!isNil(this.bitmap_)) {
                 this.context_.drawImage(this.bitmap_, 0, 0)
             }

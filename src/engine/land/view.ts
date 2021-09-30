@@ -62,7 +62,7 @@ export class LandView<
         super(scene)
 
         this.land_ = land
-        this.land_.listen("terrainChanged", terrain => {
+        this.land_.events.listen("terrainChanged", terrain => {
             this.onTerrainChanged_(terrain)
         })
 
