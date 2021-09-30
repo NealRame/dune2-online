@@ -5,7 +5,11 @@ import { Painter } from "@/graphics"
 import { Rect, ISize, Vector } from "@/maths"
 
 export abstract class SceneItem implements ISceneItem {
+    protected height_ = 0
+    protected width_ = 0
+
     private scene_: IScene
+    protected entity_: IEntity | null = null
 
     visible = true
 
@@ -14,7 +18,7 @@ export abstract class SceneItem implements ISceneItem {
     }
 
     get entity(): IEntity | null {
-        return null
+        return this.entity_
     }
 
     get scene(): IScene {
@@ -29,16 +33,16 @@ export abstract class SceneItem implements ISceneItem {
         return this.entity?.y ?? 0
     }
 
+    get position(): Vector {
+        return new Vector(this.x, this.y)
+    }
+
     get width(): number {
-        return this.entity?.width ?? 0
+        return this.width_
     }
 
     get height(): number {
-        return this.entity?.height ?? 0
-    }
-
-    get position(): Vector {
-        return new Vector(this.x, this.y)
+        return this.height_
     }
 
     get size(): ISize {

@@ -2,7 +2,7 @@ import { SceneItem } from "./item"
 import { Image, IScene } from "./types"
 
 import { Painter } from "@/graphics"
-import { Rect, IVector2D, IShape, ISize } from "@/maths"
+import { Rect, IShape, ISize } from "@/maths"
 
 import { isMatch } from "lodash"
 
@@ -14,7 +14,7 @@ function getImageSize(scene: IScene, image: Image): ISize {
     }
 }
 
-function checkImages(scene: IScene, images: Image[]) {
+function checkImages(scene: IScene, images: Image[]): ISize {
     const [head, ...tail] = images
     const size = getImageSize(scene, head)
     for (const image of tail) {
@@ -22,41 +22,38 @@ function checkImages(scene: IScene, images: Image[]) {
             throw new Error("All image must have the same size")
         }
     }
+    return size
 }
 
-function checkShape({ columns, rows }: IShape, images: Image[]) {
+function checkShape(tileSize: ISize, imageSize: ISize, images: Array<Image>)
+    : IShape {
+    const columns = tileSize.width/imageSize.width
+    const rows = tileSize.height/imageSize.height
     if (columns*rows > images.length) {
         throw new Error("Inconsistent number of images for the shape of the sprite")
     }
+    return { columns, rows }
 }
 
 export class Tile extends SceneItem {
+    protected shape_: IShape
+
     protected imageSize_: ISize
     protected images_: Image[]
-    protected shape_: IShape
 
     constructor(
         scene: IScene,
-        position: IVector2D,
-        shape: IShape,
+        size: ISize,
         images: Image[],
     ) {
         super(scene)
 
-        checkImages(scene, images)
-        checkShape(shape, images)
+        this.width_ = size.width
+        this.height_ = size.height
 
-        this.imageSize_ = getImageSize(scene, images[0])
+        this.imageSize_ = checkImages(this.scene, images)
+        this.shape_ = checkShape(this.size, this.imageSize_, images)
         this.images_ = images
-        this.shape_ = shape
-    }
-
-    get width(): number {
-        return this.shape_.columns*this.imageSize_.width
-    }
-
-    get height(): number {
-        return this.shape_.rows*this.imageSize_.height
     }
 
     render(painter: Painter, viewport: Rect): Tile {

@@ -1,22 +1,34 @@
 import { imageSet } from "@/dune2/data"
-import { IScene, Unit } from "@/engine"
+import { Sprite, IScene, Tile, Unit } from "@/engine"
 import { IVector2D } from "@/maths"
 
 export class Trike extends Unit {
+    SpriteClass = class extends Sprite {
+        protected getFrames_ = (scene: IScene): Array<Tile> => {
+            const images = imageSet("units")
+            const size = {
+                width: 1,
+                height: 1,
+            }
+            return [
+                new Tile(scene, size, [images[8]]),
+                new Tile(scene, size, [images[9]]),
+                new Tile(scene, size, [images[11]]),
+                new Tile(scene, size, [images[13]]),
+                new Tile(scene, size, [images[15]]),
+                new Tile(scene, size, [images[14]]),
+                new Tile(scene, size, [images[12]]),
+                new Tile(scene, size, [images[10]]),
+            ]
+        }
+    }
+
     constructor(scene: IScene, position: IVector2D) {
-        super(scene, position)
-
-        const images = imageSet("units")
-        const shape = { columns: 1, rows: 1 }
-
-        this.speed_ = 1.5
-        this.addFrame(shape, [images[8]] )
-            .addFrame(shape, [images[9]] )
-            .addFrame(shape, [images[11]])
-            .addFrame(shape, [images[13]])
-            .addFrame(shape, [images[15]])
-            .addFrame(shape, [images[14]])
-            .addFrame(shape, [images[12]])
-            .addFrame(shape, [images[10]])
+        super(scene, {
+            health: 1.0,
+            speed: 1.5,
+        })
+        this.x_ = position.x
+        this.y_ = position.y
     }
 }

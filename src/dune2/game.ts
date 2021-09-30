@@ -1,26 +1,28 @@
+import * as Data from "./data"
 import { LandConfig } from "./types"
 import { createLandDataGenerator, ITerrainData, Land } from "./land"
 import { MiniMap } from "./mini-map"
 
-import { Harvester } from "./units/harvester"
+// import { Harvester } from "./units/harvester"
 import { Quad } from "./units/quad"
-import { Trike } from "./units/trike"
+// import { Trike } from "./units/trike"
 
 import * as Engine from "@/engine"
+// import { IMiniMap } from "@/engine"
 
 import { Painter } from "@/graphics"
-import { IVector2D, ISize } from "@/maths"
+import { ISize, IVector2D } from "@/maths"
+
 import { once } from "lodash"
-import { IMiniMap } from "@/engine"
 
-// export const Units = {
-//     Harvester,
-//     Quad,
-//     Trike,
-// } as const
+export const Units = {
+    // Harvester,
+    Quad,
+    // Trike,
+} as const
 
-// export type UnitType = keyof typeof Units
-// export type UnitFactory = (t: UnitType, p: IVector2D) => Engine.Unit
+export type UnitType = keyof typeof Units
+export type UnitFactory = (t: UnitType, p: IVector2D) => Engine.Unit
 
 export interface GameConfig {
     painter: Painter,
@@ -30,19 +32,20 @@ export interface GameConfig {
 
 export interface Game {
     readonly engine: Engine.Engine<ITerrainData>
-    readonly miniMap: IMiniMap
-    // createUnit: UnitFactory
+    readonly miniMap: Engine.IMiniMap
+    readonly data: typeof Data
+    createUnit: UnitFactory
     initialize: () => void
 }
 
-// function createUnitFactory(engine: Engine.Engine<ITerrainData>)
-//     : UnitFactory {
-//     return (type: UnitType, position: IVector2D) => {
-//         const unit = new Units[type](engine.scene, position)
-//         engine.addUnit(unit)
-//         return unit
-//     }
-// }
+function createUnitFactory(engine: Engine.Engine<ITerrainData>)
+    : UnitFactory {
+    return (type: UnitType, position: IVector2D) => {
+        const unit = new Units[type](engine.scene, position)
+        engine.addUnit(unit)
+        return unit
+    }
+}
 
 function setupStartLocation(engine: Engine.Engine<ITerrainData>): void {
     const { land, scene } = engine
@@ -70,7 +73,8 @@ export function createGame(config: GameConfig): Game {
     return {
         get engine() { return engine },
         get miniMap() { return miniMap },
-        // createUnit: createUnitFactory(engine),
+        get data() { return Data },
+        createUnit: createUnitFactory(engine),
         initialize: once(() => {
             setupStartLocation(engine)
             engine.start()

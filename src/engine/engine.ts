@@ -4,6 +4,7 @@ import { Unit } from "./unit"
 
 import { Painter } from "@/graphics"
 import { ISize } from "@/maths"
+import { Entity } from "."
 
 export interface Config<T extends ITerrainData> {
     painter: Painter
@@ -15,7 +16,7 @@ export interface Config<T extends ITerrainData> {
 export interface Engine<T extends ITerrainData> {
     readonly scene: Scene
     readonly land: ILand<T>
-    // addUnit(unit: Unit): Engine<T>
+    addUnit(unit: Unit): Engine<T>
     start(): Engine<T>
     stop(): Engine<T>
 }
@@ -25,12 +26,15 @@ export function create<T extends ITerrainData>(
 ): Engine<T> {
     const scene = new Scene(config.size, config.painter)
     const land = new config.Land(scene, config.landData)
-    // const units = new SceneLayer(scene)
+
+    const units: Array<Unit> = []
+    const unitsLayer = new SceneLayer(scene)
 
     let animationRequestId = 0
 
-    scene.addItem(land.view)
-    // .addItem(units)
+    scene
+        .addItem(land.view)
+        .addItem(unitsLayer)
 
     return {
         get scene() {
@@ -39,14 +43,18 @@ export function create<T extends ITerrainData>(
         get land() {
             return land
         },
-        // addUnit(unit: Unit): Engine<T> {
-        //     units.addItem(unit)
-        //     return this
-        // },
+        addUnit(unit: Unit): Engine<T> {
+            units.push(unit)
+            unitsLayer.addItem(unit.view)
+            return this
+        },
         start(): Engine<T> {
             (function animationLoop() {
                 scene.render()
+
                 land.update()
+                units.forEach(unit => unit.update())
+
                 animationRequestId = requestAnimationFrame(animationLoop)
             })()
             return this

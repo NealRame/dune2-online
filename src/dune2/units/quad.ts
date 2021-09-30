@@ -1,21 +1,52 @@
 import { imageSet } from "@/dune2/data"
-import { IScene, Unit } from "@/engine"
+import { Sprite, IScene, Tile, Unit, ISceneItem, IEntity } from "@/engine"
 import { IVector2D } from "@/maths"
 
-export class Quad extends Unit {
-    constructor(scene: IScene, position: IVector2D) {
-        super(scene, position)
+class QuadSprite extends Sprite {
+    private unit_: Unit
+
+    constructor(scene: IScene, unit: Unit) {
+        super(scene)
 
         const images = imageSet("units")
-        const shape = { columns: 1, rows: 1 }
+        const size = {
+            width: 1,
+            height: 1,
+        }
+        this.entity_ = unit as IEntity
+        this.unit_ = unit
+        this.frames_ = [
+            new Tile(scene, size, [images[0]]),
+            new Tile(scene, size, [images[1]]),
+            new Tile(scene, size, [images[3]]),
+            new Tile(scene, size, [images[5]]),
+            new Tile(scene, size, [images[7]]),
+            new Tile(scene, size, [images[6]]),
+            new Tile(scene, size, [images[4]]),
+            new Tile(scene, size, [images[2]]),
+        ]
+    }
 
-        this.addFrame(shape, [images[0]])
-            .addFrame(shape, [images[1]])
-            .addFrame(shape, [images[3]])
-            .addFrame(shape, [images[5]])
-            .addFrame(shape, [images[7]])
-            .addFrame(shape, [images[6]])
-            .addFrame(shape, [images[4]])
-            .addFrame(shape, [images[2]])
+    get frameIndex(): number {
+        return this.unit_.direction
+    }
+}
+
+export class Quad extends Unit {
+    private view_: QuadSprite
+
+    constructor(scene: IScene, position: IVector2D) {
+        super(scene, {
+            health: 1.0,
+            speed: 1.0,
+        })
+        this.x_ = position.x
+        this.y_ = position.y
+        this.view_ = new QuadSprite(scene, this)
+    }
+
+    get view()
+        : ISceneItem {
+        return this.view_
     }
 }
