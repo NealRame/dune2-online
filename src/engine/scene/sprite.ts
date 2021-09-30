@@ -3,15 +3,24 @@ import { Tile } from "./tile"
 
 import { Painter } from "@/graphics"
 import { ISize, Rect, Vector } from "@/maths"
+import { clamp } from "lodash"
 
-export abstract class Sprite extends SceneItem {
+export class Sprite extends SceneItem {
+    private frameIndex_ = 0
+
     protected frames_: Array<Tile> = []
 
     get frameCount(): number {
         return this.frames_.length
     }
 
-    abstract get frameIndex(): number
+    get frameIndex(): number {
+        return this.frameIndex_
+    }
+
+    set frameIndex(index: number) {
+        this.frameIndex_ = clamp(index, 0, this.frameCount)
+    }
 
     get size(): ISize {
         return this.frames_[this.frameIndex]?.size ?? {

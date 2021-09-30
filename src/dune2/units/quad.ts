@@ -1,10 +1,8 @@
 import { imageSet } from "@/dune2/data"
-import { Sprite, IScene, Tile, Unit, ISceneItem, IEntity } from "@/engine"
+import { Sprite, IScene, Tile, Unit, ISceneItem } from "@/engine"
 import { IVector2D } from "@/maths"
 
 class QuadSprite extends Sprite {
-    private unit_: Unit
-
     constructor(scene: IScene, unit: Unit) {
         super(scene)
 
@@ -13,8 +11,7 @@ class QuadSprite extends Sprite {
             width: 1,
             height: 1,
         }
-        this.entity_ = unit as IEntity
-        this.unit_ = unit
+        this.entity_ = unit
         this.frames_ = [
             new Tile(scene, size, [images[0]]),
             new Tile(scene, size, [images[1]]),
@@ -25,10 +22,6 @@ class QuadSprite extends Sprite {
             new Tile(scene, size, [images[4]]),
             new Tile(scene, size, [images[2]]),
         ]
-    }
-
-    get frameIndex(): number {
-        return this.unit_.direction
     }
 }
 
