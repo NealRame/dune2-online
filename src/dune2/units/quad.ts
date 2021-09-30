@@ -36,6 +36,9 @@ export class Quad extends Unit {
         this.x_ = position.x
         this.y_ = position.y
         this.view_ = new QuadSprite(scene, this)
+        this.events.listen("directionChanged", () => {
+            this.view_.frameIndex = this.direction
+        })
     }
 
     get view()
