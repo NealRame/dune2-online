@@ -8,6 +8,7 @@ export type EventKey<T extends EventMap> = string & keyof T
 export interface IEmitter<T extends EventMap> {
     emit<K extends EventKey<T>>(eventName: K, eventData: T[K]): IEmitter<T>
     listen<K extends EventKey<T>>(eventName: K, receiver: EventListenerCallback<T[K]>): EventListenerCancelCallback
+    listenOnce<K extends EventKey<T>>(eventName: K, receiver: EventListenerCallback<T[K]>): EventListenerCancelCallback
     on<K extends EventKey<T>>(eventName: K): IEmitter<T>
     off<K extends EventKey<T>>(eventName: K): IEmitter<T>
 }
