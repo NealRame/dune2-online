@@ -3,7 +3,7 @@
 </template>
 
 <script lang="ts">
-import { Rect, IVector2D } from "@/maths"
+import { Rect, IVector2D, ISize } from "@/maths"
 import { Painter } from "@/graphics"
 
 import { clamp, isNil } from "lodash"
@@ -92,10 +92,21 @@ export default defineComponent({
             }),
             rect: computed((): Rect => {
                 const canvas = unref(canvasRef)
-                return new Rect({ x: 0, y: 0 }, {
+                const clientRect = canvas?.getBoundingClientRect()
+                return new Rect({
+                    x: clientRect?.x ?? 0,
+                    y: clientRect?.y ?? 0,
+                }, {
+                    width:  clientRect?.width  ?? 0,
+                    height: clientRect?.height ?? 0,
+                })
+            }),
+            size: computed((): ISize => {
+                const canvas = unref(canvasRef)
+                return {
                     width: canvas?.width ?? 0,
                     height: canvas?.height ?? 0,
-                })
+                }
             })
         }
     }

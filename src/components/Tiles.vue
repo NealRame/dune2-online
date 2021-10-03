@@ -26,7 +26,7 @@ import TilePalette from "@/components/TilePalette.vue"
 import { ImageLib, ImageSet } from "@/dune2/types"
 import { Data } from "@/dune2"
 
-import { createGrid, createScene, createTile, Image, ScaleFactor, IScene, screenToSceneCoordinate } from "@/engine"
+import { Image, ScaleFactor, IScene, Scene, Grid } from "@/engine"
 import { IPaintDevice } from "@/graphics"
 
 import { defineComponent, onMounted, ref, unref } from "vue"
@@ -58,20 +58,19 @@ export default defineComponent({
         onMounted(async () => {
             images.value = Data.imageSet(props.set as ImageSet)
 
-            scene = createScene({
+            scene = new Scene({
                 width: 60,
                 height: 60,
             }, (unref(screen) as IPaintDevice).painter)
+
             scene.scale = unref(scale)
-            scene.addItem(createGrid(scene))
+            scene.addItem(new Grid(scene))
 
             window.addEventListener("resize", resize)
 
             ;(function animationLoop() {
                 if (!isNil(scene)) {
-                    scene
-                        .update()
-                        .render()
+                    scene.render()
                     requestAnimationFrame(animationLoop)
                 }
             })()
@@ -80,15 +79,15 @@ export default defineComponent({
         })
 
         const onMouseClick = (ev: ScreenMouseClickEvent) => {
-            const image = unref(currentItem)
+            // const image = unref(currentItem)
 
-            if (isNil(image) || isNil(scene)) return
+            // if (isNil(image) || isNil(scene)) return
 
-            scene.addItem(createTile(scene, {
-                position: screenToSceneCoordinate(scene, ev.position),
-                shape: { columns: 1, rows: 1 },
-                images: [Data.imageSet(props.set as keyof ImageLib)[image]]
-            }))
+            // scene.addItem(createTile(scene, {
+            //     position: screenToSceneCoordinate(scene, ev.position),
+            //     shape: { columns: 1, rows: 1 },
+            //     images: [Data.imageSet(props.set as keyof ImageLib)[image]]
+            // }))
         }
 
         return {
