@@ -1,6 +1,6 @@
-import { Scene, SceneLayer } from "./scene"
+import { IScene, ISceneLayer, Scene, SceneLayer } from "./scene"
 import { ILand, ITerrainData, LandConstructor, LandInitialData } from "./land"
-import { Unit } from "./unit"
+import { IUnit, IUnitData, Unit } from "./unit"
 
 import { Painter } from "@/graphics"
 import { ISize } from "@/maths"
@@ -15,9 +15,53 @@ export interface Config<T extends ITerrainData> {
 export interface Engine<T extends ITerrainData> {
     readonly scene: Scene
     readonly land: ILand<T>
-    addUnit(unit: Unit): Engine<T>
+    readonly units: UnitManager
     start(): Engine<T>
     stop(): Engine<T>
+}
+
+interface UnitManager {
+    readonly layer: ISceneLayer
+    add(unit: IUnit<IUnitData>): IUnit<IUnitData>
+    update(): void
+}
+
+function createUnitManager(scene: IScene, land: ILand)
+    : UnitManager {
+    const units = new Set<IUnit<IUnitData>>()
+    const layer = new SceneLayer(scene)
+
+    scene.addItem(layer)
+
+    return {
+        get layer(): ISceneLayer {
+            return layer
+        },
+        add(unit: Unit): IUnit<IUnitData> {
+            const cancelers = [
+                unit.events.listen("destinationReached", ({ x, y }) => {
+                    land.reveal({ x: x - 1, y: y - 1 }, { width: 3, height: 3 })
+                }),
+            ]
+
+            unit.events.listen("destroyed", unit => {
+                cancelers.forEach(cancel => cancel())
+                units.delete(unit)
+            })
+
+            units.add(unit)
+            layer.addItem(unit.view)
+
+            unit.events.emit("destinationReached", unit)
+
+            return unit
+        },
+        update(): void {
+            for (const unit of units) {
+                unit.update()
+            }
+        }
+    }
 }
 
 export function create<T extends ITerrainData>(
@@ -26,14 +70,11 @@ export function create<T extends ITerrainData>(
     const scene = new Scene(config.size, config.painter)
     const land = new config.Land(scene, config.landData)
 
-    const units: Array<Unit> = []
-    const unitsLayer = new SceneLayer(scene)
+    scene.addItem(land.view)
+
+    const units = createUnitManager(scene, land)
 
     let animationRequestId = 0
-
-    scene
-        .addItem(land.view)
-        .addItem(unitsLayer)
 
     return {
         get scene() {
@@ -42,17 +83,15 @@ export function create<T extends ITerrainData>(
         get land() {
             return land
         },
-        addUnit(unit: Unit): Engine<T> {
-            units.push(unit)
-            unitsLayer.addItem(unit.view)
-            return this
+        get units() {
+            return units
         },
         start(): Engine<T> {
             (function animationLoop() {
                 scene.render()
 
                 land.update()
-                units.forEach(unit => unit.update())
+                units.update()
 
                 animationRequestId = requestAnimationFrame(animationLoop)
             })()

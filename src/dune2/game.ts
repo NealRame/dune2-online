@@ -29,9 +29,7 @@ export interface Game {
 function createUnitFactory(engine: Engine.Engine<ITerrainData>)
     : UnitFactory {
     return (type: Unit.UnitType, position: IVector2D) => {
-        const unit = Unit.create(engine.scene, type, position)
-        engine.addUnit(unit)
-        return unit
+        return engine.units.add(Unit.create(engine.scene, type, position)) as Engine.Unit
     }
 }
 
