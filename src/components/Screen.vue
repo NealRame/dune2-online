@@ -92,20 +92,16 @@ export default defineComponent({
             }),
             rect: computed((): Rect => {
                 const canvas = unref(canvasRef)
-                const clientRect = canvas?.getBoundingClientRect()
-                return new Rect({
-                    x: clientRect?.x ?? 0,
-                    y: clientRect?.y ?? 0,
-                }, {
-                    width:  clientRect?.width  ?? 0,
-                    height: clientRect?.height ?? 0,
+                const { x, y } = canvas?.getBoundingClientRect() ?? { x: 0, y: 0 }
+                return new Rect({ x, y }, {
+                    width: props.width,
+                    height: props.height,
                 })
             }),
             size: computed((): ISize => {
-                const canvas = unref(canvasRef)
                 return {
-                    width: canvas?.width ?? 0,
-                    height: canvas?.height ?? 0,
+                    width: props.width,
+                    height: props.height,
                 }
             })
         }
