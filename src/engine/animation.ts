@@ -1,13 +1,15 @@
 import { Easing, linspace } from "@/maths"
 
-import { isNil } from "lodash"
+import { isNil, noop } from "lodash"
 
 export interface Animation {
     finished: boolean,
     next(): void,
+    reset(): void,
 }
 
 export interface AnimationConfig {
+    readonly repeat?: boolean
     done?(): void
 }
 
@@ -18,22 +20,39 @@ export interface AnimationTransitionConfig extends AnimationConfig {
 }
 
 export function createTransitionAnimation(config: AnimationTransitionConfig): Animation {
-    const it = linspace(config.frames)
+    let it = linspace(config.frames)
     let t = it.next()
+
+    const repeat = config.repeat ?? false
+    const done = config.done ?? noop
+
     const finished = () => t?.done ?? false
+
+    const reset = () => {
+        it = linspace(config.frames)
+        t = it.next()
+    }
+
+    const next = () => {
+        if (!finished()) {
+            config.set(config.easing(t.value))
+            t = it.next()
+            if (finished()) {
+                if (repeat) {
+                    reset()
+                } else {
+                    done()
+                }
+            }
+        }
+    }
+
     return {
         get finished() {
             return finished()
         },
-        next(): void {
-            if (!finished()) {
-                config.set(config.easing(t.value))
-                t = it.next()
-                if (finished() && !isNil(config.done)) {
-                    config.done()
-                }
-            }
-        }
+        next,
+        reset,
     }
 }
 
@@ -42,21 +61,51 @@ export interface AnimationSequenceConfig extends AnimationConfig {
 }
 
 export function createSequenceAnimation(config: AnimationSequenceConfig): Animation {
-    let current = config.animations.shift()
-    return {
-        get finished(): boolean {
-            return isNil(current)
-        },
-        next(): void {
-            if (!isNil(current)) {
-                current.next()
-                if (current.finished) {
-                    current = config.animations.shift()
-                    if (isNil(current) && !isNil(config.done)) {
-                        config.done()
-                    }
+    let currentIndex = 0
+
+    const repeat = config.repeat ?? false
+    const done = config.done ?? noop
+
+    const current = () => {
+        return config.animations[currentIndex]
+    }
+
+    const finished = (): boolean => {
+        const animation = current()
+        if (isNil(animation)) return true
+        if (animation.finished) {
+            currentIndex += 1
+            return finished()
+        }
+        return false
+    }
+
+    const reset = () => {
+        currentIndex = 0
+        for (const animation of config.animations) {
+            animation.reset()
+        }
+    }
+
+    const next = () => {
+        if (!finished()) {
+            const animation = current()
+            animation.next()
+            if (finished()) {
+                if (repeat) {
+                    reset()
+                } else {
+                    done()
                 }
             }
         }
+    }
+
+    return {
+        get finished(): boolean {
+            return finished()
+        },
+        next,
+        reset,
     }
 }
