@@ -20,10 +20,13 @@ const quadFrames = memoize((scene: IScene) => {
     ]
 })
 
-export class QuadSprite extends Sprite {
+export class QuadView extends Sprite {
     constructor(scene: IScene, unit: Unit) {
         super(scene)
         this.entity_ = unit
         this.frames_ = quadFrames(scene)
+        unit.events.listen("directionChanged", () => {
+            this.frameIndex = unit.direction
+        })
     }
 }

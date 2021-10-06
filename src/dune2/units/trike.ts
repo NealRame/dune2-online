@@ -20,10 +20,13 @@ const trikeFrames = memoize((scene: IScene) => {
     ]
 })
 
-export class TrikeSprite extends Sprite {
+export class TrikeView extends Sprite {
     constructor(scene: IScene, unit: Unit) {
         super(scene)
         this.entity_ = unit
         this.frames_ = trikeFrames(scene)
+        unit.events.listen("directionChanged", () => {
+            this.frameIndex = unit.direction
+        })
     }
 }
