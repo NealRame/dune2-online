@@ -8,7 +8,7 @@ import { memoize } from "lodash"
 
 const harvesterFrames = memoize((scene: IScene) => {
     const images = imageSet("units")
-    const size = { width: 1, height: 1 }
+    const size = { width: 1.5, height: 1.5 }
     return [
         new Tile(scene, size, [images[16]]),
         new Tile(scene, size, [images[17]]),
