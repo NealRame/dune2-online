@@ -14,9 +14,12 @@ export interface IUnitEvent<Data extends IUnitData> {
     destinationReached: IUnit<Data>
 }
 
-export interface IUnit<Data extends IUnitData = IUnitData> extends IEntity {
+export interface IUnit<
+    Data extends IUnitData = IUnitData,
+    Events extends IUnitEvent<Data> = IUnitEvent<Data>,
+> extends IEntity {
     readonly data: Data
-    readonly events: IEmitter<IUnitEvent<Data>>
+    readonly events: IEmitter<Events>
     readonly position: Vector
 
     move(direction: Direction): IUnit<Data>
