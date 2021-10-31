@@ -35,7 +35,6 @@ declare global {
 
 export default defineComponent({
     components: { MiniMap, Screen },
-    // components: { Screen },
     setup() {
         const gameRef = ref<Game|null>(null)
         const screenRef = ref<IPaintDevice | null>(null)
