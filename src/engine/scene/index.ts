@@ -1,3 +1,4 @@
+export * from "./compound"
 export * from "./item"
 export * from "./layer"
 export * from "./scene"
