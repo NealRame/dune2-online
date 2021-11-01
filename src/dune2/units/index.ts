@@ -1,5 +1,6 @@
+import { Harvester } from "./harvester"
+
 import { QuadView } from "./quad"
-import { HarvesterView } from "./harvester"
 import { TrikeView } from "./trike"
 
 import * as Engine from "@/engine"
@@ -34,13 +35,9 @@ export function create(
     scene: Engine.IScene,
     type: UnitType,
     position: IVector2D,
-): Unit {
+): Engine.IUnit {
     if (type === "Harvester") {
-        const data: IUnitData = {
-            speed: 0.5,
-            health: 2.0,
-        }
-        return new Unit(scene, position, data, HarvesterView)
+        return new Harvester(scene, position)
     }
 
     if (type === "Quad") {
