@@ -27,10 +27,13 @@ function directionRotationSequence(from: Direction, to: Direction) {
     })
 }
 
-export abstract class Unit<Data extends IUnitData = IUnitData> extends Entity implements IUnit<Data> {
+export abstract class Unit<
+    Data extends IUnitData = IUnitData,
+    Events extends IUnitEvent<Data> = IUnitEvent<Data>
+> extends Entity implements IUnit<Data> {
     private animation_: Animation|null = null
 
-    private events_: EventEmitter<IUnitEvent<Data>>
+    private events_: EventEmitter<Events>
 
     protected data_: Data
 
@@ -41,7 +44,7 @@ export abstract class Unit<Data extends IUnitData = IUnitData> extends Entity im
     constructor(scene: IScene, unitData: Data) {
         super()
         this.data_ = unitData
-        this.events_ = new EventEmitter<IUnitEvent<Data>>()
+        this.events_ = new EventEmitter<Events>()
     }
 
     get data(): Data {
@@ -49,7 +52,7 @@ export abstract class Unit<Data extends IUnitData = IUnitData> extends Entity im
     }
 
     get events()
-        : IEmitter<IUnitEvent<Data>> {
+        : IEmitter<Events> {
         return this.events_
     }
 
