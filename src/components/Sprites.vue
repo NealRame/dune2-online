@@ -153,8 +153,28 @@ class Harvester extends Sprite {
     }
 }
 
-class HarvesterSand1 extends AnimationSprite {
+class HarvesterSand extends AnimationSprite {
     protected repeat_ = true
+
+    private x_ = 0
+    private y_ = 0
+
+    constructor(scene: IScene) {
+        super(scene)
+        this.width_ = 1
+        this.height_ = 1
+        this.x_ = 0
+        this.y_ = 0
+    }
+
+    get x(): number { return this.x_ }
+    set x(x: number) { this.x_ = x }
+
+    get y(): number { return this.y_ }
+    set y(y: number) { this.y_ = y }
+}
+
+class HarvesterSand1 extends HarvesterSand {
     constructor(scene: IScene) {
         super(scene)
         const images = imageSet("units")
@@ -165,18 +185,9 @@ class HarvesterSand1 extends AnimationSprite {
             new Tile(scene, size, [images[305]]),
         ]
     }
-
-    get x(): number {
-        return 0.25
-    }
-
-    get y(): number {
-        return 0.75
-    }
 }
 
-class HarvesterSand2 extends AnimationSprite {
-    protected repeat_ = true
+class HarvesterSand2 extends HarvesterSand {
     constructor(scene: IScene) {
         super(scene)
         const images = imageSet("units")
@@ -189,8 +200,7 @@ class HarvesterSand2 extends AnimationSprite {
     }
 }
 
-class HarvesterSand3 extends AnimationSprite {
-    protected repeat_ = true
+class HarvesterSand3 extends HarvesterSand {
     constructor(scene: IScene) {
         super(scene)
         const images = imageSet("units")
@@ -203,8 +213,7 @@ class HarvesterSand3 extends AnimationSprite {
     }
 }
 
-class HarvesterSand4 extends AnimationSprite {
-    protected repeat_ = true
+class HarvesterSand4 extends HarvesterSand {
     constructor(scene: IScene) {
         super(scene)
         const images = imageSet("units")
@@ -217,8 +226,7 @@ class HarvesterSand4 extends AnimationSprite {
     }
 }
 
-class HarvesterSand5 extends AnimationSprite {
-    protected repeat_ = true
+class HarvesterSand5 extends HarvesterSand {
     constructor(scene: IScene) {
         super(scene)
         const images = imageSet("units")
@@ -231,9 +239,7 @@ class HarvesterSand5 extends AnimationSprite {
     }
 }
 
-class HarvesterSand6 extends AnimationSprite {
-    protected repeat_ = true
-    protected frameCount_ = 60
+class HarvesterSand6 extends HarvesterSand {
     constructor(scene: IScene) {
         super(scene)
         const images = imageSet("units")
@@ -246,8 +252,7 @@ class HarvesterSand6 extends AnimationSprite {
     }
 }
 
-class HarvesterSand7 extends AnimationSprite {
-    protected repeat_ = true
+class HarvesterSand7 extends HarvesterSand {
     constructor(scene: IScene) {
         super(scene)
         const images = imageSet("units")
@@ -260,7 +265,7 @@ class HarvesterSand7 extends AnimationSprite {
     }
 }
 
-class HarvesterSand8 extends AnimationSprite {
+class HarvesterSand8 extends HarvesterSand {
     protected repeat_ = true
     constructor(scene: IScene) {
         super(scene)
@@ -282,7 +287,7 @@ export default defineComponent({
         const screenHeight = ref(0)
         const scale = ref<ScaleFactor>(4)
 
-        let scene: IScene|null = null
+        let scene: IScene|null
 
         // handle window resize events
         const onResize = () => {
@@ -308,13 +313,88 @@ export default defineComponent({
 
             scene.scale = unref(scale)
             scene.viewport.size = paintDevice.size
+
+            const harvester = new Harvester(scene)
+            const sands = [
+                new HarvesterSand1(scene),
+                new HarvesterSand2(scene),
+                new HarvesterSand3(scene),
+                new HarvesterSand4(scene),
+                new HarvesterSand5(scene),
+                new HarvesterSand6(scene),
+                new HarvesterSand7(scene),
+                new HarvesterSand8(scene),
+            ]
+            let sandCurrent = sands[0]
+
             scene
                 .addItem(new Grid(scene))
-                .addItem(new Harvester(scene))
-                .addItem(new HarvesterSand1(scene))
+                .addItem(harvester)
+                .addItem(sandCurrent)
                 // .addItem(new Explosion6(scene))
 
             window.addEventListener("resize", debounce(onResize, 60))
+            window.addEventListener("keyup", ({ key }: KeyboardEvent) => {
+                if (isNil(scene)) return
+                switch (key) {
+                case "a":
+                    harvester.frameIndex = 7
+                    scene.removeItem(sandCurrent)
+                    scene.addItem(sandCurrent = sands[7])
+                    break
+                case "z":
+                    harvester.frameIndex = 0
+                    scene.removeItem(sandCurrent)
+                    scene.addItem(sandCurrent = sands[0])
+                    break
+                case "e":
+                    harvester.frameIndex = 1
+                    scene.removeItem(sandCurrent)
+                    scene.addItem(sandCurrent = sands[1])
+                    break
+                case "q":
+                    harvester.frameIndex = 6
+                    scene.removeItem(sandCurrent)
+                    scene.addItem(sandCurrent = sands[6])
+                    break
+                case "d":
+                    harvester.frameIndex = 2
+                    scene.removeItem(sandCurrent)
+                    scene.addItem(sandCurrent = sands[2])
+                    break
+                case "w":
+                    harvester.frameIndex = 5
+                    scene.removeItem(sandCurrent)
+                    scene.addItem(sandCurrent = sands[5])
+                    break
+                case "x":
+                    harvester.frameIndex = 4
+                    scene.removeItem(sandCurrent)
+                    scene.addItem(sandCurrent = sands[4])
+                    break
+                case "c":
+                    harvester.frameIndex = 3
+                    scene.removeItem(sandCurrent)
+                    scene.addItem(sandCurrent = sands[3])
+                    break
+                case "ArrowUp":
+                    sandCurrent.y -= 1/scene.gridUnit
+                    console.log(sandCurrent.position)
+                    break
+                case "ArrowRight":
+                    sandCurrent.x += 1/scene.gridUnit
+                    console.log(sandCurrent.position)
+                    break
+                case "ArrowDown":
+                    sandCurrent.y += 1/scene.gridUnit
+                    console.log(sandCurrent.position)
+                    break
+                case "ArrowLeft":
+                    sandCurrent.x -= 1/scene.gridUnit
+                    console.log(sandCurrent.position)
+                    break
+                }
+            })
 
             ;(function animationLoop() {
                 if (!isNil(scene)) {
