@@ -3,7 +3,7 @@ import { imageSet } from "@/dune2/data"
 import { AnimationSprite, CompoundItem, IScene, ISceneItem, IUnitData, IUnitEvent, Sprite, Tile, Unit } from "@/engine"
 import { Direction, IVector2D } from "@/maths"
 
-import { memoize } from "lodash"
+import { isNil, memoize } from "lodash"
 
 const harvesterFrames = memoize((scene: IScene) => {
     const images = imageSet("units")
@@ -70,28 +70,28 @@ const harvesterSandFrames = memoize((scene: IScene) => {
 const harvesterSandPosition = memoize((direction: Direction) => {
     switch (direction) {
     case Direction.North:
-        return { x:    0.25, y:  0.6875 }
+        return { x:  0.25,   y:  0.6875 }
 
     case Direction.Northeast:
-        return { x:   -0.25, y:  0.5625 }
+        return { x: -0.25,   y:  0.5625 }
 
     case Direction.East:
-        return { x: -0.5625, y:    0.25 }
+        return { x: -0.5625, y:  0.25   }
 
     case Direction.Southeast:
-        return { x: -0.3125, y:  -0.125 }
+        return { x: -0.3125, y: -0.125  }
 
     case Direction.South:
-        return { x:    0.25, y: -0.3125 }
+        return { x:  0.25,   y: -0.3125 }
 
     case Direction.Southwest:
-        return { x:  0.8125, y: -0.125 }
+        return { x:  0.8125, y: -0.125  }
 
     case Direction.West:
-        return { x:  1.0625, y:   0.25 }
+        return { x:  1.0625, y:  0.25   }
 
     case Direction.Northwest:
-        return { x:    0.75, y: 0.5625 }
+        return { x:  0.75,   y:  0.5625 }
     }
 
     const exhaustiveCheck_: never = direction
@@ -128,17 +128,17 @@ export class HarvesterView extends CompoundItem {
         this.entity_ = harvester
         this.harvesterSprite_ = new HarvesterSprite(scene)
 
-        this.addItem(this.harvesterSprite_)
+        this.pushItem(this.harvesterSprite_)
 
         harvester.events.listen("directionChanged", () => {
             this.harvesterSprite_.frameIndex = harvester.direction
             if (harvester.isHarvesting) {
                 this.popItem()
-                this.addItem(new HarvesterSandSprite(scene, harvester.direction))
+                this.pushItem(new HarvesterSandSprite(scene, harvester.direction))
             }
         })
         harvester.events.listen("harvestStarted", () => {
-            this.addItem(new HarvesterSandSprite(scene, harvester.direction))
+            this.pushItem(new HarvesterSandSprite(scene, harvester.direction))
         })
         harvester.events.listen("harvestStopped", () => {
             this.popItem()

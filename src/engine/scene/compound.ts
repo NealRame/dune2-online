@@ -3,7 +3,7 @@ import { IScene } from "./types"
 
 import { Painter } from "@/graphics"
 import { ISize, Rect } from "@/maths"
-import { isNil, pull } from "lodash"
+import { isNil } from "lodash"
 
 export class CompoundItem extends SceneItem {
     private children_: Array<SceneItem> = []
@@ -17,7 +17,28 @@ export class CompoundItem extends SceneItem {
         this.height_ = size.height
     }
 
-    addItem(item: SceneItem)
+    insertItemAt(index: number, item: SceneItem)
+        : CompoundItem {
+        this.children_.splice(index, 0, item)
+        return this
+    }
+
+    removeItemAt(index: number)
+        : CompoundItem {
+        this.children_.splice(index, 1)
+        return this
+    }
+
+    removeItem(item: SceneItem)
+        : CompoundItem {
+        const index = this.children_.indexOf(item)
+        if (index >= 0) {
+            this.removeItemAt(index)
+        }
+        return this
+    }
+
+    pushItem(item: SceneItem)
         : CompoundItem {
         this.children_.push(item)
         return this
@@ -26,12 +47,6 @@ export class CompoundItem extends SceneItem {
     popItem()
         : CompoundItem {
         this.children_.pop()
-        return this
-    }
-
-    removeItem(item: SceneItem)
-        : CompoundItem {
-        pull(this.children_, item)
         return this
     }
 
