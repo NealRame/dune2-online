@@ -81,7 +81,8 @@ export abstract class Unit<
                     frames: Math.floor(30/this.data_.speed)*directions.length,
                     easing: Easing.step(directions.length),
                     set: t => {
-                        const direction = directions[clamp(Math.floor(t*directions.length), 0, directions.length - 1)]
+                        const step = Math.floor(t*directions.length)
+                        const direction = directions[clamp(step, 0, directions.length - 1)]
                         if (this.direction_ !== direction) {
                             this.direction_ = direction
                             this.events_.emit("directionChanged", this)
