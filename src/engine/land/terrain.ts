@@ -28,7 +28,7 @@ export class Terrain<Data extends ITerrainData> implements ITerrain<Data> {
 
     set(data: Partial<Data>): this {
         Object.assign(this.data_, data)
-        this.land_.events.emit("terrainChanged", this)
+        this.land_.emitter.emit("terrainChanged", this)
         return this
     }
 }

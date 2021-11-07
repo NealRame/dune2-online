@@ -3,7 +3,7 @@ import { imageSet } from "@/dune2/data"
 import { AnimationSprite, CompoundItem, IScene, ISceneItem, IUnitData, IUnitEvent, Sprite, Tile, Unit } from "@/engine"
 import { Direction, IVector2D } from "@/maths"
 
-import { isNil, memoize } from "lodash"
+import { memoize } from "lodash"
 
 const harvesterFrames = memoize((scene: IScene) => {
     const images = imageSet("units")
@@ -182,7 +182,7 @@ export class Harvester extends Unit<IHarvesterData, HarvesterEvents> {
     harvestStart(): Harvester {
         if (!this.harvesting_) {
             this.harvesting_ = true
-            this.events.emit("harvestStarted", this)
+            this.emitter_.emit("harvestStarted", this)
         }
         return this
     }
@@ -190,7 +190,7 @@ export class Harvester extends Unit<IHarvesterData, HarvesterEvents> {
     harvestStop(): Harvester {
         if (this.harvesting_) {
             this.harvesting_ = false
-            this.events.emit("harvestStopped", this)
+            this.emitter_.emit("harvestStopped", this)
         }
         return this
     }

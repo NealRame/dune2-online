@@ -1,5 +1,5 @@
 import { Rect, IVector2D, ISize } from "@/maths"
-import { EventEmitter, IEmitter } from "@/utils"
+import { createObservable, IObservable } from "@/utils"
 
 import { clamp } from "lodash"
 
@@ -8,21 +8,20 @@ export interface IViewportEvent {
 }
 
 export interface IViewport {
-    readonly events: IEmitter<IViewportEvent>
+    readonly events: IObservable<IViewportEvent>
     readonly rect: Rect
     position: IVector2D
     size: ISize
 }
 
 export function createViewport(sceneSize: ISize): IViewport {
-    const events = new EventEmitter<IViewportEvent>()
-
+    const [emitter, events] = createObservable<IViewportEvent>()
     const rect = new Rect({ x: 0, y: 0 }, sceneSize)
 
     const setPosition = ({ x, y }: IVector2D) => {
         rect.x = clamp(x, 0, sceneSize.width - rect.width)
         rect.y = clamp(y, 0, sceneSize.height - rect.height)
-        events.emit("changed", rect.copy())
+        emitter.emit("changed", rect.copy())
     }
 
     const setSize = (size: ISize) => {
@@ -32,7 +31,7 @@ export function createViewport(sceneSize: ISize): IViewport {
     }
 
     return {
-        get events(): EventEmitter<IViewportEvent> {
+        get events(): IObservable<IViewportEvent> {
             return events
         },
         get rect(): Rect {

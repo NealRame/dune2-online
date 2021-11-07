@@ -47,7 +47,7 @@ function createUnitManager(scene: IScene, land: ILand)
             units.add(unit)
             layer.addItem(unit.view)
 
-            unit.events.emit("destinationReached", unit)
+            // unit.events.emit("destinationReached", unit)
 
             return unit
         },

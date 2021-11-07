@@ -16,7 +16,7 @@ import {
 } from "@/maths"
 
 import { clamp, isNil, times } from "lodash"
-import { EventEmitter, IEmitter } from "@/utils"
+import { createObservable, IEmitter, IObservable } from "@/utils"
 
 function directionRotationSequence(from: Direction, to: Direction) {
     const d = (from <= to ? to : to + DirectionCount) - from
@@ -33,7 +33,8 @@ export abstract class Unit<
 > extends Entity implements IUnit<Data> {
     private animation_: Animation|null = null
 
-    private events_: EventEmitter<Events>
+    protected emitter_: IEmitter<Events>
+    protected events_: IObservable<Events>
 
     protected data_: Data
 
@@ -43,8 +44,10 @@ export abstract class Unit<
 
     constructor(scene: IScene, unitData: Data) {
         super()
+        const [emitter, events] = createObservable<Events>()
         this.data_ = unitData
-        this.events_ = new EventEmitter<Events>()
+        this.emitter_ = emitter
+        this.events_ = events
     }
 
     get data(): Data {
@@ -52,7 +55,7 @@ export abstract class Unit<
     }
 
     get events()
-        : IEmitter<Events> {
+        : IObservable<Events> {
         return this.events_
     }
 
@@ -85,7 +88,7 @@ export abstract class Unit<
                         const direction = directions[clamp(step, 0, directions.length - 1)]
                         if (this.direction_ !== direction) {
                             this.direction_ = direction
-                            this.events_.emit("directionChanged", this)
+                            this.emitter_.emit("directionChanged", this)
                         }
                     }
                 }),
@@ -98,14 +101,14 @@ export abstract class Unit<
                     }
                 })
             ],
-            done: () => this.events_.emit("destinationReached", this)
+            done: () => this.emitter_.emit("destinationReached", this)
         })
         return this
     }
 
     set(data: Partial<Data>): IUnit<Data> {
         Object.assign(this.data_, data)
-        this.events_.emit("changed", this)
+        this.emitter_.emit("changed", this)
         return this
     }
 

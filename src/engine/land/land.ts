@@ -22,7 +22,7 @@ import { Image, IScene, ISceneItem } from "@/engine/scene"
 import { ISize, IVector2D, Rect } from "@/maths"
 
 import { constant, isNil, times } from "lodash"
-import { EventEmitter, IEmitter } from "@/utils"
+import { createObservable, IEmitter, IObservable } from "@/utils"
 
 export class LandDataError extends Error {
     constructor(m: string) {
@@ -36,7 +36,9 @@ export class Land<TerrainData extends ITerrainData> extends Entity implements IL
     private indexToPosition_: IndexToPositionConverter
     private positionToIndex_: PositionToIndexConverter
 
-    private events_: EventEmitter<ILandEvent<TerrainData>>
+    private events_: IObservable<ILandEvent<TerrainData>>
+    private emitter_: IEmitter<ILandEvent<TerrainData>>
+
     private terrains_: Array<Terrain<TerrainData>> = []
     private view_: LandView<TerrainData>
 
@@ -55,7 +57,10 @@ export class Land<TerrainData extends ITerrainData> extends Entity implements IL
         this.indexToPosition_ = createIndexToPositionConverter(this.size_)
         this.positionToIndex_ = createPositionToIndexConverter(this.size_)
 
-        this.events_ = new EventEmitter<ILandEvent<TerrainData>>()
+        const [emitter, events] = createObservable<ILandEvent<TerrainData>>()
+
+        this.emitter_ = emitter
+        this.events_ = events
 
         this.terrains_ = times(this.size_.width*this.size_.height, index => {
             const position = this.indexToPosition_(index)
@@ -72,8 +77,13 @@ export class Land<TerrainData extends ITerrainData> extends Entity implements IL
     }
 
     get events()
-        : IEmitter<ILandEvent<TerrainData>> {
+        : IObservable<ILandEvent<TerrainData>> {
         return this.events_
+    }
+
+    get emitter()
+        : IEmitter<ILandEvent<TerrainData>> {
+        return this.emitter_
     }
 
     get size(): ISize {

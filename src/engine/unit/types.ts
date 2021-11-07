@@ -1,6 +1,6 @@
 import { IEntity } from "@/engine/entity"
 import { Direction, Vector } from "@/maths"
-import { IEmitter } from "@/utils"
+import { IObservable } from "@/utils"
 
 export interface IUnitData {
     health: number
@@ -19,7 +19,7 @@ export interface IUnit<
     Events extends IUnitEvent<Data> = IUnitEvent<Data>,
 > extends IEntity {
     readonly data: Data
-    readonly events: IEmitter<Events>
+    readonly events: IObservable<Events>
     readonly position: Vector
 
     move(direction: Direction): IUnit<Data>

@@ -176,7 +176,7 @@ export default defineComponent({
             const game = unref(gameRef)
             if (!isNil(game)) {
                 miniMap = game.miniMap
-                miniMap.on("changed", refresh)
+                miniMap.events.on("changed", refresh)
 
                 viewport = game.engine.scene.viewport
                 if (!isNil(viewport)) {

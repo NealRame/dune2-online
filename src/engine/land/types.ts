@@ -2,7 +2,7 @@ import { IEntity } from "@/engine/entity"
 import { IScene } from "@/engine/scene"
 
 import { Rect, IVector2D, ISize } from "@/maths"
-import { IEmitter } from "@/utils"
+import { IObservable } from "@/utils"
 
 export interface ITerrainData {
     revealed: boolean
@@ -31,7 +31,7 @@ export interface ILandEvent<Data extends ITerrainData> {
 
 export interface ILand<Data extends ITerrainData = ITerrainData> extends IEntity {
     readonly size: ISize
-    readonly events: IEmitter<ILandEvent<Data>>
+    readonly events: IObservable<ILandEvent<Data>>
     reveal(position?: IVector2D, size?: ISize): ILand<Data>
     terrain(position: IVector2D): ITerrain<Data>|null
     neighborhood(position: IVector2D): Neighborhood<Data>
