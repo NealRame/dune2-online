@@ -38,16 +38,11 @@ function createUnitManager(scene: IScene, land: ILand)
             return layer
         },
         add(unit: Unit): IUnit<IUnitData> {
-            const cancelers = [
-                unit.events.listen("destinationReached", ({ x, y }) => {
-                    land.reveal({ x: x - 1, y: y - 1 }, { width: 3, height: 3 })
-                }),
-            ]
-
-            unit.events.listen("destroyed", unit => {
-                cancelers.forEach(cancel => cancel())
-                units.delete(unit)
+            unit.events.on("destinationReached", ({ x, y }) => {
+                land.reveal({ x: x - 1, y: y - 1 }, { width: 3, height: 3 })
             })
+
+            unit.events.once("destroyed", unit => unit.events.clear())
 
             units.add(unit)
             layer.addItem(unit.view)

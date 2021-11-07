@@ -130,17 +130,17 @@ export class HarvesterView extends CompoundItem {
 
         this.pushItem(this.harvesterSprite_)
 
-        harvester.events.listen("directionChanged", () => {
+        harvester.events.on("directionChanged", () => {
             this.harvesterSprite_.frameIndex = harvester.direction
             if (harvester.isHarvesting) {
                 this.popItem()
                 this.pushItem(new HarvesterSandSprite(scene, harvester.direction))
             }
         })
-        harvester.events.listen("harvestStarted", () => {
+        harvester.events.on("harvestStarted", () => {
             this.pushItem(new HarvesterSandSprite(scene, harvester.direction))
         })
-        harvester.events.listen("harvestStopped", () => {
+        harvester.events.on("harvestStopped", () => {
             this.popItem()
         })
     }

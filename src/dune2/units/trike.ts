@@ -25,7 +25,7 @@ export class TrikeView extends Sprite {
         super(scene)
         this.entity_ = unit
         this.frames_ = trikeFrames(scene)
-        unit.events.listen("directionChanged", () => {
+        unit.events.on("directionChanged", () => {
             this.frameIndex = unit.direction
         })
     }
