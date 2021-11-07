@@ -2,7 +2,6 @@ import {
     EventKey,
     EventMap,
     EventListenerCallback,
-    // EventListenerCancelCallback,
     IEmitter,
 } from "./event"
 
@@ -63,26 +62,31 @@ export class EventEmitter<T extends EventMap> implements IEmitter<T> {
         return this
     }
 
+    off<K extends EventKey<T>>(eventName: K): IEmitter<T>
+    off<K extends EventKey<T>>(eventName: K, callback: EventListenerCallback<T[K]>): IEmitter<T>
     off<K extends EventKey<T>>(
         eventName: K,
-        callback: EventListenerCallback<T[K]>,
+        callback?: EventListenerCallback<T[K]>,
     ): EventEmitter<T> {
-        const eventHandlers = this.handlers_[eventName]
-        if (!isNil(eventHandlers)) {
-            const index = eventHandlers.indexOf(callback)
-            if (index >= 0) {
-                eventHandlers.splice(index, 1)
+        if (!isNil(callback)) {
+            const eventHandlers = this.handlers_[eventName]
+            if (!isNil(eventHandlers)) {
+                const index = eventHandlers.indexOf(callback)
+                if (index >= 0) {
+                    eventHandlers.splice(index, 1)
+                }
             }
-        }
-
-        const eventHandlersOnce = this.handlersOnce_[eventName]
-        if (!isNil(eventHandlersOnce)) {
-            const index = eventHandlersOnce.indexOf(callback)
-            if (index >= 0) {
-                eventHandlersOnce.splice(index, 1)
+            const eventHandlersOnce = this.handlersOnce_[eventName]
+            if (!isNil(eventHandlersOnce)) {
+                const index = eventHandlersOnce.indexOf(callback)
+                if (index >= 0) {
+                    eventHandlersOnce.splice(index, 1)
+                }
             }
+        } else {
+            delete this.handlers_[eventName]
+            delete this.handlersOnce_[eventName]
         }
-
         return this
     }
 
