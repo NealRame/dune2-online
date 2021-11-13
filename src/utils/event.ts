@@ -6,10 +6,6 @@ export type EventListenerCallback<EventType> = (event: EventType) => void
 export type EventMap = Record<string, any>
 export type EventKey<T extends EventMap> = string & keyof T
 
-export type PropertyEventMap<Type> = {
-    [Property in keyof Type as `${string & Property}Changed`]: Type[Property]
-}
-
 export interface IEmitter<T extends EventMap> {
     emit<K extends EventKey<T>>(eventName: K, eventData: T[K]): IEmitter<T>
 }
