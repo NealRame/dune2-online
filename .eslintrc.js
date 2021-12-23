@@ -13,23 +13,25 @@ module.exports = {
     },
     rules: {
         "comma-dangle": ["warn", "only-multiline"],
-        "indent": ["warn", 4],
-        "semi": ["warn", "never"],
+        indent: ["warn", 4],
+        semi: ["warn", "never"],
         "space-before-function-paren": ["warn", {
-            "anonymous": "always",
-            "asyncArrow": "always",
-            "named": "never",
+            anonymous: "always",
+            asyncArrow: "always",
+            named: "never",
         }],
         "space-in-parens": "off",
-        "key-spacing": ["error", { "mode": "minimum" }],
+        "key-spacing": ["error", { mode: "minimum" }],
         "space-infix-ops": ["off"],
         "operator-linebreak": ["off"],
         "no-console": process.env.NODE_ENV === "production" ? "warn" : "off",
         "no-debugger": process.env.NODE_ENV === "production" ? "warn" : "off",
         "no-multi-spaces": ["off"],
-        "quotes": ["warn", "double"],
+        quotes: ["warn", "double"],
         "no-use-before-define": "off",
-        "@typescript-eslint/no-use-before-define": ["error"]
+        "no-useless-constructor": "off",
+        "@typescript-eslint/no-use-before-define": ["error"],
+        "@typescript-eslint/no-useless-constructor": ["error"]
     },
     overrides: [{
         files: [
