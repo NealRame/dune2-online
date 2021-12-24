@@ -41,6 +41,7 @@
     "open-simplex-noise": "^2.5.0",
     "pako": "^2.0.3",
     "promise-worker": "^2.0.1",
+    "reflect-metadata": "^0.1.13",
     "sass": "^1.35.1",
     "sass-loader": "^8.0.2",
     "style-resources-loader": "^1.4.1",
