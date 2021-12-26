@@ -1,3 +1,39 @@
+<script lang="ts">
+import { Image } from "@/engine"
+
+import { computed, defineComponent } from "vue"
+
+export default defineComponent({
+    props: ["images", "modelValue"],
+    emits: ["update:modelValue"],
+    setup(props, { emit }) {
+        const currentItem = computed({
+            get: () => props.modelValue,
+            set: value => emit("update:modelValue", value)
+        })
+        return {
+            currentItem,
+            dataURI(image: Image) {
+                const bitmap = image[2]
+                const canvas = document.createElement("canvas")
+                const context = canvas.getContext("2d") as CanvasRenderingContext2D
+                const { width, height } = bitmap
+
+                canvas.width = width
+                canvas.height = height
+                context.drawImage(bitmap, 0, 0)
+
+                return canvas.toDataURL()
+            },
+            onChange(ev: InputEvent): void {
+                const index = Number((ev.target as HTMLInputElement).value)
+                currentItem.value = index
+            },
+        }
+    },
+})
+</script>
+
 <template>
     <form>
         <ol v-once>
@@ -55,39 +91,3 @@ form {
     }
 }
 </style>
-
-<script lang="ts">
-import { Image } from "@/engine"
-
-import { computed, defineComponent } from "vue"
-
-export default defineComponent({
-    props: ["images", "modelValue"],
-    emits: ["update:modelValue"],
-    setup(props, { emit }) {
-        const currentItem = computed({
-            get: () => props.modelValue,
-            set: value => emit("update:modelValue", value)
-        })
-        return {
-            currentItem,
-            dataURI(image: Image) {
-                const bitmap = image[2]
-                const canvas = document.createElement("canvas")
-                const context = canvas.getContext("2d") as CanvasRenderingContext2D
-                const { width, height } = bitmap
-
-                canvas.width = width
-                canvas.height = height
-                context.drawImage(bitmap, 0, 0)
-
-                return canvas.toDataURL()
-            },
-            onChange(ev: InputEvent): void {
-                const index = Number((ev.target as HTMLInputElement).value)
-                currentItem.value = index
-            },
-        }
-    },
-})
-</script>

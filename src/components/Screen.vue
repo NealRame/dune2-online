@@ -1,7 +1,3 @@
-<template>
-    <canvas ref="canvas" :width="width" :height="height"></canvas>
-</template>
-
 <script lang="ts">
 import { Rect, IVector2D, ISize } from "@/maths"
 import { Painter } from "@/graphics"
@@ -108,3 +104,7 @@ export default defineComponent({
     }
 })
 </script>
+
+<template>
+    <canvas ref="canvas" :width="width" :height="height"></canvas>
+</template>

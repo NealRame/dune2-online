@@ -1,3 +1,35 @@
+
+<script lang="ts">
+import { defineComponent } from "vue"
+
+import { Easing, sequence } from "@/maths"
+
+function fadeOutAnimation(frameCount: number) {
+    return (el: HTMLElement, animationDone: () => void) => {
+        const it = sequence(frameCount, Easing.Quadratic.easeIn)
+        const animationCallback = () => {
+            const { done, value } = it.next()
+            el.style.opacity = String(1 - (value ?? 1))
+            if (done) {
+                animationDone()
+            } else {
+                requestAnimationFrame(animationCallback)
+            }
+        }
+        animationCallback()
+    }
+}
+
+export default defineComponent({
+    props: ["show"],
+    setup() {
+        return {
+            fadeOut: fadeOutAnimation(15),
+        }
+    }
+})
+</script>
+
 <template>
     <transition name="modal" @leave="fadeOut" :css="false" >
         <div v-if="show" class="modal" tabindex=-1>
@@ -36,34 +68,3 @@
     }
 }
 </style>
-
-<script lang="ts">
-import { defineComponent } from "vue"
-
-import { Easing, sequence } from "@/maths"
-
-function fadeOutAnimation(frameCount: number) {
-    return (el: HTMLElement, animationDone: () => void) => {
-        const it = sequence(frameCount, Easing.Quadratic.easeIn)
-        const animationCallback = () => {
-            const { done, value } = it.next()
-            el.style.opacity = String(1 - (value ?? 1))
-            if (done) {
-                animationDone()
-            } else {
-                requestAnimationFrame(animationCallback)
-            }
-        }
-        animationCallback()
-    }
-}
-
-export default defineComponent({
-    props: ["show"],
-    setup() {
-        return {
-            fadeOut: fadeOutAnimation(15),
-        }
-    }
-})
-</script>

@@ -1,78 +1,3 @@
-<template>
-    <div id="minimap-wrapper">
-        <button id="zoom-in">
-            <font-awesome-icon icon="search-plus" @click="onZoomInClicked"/>
-        </button>
-        <button id="zoom-out">
-            <font-awesome-icon icon="search-minus" @click="onZoomOutClicked"/>
-        </button>
-        <screen id="minimap" ref="screen"
-            :width="width"
-            :height="height"
-            @mouseClick="onMouseEvent"
-            @mouseMotion="onMouseEvent"
-        />
-    </div>
-</template>
-
-<style lang="scss" scoped>
-#minimap-wrapper {
-    position: fixed;
-    right: $minimap-position-right;
-    bottom: $minimap-position-bottom;
-    padding: 0;
-
-    canvas#minimap {
-        border:
-            $minimap-color1
-            $minimap-border-thickness
-            $minimap-border-type;
-        border-radius: $minimap-border-radius;
-        box-shadow: 0 0 4px $minimap-shadow-color1;
-
-        transition: all 0.2s ease-in;
-        -webkit-transition: all 0.2s ease-in;
-
-        &:hover {
-            border-color: $minimap-color2;
-            border-radius: $minimap-border-radius;
-            box-shadow: 0 0 16px $minimap-shadow-color2;
-
-            transform: scale($minimap-scale-factor);
-
-            -webkit-transition: all 0.2s ease-out;
-            transition: all 0.2s ease-out;
-        }
-    }
-
-    button {
-        background-color: transparent;
-
-        border: none;
-        color: $minimap-color1;
-        cursor: pointer;
-
-        float: left;
-        clear: both;
-
-        height: $minimap-zoom-button-width;
-        width: $minimap-zoom-button-height;
-
-        -webkit-transition: all 0.2s ease-in;
-        transition: all 0.2s ease-in;
-
-        &:hover {
-            color: $minimap-color2;
-            transform: scale($minimap-zoom-button-scale-factor);
-
-            -webkit-transition: all 0.2s ease-out;
-            transition: all 0.2s ease-out;
-        }
-    }
-}
-
-</style>
-
 <script lang="ts">
 import Screen, { ScreenMouseClickEvent, ScreenMouseMotionEvent } from "@/components/Screen.vue"
 
@@ -198,3 +123,77 @@ export default defineComponent({
     }
 })
 </script>
+
+<template>
+    <div id="minimap-wrapper">
+        <button id="zoom-in">
+            <font-awesome-icon icon="search-plus" @click="onZoomInClicked"/>
+        </button>
+        <button id="zoom-out">
+            <font-awesome-icon icon="search-minus" @click="onZoomOutClicked"/>
+        </button>
+        <screen id="minimap" ref="screen"
+            :width="width"
+            :height="height"
+            @mouseClick="onMouseEvent"
+            @mouseMotion="onMouseEvent"
+        />
+    </div>
+</template>
+
+<style lang="scss" scoped>
+#minimap-wrapper {
+    position: fixed;
+    right: $minimap-position-right;
+    bottom: $minimap-position-bottom;
+    padding: 0;
+
+    canvas#minimap {
+        border:
+            $minimap-color1
+            $minimap-border-thickness
+            $minimap-border-type;
+        border-radius: $minimap-border-radius;
+        box-shadow: 0 0 4px $minimap-shadow-color1;
+
+        transition: all 0.2s ease-in;
+        -webkit-transition: all 0.2s ease-in;
+
+        &:hover {
+            border-color: $minimap-color2;
+            border-radius: $minimap-border-radius;
+            box-shadow: 0 0 16px $minimap-shadow-color2;
+
+            transform: scale($minimap-scale-factor);
+
+            -webkit-transition: all 0.2s ease-out;
+            transition: all 0.2s ease-out;
+        }
+    }
+
+    button {
+        background-color: transparent;
+
+        border: none;
+        color: $minimap-color1;
+        cursor: pointer;
+
+        float: left;
+        clear: both;
+
+        height: $minimap-zoom-button-width;
+        width: $minimap-zoom-button-height;
+
+        -webkit-transition: all 0.2s ease-in;
+        transition: all 0.2s ease-in;
+
+        &:hover {
+            color: $minimap-color2;
+            transform: scale($minimap-zoom-button-scale-factor);
+
+            -webkit-transition: all 0.2s ease-out;
+            transition: all 0.2s ease-out;
+        }
+    }
+}
+</style>

@@ -1,3 +1,14 @@
+<script lang="ts">
+import { defineComponent } from "vue"
+
+export default defineComponent({
+    props: {
+        current: Number,
+        label: String,
+    },
+})
+</script>
+
 <template>
     <div class="progress-bar">
         <label>
@@ -82,14 +93,3 @@
     }
 }
 </style>
-
-<script lang="ts">
-import { defineComponent } from "vue"
-
-export default defineComponent({
-    props: {
-        current: Number,
-        label: String,
-    },
-})
-</script>

@@ -1,20 +1,3 @@
-<template>
-    <screen id="screen" ref="screen"
-        :width="screenWidth"
-        :height="screenHeight"
-        @mouseMotion="onMouseMoved"
-    />
-    <mini-map :game="game" />
-</template>
-
-<style lang="scss" scoped>
-canvas#screen {
-    position: fixed;
-    left: 0;
-    top: 0;
-}
-</style>
-
 <script lang="ts">
 import MiniMap from "@/components/MiniMap.vue"
 import Screen, { ScreenMouseMotionEvent } from "@/components/Screen.vue"
@@ -112,3 +95,20 @@ export default defineComponent({
     }
 })
 </script>
+
+<template>
+    <screen id="screen" ref="screen"
+        :width="screenWidth"
+        :height="screenHeight"
+        @mouseMotion="onMouseMoved"
+    />
+    <mini-map :game="game" />
+</template>
+
+<style lang="scss" scoped>
+canvas#screen {
+    position: fixed;
+    left: 0;
+    top: 0;
+}
+</style>

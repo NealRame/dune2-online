@@ -1,24 +1,3 @@
-<template>
-    <screen ref="screen"
-        :width="screenWidth"
-        :height="screenHeight"
-        @mouseClick="onMouseClick"
-    />
-    <tile-palette
-        v-if="images"
-        v-model="currentItem"
-        :images="images"
-    />
-</template>
-
-<style lang="scss" scoped>
-canvas {
-    position: absolute;
-    left: $palette-width;
-    top: 0;
-}
-</style>
-
 <script lang="ts">
 import Screen, { ScreenMouseClickEvent } from "@/components/Screen.vue"
 import TilePalette from "@/components/TilePalette.vue"
@@ -125,3 +104,24 @@ export default defineComponent({
     }
 })
 </script>
+
+<template>
+    <screen ref="screen"
+        :width="screenWidth"
+        :height="screenHeight"
+        @mouseClick="onMouseClick"
+    />
+    <tile-palette
+        v-if="images"
+        v-model="currentItem"
+        :images="images"
+    />
+</template>
+
+<style lang="scss" scoped>
+canvas {
+    position: absolute;
+    left: $palette-width;
+    top: 0;
+}
+</style>

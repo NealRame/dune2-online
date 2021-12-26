@@ -1,17 +1,3 @@
-<template>
-    <screen ref="screen"
-        :width="screenWidth"
-        :height="screenHeight"
-    />
-</template>
-
-<style lang="scss" scoped>
-canvas {
-    position: absolute;
-    left: 0;
-    top: 0;
-}
-</style>
 
 <script lang="ts">
 import Screen from "@/components/Screen.vue"
@@ -414,3 +400,18 @@ export default defineComponent({
     }
 })
 </script>
+
+<template>
+    <screen ref="screen"
+        :width="screenWidth"
+        :height="screenHeight"
+    />
+</template>
+
+<style lang="scss" scoped>
+canvas {
+    position: absolute;
+    left: 0;
+    top: 0;
+}
+</style>
