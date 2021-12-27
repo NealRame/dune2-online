@@ -1,19 +1,18 @@
-export interface IVector2D {
-    x: number,
-    y: number,
+export interface IShape2D {
+    columns: number,
+    rows: number,
 }
 
 export interface ISize2D {
     width: number
     height: number
 }
+export interface IVector2D {
+    x: number,
+    y: number,
+}
 
 export type IRect2D = IVector2D & ISize2D
-
-export interface IShape2D {
-    columns: number,
-    rows: number,
-}
 
 export interface ITransformMatrix2D {
     m11: number,
