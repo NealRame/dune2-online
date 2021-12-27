@@ -22,7 +22,7 @@ export class Model<
     }
 
     get events()
-    : IObservable<PropertyEventMap<Data> & Events> {
+        : IObservable<PropertyEventMap<Data> & Events> {
         return this.events_
     }
 
