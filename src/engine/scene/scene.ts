@@ -7,7 +7,7 @@ import { IEntity } from "@/engine/entity"
 import { scaleDown, ScaleFactor, scaleUp } from "@/engine/scale"
 import { createViewport, IViewport } from "@/engine/viewport"
 
-import { Rect, IVector2D, ISize, Vector } from "@/maths"
+import { Rect, IVector2D, ISize2D, Vector } from "@/maths"
 
 import { isNil } from "lodash"
 
@@ -27,7 +27,7 @@ export class Scene implements IScene {
         this.viewport_.size = this.painter_.rect.scaled(1/this.gridSpacing).size
     }
 
-    constructor(size: ISize, painter: Painter) {
+    constructor(size: ISize2D, painter: Painter) {
         this.backgroundColor_ = cssHex([0, 0, 0])
         this.width_ = size.width
         this.height_ = size.height
@@ -81,7 +81,7 @@ export class Scene implements IScene {
         return this.height_
     }
 
-    get size(): ISize {
+    get size(): ISize2D {
         return {
             width: this.width_,
             height: this.height_,
@@ -182,8 +182,8 @@ export function screenToScenePosition(
     return (new Vector(x, y)).mul(1/gridSpacing).add(topLeft)
 }
 
-export function sceneToScreenSize(scene: IScene, size: ISize)
-    : ISize {
+export function sceneToScreenSize(scene: IScene, size: ISize2D)
+    : ISize2D {
     const gridSpacing = scene.gridSpacing
     return {
         width: size.width*gridSpacing,
@@ -191,8 +191,8 @@ export function sceneToScreenSize(scene: IScene, size: ISize)
     }
 }
 
-export function screenToSceneSize(scene: IScene, size: ISize)
-    : ISize {
+export function screenToSceneSize(scene: IScene, size: ISize2D)
+    : ISize2D {
     const { gridSpacing } = scene
     return {
         width: size.width/gridSpacing,

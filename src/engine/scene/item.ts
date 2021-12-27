@@ -2,7 +2,7 @@ import { IScene, ISceneItem } from "./types"
 
 import { IEntity } from "@/engine/entity"
 import { Painter } from "@/graphics"
-import { Rect, ISize, Vector } from "@/maths"
+import { Rect, ISize2D, Vector } from "@/maths"
 
 export abstract class SceneItem implements ISceneItem {
     protected height_ = 0
@@ -45,7 +45,7 @@ export abstract class SceneItem implements ISceneItem {
         return this.height_
     }
 
-    get size(): ISize {
+    get size(): ISize2D {
         return {
             width: this.width,
             height: this.height,

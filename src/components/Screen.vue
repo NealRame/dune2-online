@@ -1,5 +1,5 @@
 <script lang="ts">
-import { Rect, IVector2D, ISize } from "@/maths"
+import { Rect, IVector2D, ISize2D } from "@/maths"
 import { Painter } from "@/graphics"
 
 import { clamp, isNil } from "lodash"
@@ -94,7 +94,7 @@ export default defineComponent({
                     height: props.height,
                 })
             }),
-            size: computed((): ISize => {
+            size: computed((): ISize2D => {
                 return {
                     width: props.width,
                     height: props.height,

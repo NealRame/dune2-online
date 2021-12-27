@@ -2,11 +2,11 @@ import { SceneItem } from "./item"
 import { Image, IScene } from "./types"
 
 import { Painter } from "@/graphics"
-import { Rect, IShape, ISize } from "@/maths"
+import { Rect, IShape, ISize2D } from "@/maths"
 
 import { isMatch } from "lodash"
 
-function getImageSize(scene: IScene, image: Image): ISize {
+function getImageSize(scene: IScene, image: Image): ISize2D {
     const { width: w, height: h } = image[1]
     return {
         width: w/scene.gridUnit,
@@ -14,7 +14,7 @@ function getImageSize(scene: IScene, image: Image): ISize {
     }
 }
 
-function checkImages(scene: IScene, images: Image[]): ISize {
+function checkImages(scene: IScene, images: Image[]): ISize2D {
     const [head, ...tail] = images
     const size = getImageSize(scene, head)
     for (const image of tail) {
@@ -25,7 +25,7 @@ function checkImages(scene: IScene, images: Image[]): ISize {
     return size
 }
 
-function checkShape(tileSize: ISize, imageSize: ISize, images: Array<Image>)
+function checkShape(tileSize: ISize2D, imageSize: ISize2D, images: Array<Image>)
     : IShape {
     const columns = tileSize.width/imageSize.width
     const rows = tileSize.height/imageSize.height
@@ -38,12 +38,12 @@ function checkShape(tileSize: ISize, imageSize: ISize, images: Array<Image>)
 export class Tile extends SceneItem {
     protected shape_: IShape
 
-    protected imageSize_: ISize
+    protected imageSize_: ISize2D
     protected images_: Image[]
 
     constructor(
         scene: IScene,
-        size: ISize,
+        size: ISize2D,
         images: Image[],
     ) {
         super(scene)

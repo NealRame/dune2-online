@@ -1,4 +1,4 @@
-import { Rect, IVector2D, ISize } from "@/maths"
+import { Rect, IVector2D, ISize2D } from "@/maths"
 
 import { isNil } from "lodash"
 
@@ -36,7 +36,7 @@ export class Painter {
         }
     }
 
-    get size(): ISize {
+    get size(): ISize2D {
         const { width, height } = this.canvas_
         return {
             width,
@@ -112,7 +112,7 @@ export class Painter {
 
     drawRect(
         { x, y }: IVector2D,
-        { width, height }: ISize,
+        { width, height }: ISize2D,
     ): Painter {
         this.context_.beginPath()
         this.context_.moveTo(x, y)
@@ -126,7 +126,7 @@ export class Painter {
 
     fillRect(
         { x, y }: IVector2D,
-        { width, height }: ISize,
+        { width, height }: ISize2D,
     ): Painter {
         this.context_.beginPath()
         this.context_.moveTo(x, y)
@@ -160,7 +160,7 @@ export class Painter {
         imageBitmap: ImageBitmap,
         { x, y }: IVector2D,
         srcRect?: Rect,
-        dstSize?: ISize,
+        dstSize?: ISize2D,
     ): Painter {
         if (isNil(srcRect)) {
             this.context_.drawImage(imageBitmap, x, y)

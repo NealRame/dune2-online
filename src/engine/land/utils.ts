@@ -1,9 +1,9 @@
-import { ISize, IVector2D } from "@/maths"
+import { ISize2D, IVector2D } from "@/maths"
 
 export type PositionToIndexConverter = (p: IVector2D) => number
 export function createPositionToIndexConverter(
-    { width, height }: ISize,
-    chunkSize?: ISize,
+    { width, height }: ISize2D,
+    chunkSize?: ISize2D,
 ): PositionToIndexConverter {
     const chunkWidth = chunkSize?.width ?? 1
     const chunkHeight = chunkSize?.height ?? 1
@@ -23,7 +23,7 @@ export function createPositionToIndexConverter(
 }
 
 export type IndexToPositionConverter = (i: number) => IVector2D
-export function createIndexToPositionConverter({ width }: ISize)
+export function createIndexToPositionConverter({ width }: ISize2D)
     : IndexToPositionConverter {
     return index => {
         return {

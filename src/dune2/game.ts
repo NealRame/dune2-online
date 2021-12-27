@@ -6,7 +6,7 @@ import { MiniMap } from "./mini-map"
 
 import * as Engine from "@/engine"
 import { Painter } from "@/graphics"
-import { ISize, IVector2D } from "@/maths"
+import { ISize2D, IVector2D } from "@/maths"
 
 import { once } from "lodash"
 
@@ -14,7 +14,7 @@ export type UnitFactory = (t: Unit.UnitType, p: IVector2D) => Engine.Unit
 
 export interface GameConfig {
     painter: Painter,
-    size: ISize,
+    size: ISize2D,
     land?: LandConfig,
 }
 

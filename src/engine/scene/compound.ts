@@ -2,7 +2,7 @@ import { SceneItem } from "./item"
 import { IScene } from "./types"
 
 import { Painter } from "@/graphics"
-import { ISize, Rect } from "@/maths"
+import { ISize2D, Rect } from "@/maths"
 import { isNil } from "lodash"
 
 export class CompoundItem extends SceneItem {
@@ -10,7 +10,7 @@ export class CompoundItem extends SceneItem {
 
     constructor(
         scene: IScene,
-        size: ISize,
+        size: ISize2D,
     ) {
         super(scene)
         this.width_ = size.width

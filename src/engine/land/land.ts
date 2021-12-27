@@ -19,7 +19,7 @@ import { LandView } from "./view"
 import { Entity } from "@/engine/entity"
 import { Image, IScene, ISceneItem } from "@/engine/scene"
 
-import { ISize, IVector2D, Rect } from "@/maths"
+import { ISize2D, IVector2D, Rect } from "@/maths"
 
 import { constant, isNil, times } from "lodash"
 import { createObservable, IEmitter, IObservable } from "@/utils"
@@ -32,7 +32,7 @@ export class LandDataError extends Error {
 }
 
 export class Land<TerrainData extends ITerrainData> extends Entity implements ILand<TerrainData> {
-    private size_: ISize
+    private size_: ISize2D
     private indexToPosition_: IndexToPositionConverter
     private positionToIndex_: PositionToIndexConverter
 
@@ -86,7 +86,7 @@ export class Land<TerrainData extends ITerrainData> extends Entity implements IL
         return this.emitter_
     }
 
-    get size(): ISize {
+    get size(): ISize2D {
         return this.size_
     }
 
@@ -104,7 +104,7 @@ export class Land<TerrainData extends ITerrainData> extends Entity implements IL
         ]
     }
 
-    reveal(position: IVector2D, size?: ISize): this {
+    reveal(position: IVector2D, size?: ISize2D): this {
         size = size ?? { width: 1, height: 1 }
         for (const terrain of this.terrains(new Rect(position, size))) {
             terrain.set({ revealed: true } as Partial<TerrainData>)

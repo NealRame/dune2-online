@@ -3,7 +3,7 @@ import { Tile } from "./tile"
 
 import { Animation, createTransitionAnimation } from "@/engine/animation"
 import { Painter } from "@/graphics"
-import { Easing, ISize, Rect, Vector } from "@/maths"
+import { Easing, ISize2D, Rect, Vector } from "@/maths"
 
 import { clamp, isNil } from "lodash"
 
@@ -11,7 +11,7 @@ export class SpriteBase extends SceneItem {
     protected frames_: Array<Tile> = []
     protected frameIndex_ = 0
 
-    get size(): ISize {
+    get size(): ISize2D {
         return this.frames_[this.frameIndex_]?.size ?? {
             width: 0,
             height: 0,

@@ -3,11 +3,11 @@ import { ILand, ITerrainData, LandConstructor, LandInitialData } from "./land"
 import { IUnit, IUnitData, Unit } from "./unit"
 
 import { Painter } from "@/graphics"
-import { ISize } from "@/maths"
+import { ISize2D } from "@/maths"
 
 export interface Config<T extends ITerrainData> {
     painter: Painter
-    size: ISize
+    size: ISize2D
     Land: LandConstructor<T>
     landData: LandInitialData<T>
 }

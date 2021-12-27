@@ -2,10 +2,13 @@ export interface IVector2D {
     x: number,
     y: number,
 }
-export interface ISize {
+
+export interface ISize2D {
     width: number
     height: number
 }
+
+export type IRect2D = IVector2D & ISize2D
 
 export interface IShape {
     columns: number,
