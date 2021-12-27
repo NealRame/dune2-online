@@ -2,7 +2,7 @@ import { SceneItem } from "./item"
 import { Image, IScene } from "./types"
 
 import { Painter } from "@/graphics"
-import { Rect, IShape, ISize2D } from "@/maths"
+import { Rect, IShape2D, ISize2D } from "@/maths"
 
 import { isMatch } from "lodash"
 
@@ -26,7 +26,7 @@ function checkImages(scene: IScene, images: Image[]): ISize2D {
 }
 
 function checkShape(tileSize: ISize2D, imageSize: ISize2D, images: Array<Image>)
-    : IShape {
+    : IShape2D {
     const columns = tileSize.width/imageSize.width
     const rows = tileSize.height/imageSize.height
     if (columns*rows > images.length) {
@@ -36,7 +36,7 @@ function checkShape(tileSize: ISize2D, imageSize: ISize2D, images: Array<Image>)
 }
 
 export class Tile extends SceneItem {
-    protected shape_: IShape
+    protected shape_: IShape2D
 
     protected imageSize_: ISize2D
     protected images_: Image[]

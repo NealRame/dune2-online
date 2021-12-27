@@ -10,7 +10,7 @@ export interface ISize2D {
 
 export type IRect2D = IVector2D & ISize2D
 
-export interface IShape {
+export interface IShape2D {
     columns: number,
     rows: number,
 }

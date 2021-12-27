@@ -1,6 +1,6 @@
 import { Image } from "@/engine"
 import { Color } from "@/graphics"
-import { IShape } from "@/maths"
+import { IShape2D } from "@/maths"
 
 // Palette
 export type Palette = readonly Color.RGBA[]
@@ -12,7 +12,7 @@ export type ImageLib = Record<ImageSet, Image[]>
 
 // Tile descriptor
 export type TileDescriptor = {
-    shape: IShape,
+    shape: IShape2D,
     images: Image[],
 }
 
