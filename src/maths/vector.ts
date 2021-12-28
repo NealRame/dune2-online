@@ -1,20 +1,80 @@
 import { Direction, IVector2D, ITransformMatrix2D } from "./types"
 
 export class Vector implements IVector2D {
-    x: number
-    y: number
+    constructor(
+        public x: number,
+        public y: number,
+    ) { }
 
-    constructor(x: number, y: number) {
-        this.x = x
-        this.y = y
+    static FromVector({ x, y }: IVector2D): Vector {
+        return new Vector(x, y)
     }
 
-    /**
-     * Return a copy of this Vector
-     * @returns a Vector
-     */
-    copy(): Vector {
-        return new Vector(this.x, this.y)
+    static FromDirection(direction: Direction): Vector {
+        switch (direction) {
+        case Direction.North:
+            return Vector.Up
+
+        case Direction.Northeast:
+            return Vector.UpRight
+
+        case Direction.East:
+            return Vector.Right
+
+        case Direction.Southeast:
+            return Vector.DownRight
+
+        case Direction.South:
+            return Vector.Down
+
+        case Direction.Southwest:
+            return Vector.DownLeft
+
+        case Direction.West:
+            return Vector.Left
+
+        case Direction.Northwest:
+            return Vector.UpLeft
+        }
+
+        const exhaustiveCheck_: never = direction
+        return exhaustiveCheck_
+    }
+
+    static get Null(): Vector {
+        return new Vector( 0,  0)
+    }
+
+    static get Up(): Vector {
+        return new Vector( 0, -1)
+    }
+
+    static get Left(): Vector {
+        return new Vector(-1,  0)
+    }
+
+    static get Down(): Vector {
+        return new Vector( 0,  1)
+    }
+
+    static get Right(): Vector {
+        return new Vector( 1,  0)
+    }
+
+    static get UpLeft(): Vector {
+        return new Vector(-Math.sqrt(1), -Math.sqrt(1))
+    }
+
+    static get UpRight(): Vector {
+        return new Vector( Math.sqrt(1), -Math.sqrt(1))
+    }
+
+    static get DownRight(): Vector {
+        return new Vector( Math.sqrt(1),  Math.sqrt(1))
+    }
+
+    static get DownLeft(): Vector {
+        return new Vector(-Math.sqrt(1),  Math.sqrt(1))
     }
 
     /**
@@ -114,72 +174,5 @@ export class Vector implements IVector2D {
 
     toString(): string {
         return `(${this.x}, ${this.y})`
-    }
-
-    static get Null(): Vector {
-        return new Vector( 0,  0)
-    }
-
-    static get Up(): Vector {
-        return new Vector( 0, -1)
-    }
-
-    static get Left(): Vector {
-        return new Vector(-1,  0)
-    }
-
-    static get Down(): Vector {
-        return new Vector( 0,  1)
-    }
-
-    static get Right(): Vector {
-        return new Vector( 1,  0)
-    }
-
-    static get UpLeft(): Vector {
-        return new Vector(-Math.sqrt(1), -Math.sqrt(1))
-    }
-
-    static get UpRight(): Vector {
-        return new Vector( Math.sqrt(1), -Math.sqrt(1))
-    }
-
-    static get DownRight(): Vector {
-        return new Vector( Math.sqrt(1),  Math.sqrt(1))
-    }
-
-    static get DownLeft(): Vector {
-        return new Vector(-Math.sqrt(1),  Math.sqrt(1))
-    }
-
-    static FromDirection(direction: Direction): Vector {
-        switch (direction) {
-        case Direction.North:
-            return Vector.Up
-
-        case Direction.Northeast:
-            return Vector.UpRight
-
-        case Direction.East:
-            return Vector.Right
-
-        case Direction.Southeast:
-            return Vector.DownRight
-
-        case Direction.South:
-            return Vector.Down
-
-        case Direction.Southwest:
-            return Vector.DownLeft
-
-        case Direction.West:
-            return Vector.Left
-
-        case Direction.Northwest:
-            return Vector.UpLeft
-        }
-
-        const exhaustiveCheck_: never = direction
-        return exhaustiveCheck_
     }
 }
