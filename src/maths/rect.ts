@@ -38,6 +38,52 @@ export class Rect implements IRect2D {
     }
 
     /**
+     * Returns the smallest bounding rectangle of the given rectangles.
+     * @param r1
+     * @returns Rect
+     */
+    static bounding(r1: Rect, ...rects: Array<Rect>): Rect {
+        const u = Rect.fromRect(r1)
+        for (const r of rects) {
+            const leftX = Math.min(u.leftX, r.leftX)
+            const rightX = Math.max(u.rightX, r.rightX)
+            const topY = Math.min(u.topY, r.topY)
+            const bottomY = Math.max(u.bottomY, r.bottomY)
+
+            u.x = leftX
+            u.y = topY
+            u.width = rightX - leftX
+            u.height = bottomY - topY
+        }
+        return u
+    }
+
+    /**
+     * Returns the result of the intersection of the given rectangles
+     * @param r1
+     * @returns Rect
+     */
+    static intersection(r1: Rect, ...rects: Array<Rect>): Rect | null {
+        const i = Rect.fromRect(r1)
+        for (const r of rects) {
+            if (!i.overlap(r)) {
+                return null
+            }
+
+            const leftX = Math.max(i.leftX, r.leftX)
+            const rightX = Math.min(i.rightX, r.rightX)
+            const topY = Math.max(i.topY, r.topY)
+            const bottomY = Math.min(i.bottomY, r.bottomY)
+
+            i.x = leftX
+            i.y = topY
+            i.width = rightX - leftX
+            i.height = bottomY - topY
+        }
+        return i
+    }
+
+    /**
      * @returns the size to this Rect
      */
     get size(): ISize2D {
@@ -142,58 +188,6 @@ export class Rect implements IRect2D {
         const by2 = rect.bottomY
         return ((ax2 >= bx1 && ax2 <= bx2) || (bx2 >= ax1 && bx2 <= ax2))
             && ((ay2 >= by1 && ay2 <= by2) || (by2 >= ay1 && by2 <= ay2))
-    }
-
-    /**
-     * Returns the result of the intersection of this rectangle and the given
-     * one
-     * @param rect
-     * @returns Rect
-     */
-    intersected(rect: Rect): Rect|null {
-        if (!this.overlap(rect)) {
-            return null
-        }
-
-        const leftX = Math.max(this.leftX, rect.leftX)
-        const rightX = Math.min(this.rightX, rect.rightX)
-        const topY = Math.max(this.topY, rect.topY)
-        const bottomY = Math.min(this.bottomY, rect.bottomY)
-
-        return new Rect({
-            x: leftX,
-            y: topY,
-        }, {
-            width: rightX - leftX,
-            height: bottomY - topY,
-        })
-    }
-
-    /**
-     * Unites this rectangle with the given rectangle.
-     * @param rect
-     * @returns Rect
-     */
-    add(rect: Rect): Rect {
-        const leftX = Math.min(this.leftX, rect.leftX)
-        const rightX = Math.max(this.rightX, rect.rightX)
-        const topY = Math.min(this.topY, rect.topY)
-        const bottomY = Math.max(this.bottomY, rect.bottomY)
-        this.x = leftX
-        this.y = topY
-        this.width = rightX - leftX
-        this.height = bottomY - topY
-        return this
-    }
-
-    /**
-     * Returns the bounding rectangle of this rectangle and the given
-     * rectangle.
-     * @param rect
-     * @returns Rect
-     */
-    united(rect: Rect): Rect {
-        return Rect.fromRect(this).add(rect)
     }
 
     /**

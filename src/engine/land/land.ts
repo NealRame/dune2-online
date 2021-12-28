@@ -120,7 +120,7 @@ export class Land<TerrainData extends ITerrainData> extends Entity implements IL
     * terrains(zone?: Rect)
         : Generator<ITerrain<TerrainData>, void, undefined> {
         if (!isNil(zone)) {
-            const rect = this.view.rect.intersected(zone)
+            const rect = Rect.intersection(this.view.rect, zone)
             if (!isNil(rect)) {
                 for (const { x, y } of rect.partition()) {
                     yield this.terrain({ x, y }) as ITerrain<TerrainData>

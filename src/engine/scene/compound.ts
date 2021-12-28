@@ -53,10 +53,11 @@ export class CompoundItem extends SceneItem {
     render(painter: Painter, viewport: Rect)
         : CompoundItem {
         const { gridSpacing } = this.scene
-        const rect = viewport.intersected(this.rect)
+        const rect = Rect.intersection(viewport, this.rect)
 
         if (!isNil(rect)) {
             const origin = rect.topLeft().sub(viewport.topLeft())
+
             for (const item of this.children_) {
                 painter.save()
                 painter.translate(item.position.add(origin).mul(gridSpacing))
