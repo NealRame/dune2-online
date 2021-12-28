@@ -174,7 +174,7 @@ export class Rect implements IRect2D {
      * @param rect
      * @returns Rect
      */
-    union(rect: Rect): Rect {
+    add(rect: Rect): Rect {
         const leftX = Math.min(this.leftX, rect.leftX)
         const rightX = Math.max(this.rightX, rect.rightX)
         const topY = Math.min(this.topY, rect.topY)
@@ -193,7 +193,7 @@ export class Rect implements IRect2D {
      * @returns Rect
      */
     united(rect: Rect): Rect {
-        return Rect.fromRect(this).union(rect)
+        return Rect.fromRect(this).add(rect)
     }
 
     /**
