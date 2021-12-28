@@ -1,4 +1,4 @@
-import { IVector2D, ISize2D } from "./types"
+import { IRect2D, ISize2D, IVector2D, } from "./types"
 import { Vector } from "./vector"
 
 import { isNumber } from "lodash"
@@ -6,7 +6,7 @@ import { isNumber } from "lodash"
 /**
  * @class Rect
  */
-export class Rect implements IVector2D, ISize2D {
+export class Rect implements IRect2D {
     x: number
     y: number
     width: number
@@ -25,6 +25,16 @@ export class Rect implements IVector2D, ISize2D {
         this.y = y
         this.width = width
         this.height = height
+    }
+
+    /**
+     * @returns a copy of the given rectangle
+     */
+    static fromRect({ x, y, width, height }: IRect2D): Rect {
+        return new Rect(
+            { x, y },
+            { width, height },
+        )
     }
 
     /**
@@ -117,19 +127,6 @@ export class Rect implements IVector2D, ISize2D {
     }
 
     /**
-     * @returns a copy of this
-     */
-    copy(): Rect {
-        return new Rect({
-            x: this.x,
-            y: this.y,
-        }, {
-            width: this.width,
-            height: this.height,
-        })
-    }
-
-    /**
      * Return true if and only if the given rectangle intersect this rectangle.
      * @param rect
      * @returns boolean
@@ -196,7 +193,7 @@ export class Rect implements IVector2D, ISize2D {
      * @returns Rect
      */
     united(rect: Rect): Rect {
-        return this.copy().union(rect)
+        return Rect.fromRect(this).union(rect)
     }
 
     /**
@@ -215,7 +212,7 @@ export class Rect implements IVector2D, ISize2D {
      * @returns a copy of thie Rect that it is cropped to the given size
      */
     cropped({ width, height }: ISize2D): Rect {
-        return this.copy().crop({ width, height })
+        return Rect.fromRect(this).crop({ width, height })
     }
 
     /**
@@ -234,7 +231,7 @@ export class Rect implements IVector2D, ISize2D {
      * @returns a copy of this Rect that is translated using given vector
      */
     translated({ x, y }: IVector2D): Rect {
-        return this.copy().translate({ x, y })
+        return Rect.fromRect(this).translate({ x, y })
     }
 
     /**
@@ -256,7 +253,7 @@ export class Rect implements IVector2D, ISize2D {
      * @returns a copy of this rect scaled by the given factor
      */
     scaled(k: {kx: number, ky: number} | number): Rect {
-        return this.copy().scale(k)
+        return Rect.fromRect(this).scale(k)
     }
 
     * partition(chunk: ISize2D = { width: 1, height: 1 }): Generator<Rect> {

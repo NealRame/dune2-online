@@ -21,7 +21,7 @@ export function createViewport(sceneSize: ISize2D): IViewport {
     const setPosition = ({ x, y }: IVector2D) => {
         rect.x = clamp(x, 0, sceneSize.width - rect.width)
         rect.y = clamp(y, 0, sceneSize.height - rect.height)
-        emitter.emit("changed", rect.copy())
+        emitter.emit("changed", Rect.fromRect(rect))
     }
 
     const setSize = (size: ISize2D) => {
@@ -35,7 +35,7 @@ export function createViewport(sceneSize: ISize2D): IViewport {
             return events
         },
         get rect(): Rect {
-            return rect.copy()
+            return Rect.fromRect(rect)
         },
         get position(): IVector2D {
             return rect.topLeft()
