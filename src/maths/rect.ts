@@ -1,4 +1,4 @@
-import { IRect2D, ISize2D, IVector2D, } from "./types"
+import { IRect2D, ISize2D, IVector2D } from "./types"
 import { Vector } from "./vector"
 
 import { isNumber } from "lodash"
