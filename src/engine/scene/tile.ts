@@ -65,7 +65,7 @@ export class Tile extends SceneItem {
             })
             const sceneRect = new Rect(scenePos, this.imageSize_)
 
-            if (viewport.intersects(sceneRect)) {
+            if (viewport.overlap(sceneRect)) {
                 const bitmap = this.images_[i][scale]
                 const screenPos = scenePos.sub(viewport).mul(gridSpacing)
                 painter.drawImageBitmap(bitmap, screenPos)

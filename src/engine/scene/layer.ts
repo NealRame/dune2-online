@@ -44,7 +44,7 @@ export class SceneLayer extends SceneItem implements ISceneLayer {
     render(painter: Painter, viewport: Rect)
         : this {
         for (const item of this.items_) {
-            if (item.visible && viewport.intersects(item.rect)) {
+            if (item.visible && viewport.overlap(item.rect)) {
                 item.render(painter, viewport)
             }
         }

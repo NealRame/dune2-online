@@ -87,7 +87,7 @@ export class LandView<
     render(painter: Painter, viewport: Rect)
         : SceneItem {
         for (const item of this.chunks_) {
-            if (viewport.intersects(item.rect)) {
+            if (viewport.overlap(item.rect)) {
                 item.render(painter, viewport)
             }
         }

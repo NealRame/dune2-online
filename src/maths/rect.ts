@@ -131,7 +131,7 @@ export class Rect implements IRect2D {
      * @param rect
      * @returns boolean
      */
-    intersects(rect: Rect): boolean {
+    overlap(rect: Rect): boolean {
         const ax1 = this.leftX
         const ay1 = this.topY
         const ax2 = this.rightX
@@ -151,7 +151,7 @@ export class Rect implements IRect2D {
      * @returns Rect
      */
     intersected(rect: Rect): Rect|null {
-        if (!this.intersects(rect)) {
+        if (!this.overlap(rect)) {
             return null
         }
 
