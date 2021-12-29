@@ -1,33 +1,23 @@
 <script lang="ts">
-import { Image } from "@/engine"
+import { defineComponent } from "vue"
 
-import { computed, defineComponent } from "vue"
+import TilePaletteItem from "./TilePaletteItem.vue"
+
+import { TileDescriptor } from "@/dune2/types"
+import { ScaleFactor } from "@/engine"
 
 export default defineComponent({
-    props: ["images", "modelValue"],
+    components: { TilePaletteItem },
+    props: ["tiles", "scale", "modelValue"],
     emits: ["update:modelValue"],
-    setup(props, { emit }) {
-        const currentItem = computed({
-            get: () => props.modelValue,
-            set: value => emit("update:modelValue", value)
-        })
+    setup(props: {
+        tiles: Array<TileDescriptor>,
+        scale: ScaleFactor | undefined,
+        modelValue: number,
+    }, { emit }) {
         return {
-            currentItem,
-            dataURI(image: Image) {
-                const bitmap = image[2]
-                const canvas = document.createElement("canvas")
-                const context = canvas.getContext("2d") as CanvasRenderingContext2D
-                const { width, height } = bitmap
-
-                canvas.width = width
-                canvas.height = height
-                context.drawImage(bitmap, 0, 0)
-
-                return canvas.toDataURL()
-            },
-            onChange(ev: InputEvent): void {
-                const index = Number((ev.target as HTMLInputElement).value)
-                currentItem.value = index
+            onChange(tileIndex: number): void {
+                emit("update:modelValue", tileIndex)
             },
         }
     },
@@ -37,11 +27,8 @@ export default defineComponent({
 <template>
     <form>
         <ol v-once>
-            <li v-for="(item, index) in images" :key="index">
-                <label>
-                    <input type="radio" name="palette-item" :value="index" @change="onChange"/>
-                    <img :src="dataURI(item)" :title="index">
-                </label>
+            <li v-for="(tile, index) in tiles" :key="index">
+                <tile-palette-item :index="index" :scale="scale" :tile="tile" @change="onChange(index)" />
             </li>
         </ol>
     </form>
@@ -69,24 +56,6 @@ form {
             display: inline-block;
             overflow: visible;
             position: relative;
-
-            input[type=radio] {
-                opacity: 0;
-                position: absolute;
-                height: 0;
-                width: 0;
-                & + img {
-                    border: 1px solid gray;
-                    display: inline-block;
-                    margin: 1px;
-                    &:hover {
-                        border-color:red;
-                    }
-                }
-                &:checked + img {
-                    border-color: rgb(221, 136, 38);
-                }
-            }
         }
     }
 }
