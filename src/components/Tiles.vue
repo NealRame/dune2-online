@@ -58,7 +58,7 @@ export default defineComponent({
         :height="screenHeight"
         @mouseClick="onMouseClick"
     />
-    <tile-palette :tiles="tiles" :scale="4" v-model="currentTileIndex"/>
+    <tile-palette :tiles="tiles" :scale="2" v-model="currentTileIndex"/>
 </template>
 
 <style lang="scss" scoped>
