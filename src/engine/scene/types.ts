@@ -1,8 +1,11 @@
+import { IEntity } from "@/engine/entity"
 import { IViewport } from "@/engine/viewport"
 import { ScaleFactor } from "@/engine/scale"
-import { Painter } from "@/graphics"
+
+import { Color, Painter } from "@/graphics"
 import { Rect, ISize2D, Vector } from "@/maths"
-import { IEntity } from ".."
+
+export type Palette = readonly Color.RGBA[]
 
 export type Image = Record<ScaleFactor, ImageBitmap>
 
