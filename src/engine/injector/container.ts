@@ -1,102 +1,93 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
-/* eslint-disable @typescript-eslint/ban-types */
 import "reflect-metadata"
 
-export interface TConstructor<T = any> {
-    new(...args: Array<never>): T
-}
+import { isNil } from "lodash"
 
-type DefaultMap = Map<number, unknown>
+import {
+    ServiceAliasUndefined,
+    ServiceNotFoundError,
+} from "./errors"
 
-export enum Lifecycle {
-    Singleton,
-    Transient,
-}
+import {
+    ServiceToken,
+} from "./token"
 
-const ServiceLifecyclePropertyKey = Symbol("service:lifecycle")
-const ServiceDefaultKey = Symbol("service:default")
-const ServiceInjectKey = Symbol("service:inject")
+import {
+    TConstructor,
+    ServiceIdentifier,
+    ServiceLifecycle,
+} from "./types"
 
-function isService(type: Function)
-    : boolean {
-    return Reflect.hasMetadata(ServiceLifecyclePropertyKey, type)
-}
-
-function isPrimitive(type: Function)
-    : boolean {
-    return type === Number
-        || type === String
-        || type === Boolean
-}
-
-function getDefaults(service: TConstructor)
-    : DefaultMap {
-    if (Reflect.hasMetadata(ServiceDefaultKey, service)) {
-        return Reflect.getMetadata(ServiceDefaultKey, service)
-    }
-    return new Map()
-}
-
-export function Service(lifecycle: Lifecycle)
-    : ClassDecorator {
-    return Reflect.metadata(ServiceLifecyclePropertyKey, lifecycle)
-}
-
-export function Inject(token: string | symbol)
-    : ParameterDecorator {
-    return Reflect.metadata(ServiceInjectKey, token)
-}
-
-export function Default<T>(value: T)
-    : ParameterDecorator {
-    return (target, _, index) => {
-        const defaults = (Reflect.hasMetadata(ServiceDefaultKey, target)
-            ? Reflect.getMetadata(ServiceDefaultKey, target)
-            : new Map()) as DefaultMap
-        defaults.set(index, value)
-        Reflect.defineMetadata(ServiceDefaultKey, defaults, target)
-    }
-}
+import {
+    getServiceDefaultParameterMap,
+    getServiceInjectionParameterMap,
+    getServiceLifecyle,
+    getServiceParametersMetadata,
+} from "./utils"
 
 export class Container {
+    private aliases_ = new WeakMap<ServiceToken, TConstructor>()
     private singletons_ = new WeakMap<TConstructor, unknown>()
 
-    private parameterInjector_(service: TConstructor) {
-        const defaultMap = Reflect.getMetadata(ServiceDefaultKey, service) as DefaultMap ?? new Map()
-        return (paramType: Function, paramIndex: number) => {
-            if (isService(paramType)) {
-                return this.get(paramType as TConstructor)
-            } else if (isPrimitive(paramType)) {
-                return defaultMap.has(paramIndex)
-                    ? defaultMap.get(paramIndex)
-                    : paramType()
+    private injectServiceParameters_(service: TConstructor) {
+        const parametersMeta = getServiceParametersMetadata(service)
+        const injectedParamsMap = getServiceInjectionParameterMap(service)
+        const defaultParamsMap = getServiceDefaultParameterMap(service)
+
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        return parametersMeta.map((type: any, index: number) => {
+            if (injectedParamsMap.has(index)) {
+                return this.get(injectedParamsMap.get(index) as TConstructor)
             }
-            throw new Error(`Failed to get requested service ${service.name}, cannot inject parameter=${paramIndex}`)
-        }
-    }
-
-    private inject_<T>(service: TConstructor<T>): T {
-        const serviceParamsTypes = Reflect.getMetadata("design:paramtypes", service) ?? []
-        const injectParameter = this.parameterInjector_(service)
-        return Reflect.construct(
-            service,
-            serviceParamsTypes.map(injectParameter)
-        )
-    }
-
-    has<T>(constructor: TConstructor<T>): boolean {
-        return isService(constructor)
-    }
-
-    get<T>(service: TConstructor<T>): T {
-        const lifecycle = Reflect.getMetadata(ServiceLifecyclePropertyKey, service)
-        if (lifecycle === Lifecycle.Singleton) {
-            if (!this.singletons_.has(service)) {
-                this.singletons_.set(service, this.inject_(service))
+            if (defaultParamsMap.has(index)) {
+                return defaultParamsMap.get(index)
             }
-            return this.singletons_.get(service) as T
-        } else {
-            return this.inject_(service)
+            return type()
+        })
+    }
+
+    private injectTransient_(service: TConstructor) {
+        const params = this.injectServiceParameters_(service)
+        return Reflect.construct(service, params)
+    }
+
+    private injectSingleton_(service: TConstructor) {
+        if (!this.singletons_.has(service)) {
+            this.singletons_.set(service, this.injectTransient_(service))
         }
+        return this.singletons_.get(service)
+    }
+
+    private injectClassService_<T>(service: TConstructor<T>)
+        : T {
+        const lifecycle = getServiceLifecyle(service)
+        if (isNil(lifecycle)) {
+            throw new ServiceNotFoundError(service)
+        }
+        return (lifecycle === ServiceLifecycle.Singleton
+            ? this.injectSingleton_(service)
+            : this.injectTransient_(service)
+        ) as T
+    }
+
+    private injectAliasedService_<T>(service: ServiceToken<T>)
+        : T {
+        const classService = this.aliases_.get(service)
+        if (isNil(classService)) {
+            throw new ServiceAliasUndefined(service)
+        }
+        return this.injectClassService_(classService as TConstructor<T>)
+    }
+
+    alias<T>(token: ServiceToken<T>, service: TConstructor<T>)
+        : this {
+        this.aliases_.set(token, service)
+        return this
+    }
+
+    get<T>(service: ServiceIdentifier<T>)
+        : T {
+        return service instanceof ServiceToken
+            ? this.injectAliasedService_(service)
+            : this.injectClassService_(service)
     }
 }
