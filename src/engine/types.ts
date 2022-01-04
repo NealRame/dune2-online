@@ -20,5 +20,5 @@ export interface ImagesResourceDecoder {
 }
 
 export interface GameMetadata {
-    resources?: Array<TConstructor>
+    resources: Array<TConstructor>
 }
