@@ -16,11 +16,11 @@ import {
     TConstructor,
     ServiceIdentifier,
     ServiceLifecycle,
+    ServiceParameterMetadata,
+    ServiceMetadata,
 } from "./types"
 
 import {
-    getServiceDefaultParameterMap,
-    getServiceInjectionParameterMap,
     getServiceMetadata,
     getServiceParametersMetadata,
     isService,
@@ -33,43 +33,51 @@ export class Container {
 
     private injectServiceParameters_(service: TConstructor) {
         const parametersMeta = getServiceParametersMetadata(service)
-        const injectedParamsMap = getServiceInjectionParameterMap(service)
-        const defaultParamsMap = getServiceDefaultParameterMap(service)
+        const { parameters: serviceParametersMeta } = getServiceMetadata(service)
 
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         return parametersMeta.map((type: any, index: number) => {
-            if (injectedParamsMap.has(index)) {
-                return this.get(injectedParamsMap.get(index) as TConstructor)
-            }
-            if (defaultParamsMap.has(index)) {
-                return defaultParamsMap.get(index)
+            if (serviceParametersMeta.has(index)) {
+                const parameterMeta = serviceParametersMeta.get(index) as ServiceParameterMetadata
+                if (!isNil(parameterMeta.service)) {
+                    return this.get(parameterMeta.service, parameterMeta.fallback)
+                }
             }
             return type()
         })
     }
 
-    private injectTransient_(service: TConstructor) {
-        const params = this.injectServiceParameters_(service)
-        return Reflect.construct(service, params)
+    private injectTransient_(service: TConstructor, serviceMetadata: ServiceMetadata) {
+        if (isNil(serviceMetadata.factory)) {
+            const params = this.injectServiceParameters_(service)
+            return Reflect.construct(service, params)
+        } else {
+            return serviceMetadata.factory(this)
+        }
     }
 
-    private injectSingleton_(service: TConstructor) {
+    private injectSingleton_(service: TConstructor, serviceMetadata: ServiceMetadata) {
         if (!this.singletons_.has(service)) {
-            this.singletons_.set(service, this.injectTransient_(service))
+            this.singletons_.set(
+                service,
+                this.injectTransient_(service, serviceMetadata),
+            )
         }
         return this.singletons_.get(service)
     }
 
-    private injectClassService_<T>(service: TConstructor<T>)
+    private injectClassService_<T>(service: TConstructor<T>, fallback?: T)
         : T {
-        const metadata = getServiceMetadata(service)
-        if (isNil(metadata)) {
-            throw new ServiceNotFoundError(service)
+        if (isService(service)) {
+            const metadata = getServiceMetadata(service)
+            return (metadata.lifecycle === ServiceLifecycle.Singleton
+                ? this.injectSingleton_(service, metadata)
+                : this.injectTransient_(service, metadata)
+            ) as T
+        } else if (!isNil(fallback)) {
+            return fallback
         }
-        return (metadata.lifecycle === ServiceLifecycle.Singleton
-            ? this.injectSingleton_(service)
-            : this.injectTransient_(service)
-        ) as T
+        throw new ServiceNotFoundError(service)
     }
 
     private injectAliasedService_<T>(service: Token<T>)
@@ -91,17 +99,18 @@ export class Container {
         return this
     }
 
-    get<T>(id: ServiceIdentifier<T>)
+    get<T>(id: ServiceIdentifier<T>, fallback?: T)
         : T {
         if (id instanceof Token) {
             if (this.values_.has(id)) {
                 return this.values_.get(id) as T
-            }
-            if (this.aliases_.has(id)) {
+            } else if (this.aliases_.has(id)) {
                 return this.injectAliasedService_(id)
+            } else if (!isNil(fallback)) {
+                return fallback
             }
             throw new ServiceAliasOrValueUndefined(id)
         }
-        return this.injectClassService_(id)
+        return this.injectClassService_(id, fallback)
     }
 }

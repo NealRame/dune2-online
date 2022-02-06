@@ -10,35 +10,60 @@ import {
     ServiceIdentifier,
     ServiceLifecycle,
     ServiceMetadata,
+    TConstructor,
 } from "./types"
 
 import {
-    getServiceDefaultParameterMap,
-    getServiceInjectionParameterMap,
+    getServiceMetadata,
+    isService,
 } from "./utils"
 
-export function Service(metadata?: Partial<ServiceMetadata>)
+function getServiceOrCreate(service: TConstructor)
+    : ServiceMetadata {
+    if (!isService(service)) {
+        Reflect.defineMetadata(
+            ServiceMetadataKey,
+            {
+                lifecycle: ServiceLifecycle.Transient,
+                parameters: new Map(),
+            },
+            service
+        )
+    }
+    const metadata = getServiceMetadata(service)
+    return metadata
+}
+
+export function Service(metadata?: Partial<Omit<ServiceMetadata, "parameters">>)
     : ClassDecorator {
-    return Reflect.metadata(
-        ServiceMetadataKey,
-        Object.assign({
-            lifecycle: ServiceLifecycle.Transient
-        }, metadata)
-    )
+    // eslint-disable-next-line @typescript-eslint/ban-types
+    return (target: Function) => {
+        Object.assign(
+            getServiceOrCreate(target as TConstructor),
+            metadata,
+        )
+    }
 }
 
 export function Inject(service: ServiceIdentifier)
     : ParameterDecorator {
     return (target: any, _: any, parameterIndex: number) => {
-        const paramsMap = getServiceInjectionParameterMap(target)
-        paramsMap.set(parameterIndex, service)
+        const { parameters } = getServiceOrCreate(target)
+        parameters.set(parameterIndex, {
+            ...parameters.get(parameterIndex),
+            service,
+        })
     }
 }
 
-export function Default(value: boolean | number | string | symbol)
+export function Default(fallback: boolean | number | string | symbol)
     : ParameterDecorator {
     return (target: any, _: any, parameterIndex: number) => {
-        const paramsMap = getServiceDefaultParameterMap(target)
-        paramsMap.set(parameterIndex, value)
+        const { parameters } = getServiceOrCreate(target)
+        parameters.set(parameterIndex, {
+            ...parameters.get(parameterIndex),
+            fallback,
+        })
+        getServiceMetadata(target).parameters = parameters
     }
 }
