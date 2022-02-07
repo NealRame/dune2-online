@@ -83,12 +83,12 @@ export default defineComponent({
 
     @keyframes progress-value-animation {
         to {
-            transform: translateX(100%*math.div(100%, $progress-bar-undeterminate-value-width - 1));
+            transform: translateX(100%*(math.div(100%, math.clamp(1%, $progress-bar-undeterminate-value-width, 100%)) - 1));
         }
     }
     @-webkit-keyframes progress-value-animation {
         to {
-            transform: translateX(100%*math.div(100%, $progress-bar-undeterminate-value-width - 1));
+            transform: translateX(100%*(math.div(100%, math.clamp(1%, $progress-bar-undeterminate-value-width, 100%)) - 1));
         }
     }
 }
