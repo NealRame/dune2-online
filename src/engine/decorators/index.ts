@@ -1,2 +1,2 @@
 export * from "./game"
-export * from "./resource"
+export * as Resources from "./resource"
