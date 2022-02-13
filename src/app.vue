@@ -1,10 +1,7 @@
 <script lang="ts">
 import { defineComponent, onMounted, ref } from "vue"
 
-import {
-    Dune,
-    TerrainImagesIdentifier,
-} from "@/dune"
+import * as Dune from "@/dune"
 
 import {
     create
@@ -23,7 +20,7 @@ export default defineComponent({
         const loadingValueRef = ref<number | null>(null)
 
         onMounted(async () => {
-            const engine = await create(Dune, {
+            const engine = await create(Dune.Game, {
                 begin() {
                     loadingRef.value = true
                 },
@@ -38,7 +35,7 @@ export default defineComponent({
                 },
             })
 
-            console.log(engine.get(TerrainImagesIdentifier))
+            console.log(engine.get(Dune.Resources.TerrainImages))
         })
 
         return {

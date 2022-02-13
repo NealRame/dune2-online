@@ -1,37 +1,42 @@
-import { Game } from "@/engine/decorators"
+import * as Engine from "@/engine"
 
 import {
-    PaletteIdentifier,
-    TerrainImagesIdentifier,
-    UnitsImagesIdentifier,
-    MiscImagesIdentifier,
+    Palette,
     PaletteDecoder,
+    MiscImages,
+    TerrainImages,
+    UnitsImages,
     ImagesDecoder,
 } from "./resources"
 
-export * from "./resources"
-
-@Game({
+@Engine.Decorators.Game({
     resources: [{
-        id: PaletteIdentifier,
+        id: Palette,
         name: "palette",
         uri: "/assets/palette.json.gz",
         decoder: PaletteDecoder,
     }, {
-        id: MiscImagesIdentifier,
+        id: MiscImages,
         name: "misc images",
         uri: "/assets/images.misc.json.gz",
         decoder: ImagesDecoder,
     }, {
-        id: TerrainImagesIdentifier,
+        id: TerrainImages,
         name: "terrain images",
         uri: "/assets/images.terrain.json.gz",
         decoder: ImagesDecoder,
     }, {
-        id: UnitsImagesIdentifier,
+        id: UnitsImages,
         name: "units images",
         uri: "/assets/images.units.json.gz",
         decoder: ImagesDecoder,
     }],
 })
-export class Dune {}
+export class Game {}
+
+export const Resources = {
+    Palette,
+    MiscImages,
+    TerrainImages,
+    UnitsImages,
+}

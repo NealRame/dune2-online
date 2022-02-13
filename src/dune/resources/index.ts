@@ -2,7 +2,8 @@
 import DecodePaletteWorker from "worker-loader!./workers/decode-palette"
 import DecodeImagesWorker from "worker-loader!./workers/decode-images"
 
-import { Image, Palette } from "@/engine/scene"
+import * as Engine from "@/engine"
+
 import { Inject, Service, ServiceLifecycle, Token } from "@/engine/injector"
 import {
     IGameImagesDecoder,
@@ -11,7 +12,7 @@ import {
 
 import PromiseWorker from "promise-worker"
 
-export const PaletteIdentifier = new Token<Palette>("palette")
+export const Palette = new Token<Engine.Palette>("palette")
 
 @Service({
     lifecycle: ServiceLifecycle.Singleton
@@ -24,14 +25,14 @@ export class PaletteDecoder implements IGamePaletteDecoder {
     }
 
     decode(data: Uint8Array)
-        : Promise<Palette> {
+        : Promise<Engine.Palette> {
         return this.worker_.postMessage(data)
     }
 }
 
-export const MiscImagesIdentifier = new Token<Array<Image>>("misc")
-export const TerrainImagesIdentifier = new Token<Array<Image>>("terrain")
-export const UnitsImagesIdentifier = new Token<Array<Image>>("units")
+export const MiscImages = new Token<Array<Engine.Image>>("misc")
+export const TerrainImages = new Token<Array<Engine.Image>>("terrain")
+export const UnitsImages = new Token<Array<Engine.Image>>("units")
 
 @Service({
     lifecycle: ServiceLifecycle.Singleton
@@ -40,13 +41,13 @@ export class ImagesDecoder implements IGameImagesDecoder {
     private worker_: PromiseWorker
 
     constructor(
-        @Inject(PaletteIdentifier) private palette_: Palette
+        @Inject(Palette) private palette_: Engine.Palette
     ) {
         this.worker_ = new PromiseWorker(new DecodeImagesWorker())
     }
 
     decode(data: Uint8Array, identifier: Token)
-        : Promise<Image[]> {
+        : Promise<Engine.Image[]> {
         return this.worker_.postMessage({
             data,
             set: identifier.name,
