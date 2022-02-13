@@ -8,3 +8,5 @@ export * from "./scale"
 export * from "./scene"
 export * from "./unit"
 export * from "./viewport"
+
+export * as Decorators from "./decorators"
