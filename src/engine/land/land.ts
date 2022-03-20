@@ -21,9 +21,8 @@ import { Image, IScene, ISceneItem } from "@/engine/scene"
 
 import { ISize2D, IVector2D, Rect } from "@/maths"
 
-import { constant, isNil, times } from "lodash"
+import { constant, isNil } from "lodash"
 import { createObservable, IEmitter, IObservable } from "@/utils"
-import { Token } from "../injector"
 
 export class LandConfigurationError extends Error {
     constructor(m: string) {
