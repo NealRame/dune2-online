@@ -5,8 +5,8 @@ import {
     ITerrainData,
     ITerrain,
     Neighborhood,
-    LandInitialData,
-    TileIndexGetter
+    TileIndexGetter,
+    ILandTerrainGenerator
 } from "./types"
 import {
     createPositionToIndexConverter,
@@ -23,6 +23,14 @@ import { ISize2D, IVector2D, Rect } from "@/maths"
 
 import { constant, isNil, times } from "lodash"
 import { createObservable, IEmitter, IObservable } from "@/utils"
+import { Token } from "../injector"
+
+export class LandConfigurationError extends Error {
+    constructor(m: string) {
+        super(m)
+        Object.setPrototypeOf(this, LandConfigurationError.prototype)
+    }
+}
 
 export class LandDataError extends Error {
     constructor(m: string) {
@@ -48,8 +56,8 @@ export class Land<TerrainData extends ITerrainData> extends Entity implements IL
     tiles: Array<Image> = []
 
     constructor(
+        generator: ILandTerrainGenerator<TerrainData>,
         scene: IScene,
-        landData: LandInitialData<TerrainData>,
     ) {
         super()
 
@@ -61,17 +69,8 @@ export class Land<TerrainData extends ITerrainData> extends Entity implements IL
 
         this.emitter_ = emitter
         this.events_ = events
-
-        this.terrains_ = times(this.size_.width*this.size_.height, index => {
-            const position = this.indexToPosition_(index)
-            const data = (typeof landData === "function")
-                ? landData(position)
-                : landData[index]
-
-            if (isNil(data)) {
-                throw new LandDataError("Not enougth data to cover land area!")
-            }
-            return new Terrain(position, data, this)
+        this.terrains_ = generator.generate(this.size_).map((data, index) => {
+            return new Terrain(this.indexToPosition_(index), data, this)
         })
         this.view_ = new LandView(this, scene)
     }

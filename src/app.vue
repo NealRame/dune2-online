@@ -1,5 +1,5 @@
 <script lang="ts">
-import { defineComponent, onMounted, ref } from "vue"
+import { defineComponent, onMounted, ref, unref } from "vue"
 
 import * as Dune from "@/dune"
 
@@ -15,12 +15,14 @@ import ProgressBar from "@/components/ProgressBar.vue"
 export default defineComponent({
     components: { Modal, ProgressBar },
     setup() {
+        const screenRef = ref<HTMLCanvasElement | null>(null)
         const loadingRef = ref<boolean>(true)
         const loadingLabelRef = ref<string>("")
         const loadingValueRef = ref<number | null>(null)
 
         onMounted(async () => {
-            const engine = await create(Dune.Game, {
+            const screen = unref(screenRef) as HTMLCanvasElement
+            const engine = await create(Dune.Game, screen, {
                 begin() {
                     loadingRef.value = true
                 },
@@ -42,6 +44,7 @@ export default defineComponent({
             loading: loadingRef,
             loadingLabel: loadingLabelRef,
             loadingValue: loadingValueRef,
+            screen: screenRef,
         }
     }
 })
@@ -54,5 +57,5 @@ export default defineComponent({
             :label="loadingLabel"
         />
     </modal>
-    <h1>DUNE</h1>
+    <canvas id="screen" ref="screen"/>
 </template>

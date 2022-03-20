@@ -1,5 +1,10 @@
 export const GameMetadataKeys = {
-    resources: Symbol("game:metadata:resources")
+    resources: Symbol("game:metadata:resources"),
+    land: Symbol("game:metadata:land"),
+}
+
+export const GameLandMetadataKeys = {
+    generator: Symbol("game:metadata:land:generator"),
 }
 
 export const GameResourcesMetadataKeys = {

@@ -29,6 +29,16 @@ export interface ILandEvent<Data extends ITerrainData> {
     terrainChanged: ITerrain<Data>
 }
 
+export type ILandConfig = Record<string, unknown>
+
+export interface ILandConfigProvider<Config extends ILandConfig> {
+    getConfig(): Config
+}
+
+export interface ILandTerrainGenerator<Data extends ITerrainData = ITerrainData> {
+    generate(size: ISize2D): Array<Data>
+}
+
 export interface ILand<Data extends ITerrainData = ITerrainData> extends IEntity {
     readonly size: ISize2D
     readonly events: IObservable<ILandEvent<Data>>

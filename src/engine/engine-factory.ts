@@ -3,18 +3,27 @@
 
 import {
     GameMetadataKeys,
+    GameLandMetadataKeys,
 } from "./constants"
 import {
     Container,
     Token,
 } from "./injector"
 import {
-    GameMetadata, IProgressNotifier
+    GameMetadata,
+    IProgressNotifier
 } from "./types"
+
+import {
+    Painter
+} from "@/graphics"
 
 import {
     fetchData
 } from "@/utils"
+
+import { isNil } from "lodash"
+import { Scene } from "./scene"
 
 export interface IEngine {
     get<T>(id: Token<T>): T
@@ -23,6 +32,17 @@ export interface IEngine {
 function getGameResourcesMetadata(game: any) {
     const rcMeta = Reflect.getMetadata(GameMetadataKeys.resources, game) ?? []
     return rcMeta as NonNullable<GameMetadata["resources"]>
+}
+
+function getGameLandMetadata(game: any) {
+    const landMeta = Reflect.getMetadata(GameMetadataKeys.land, game)
+    if (isNil(landMeta)) {
+        throw new Error("missing land configuration")
+    }
+    if (isNil(landMeta.generator)) {
+        throw new Error("missing land.generator configuration")
+    }
+    return landMeta as NonNullable<GameMetadata["land"]>
 }
 
 async function loadResources(
@@ -48,8 +68,17 @@ async function loadResources(
     }
 }
 
+function createLand(
+    game: any,
+    container: Container,
+) {
+    const metadata = getGameLandMetadata(game)
+    // container.set(GameLandMetadataKeys.generator, metadata.generator)
+}
+
 export async function create(
     game: any,
+    screen: HTMLCanvasElement,
     progress: IProgressNotifier,
 ): Promise<IEngine> {
     const container = new Container()
@@ -57,6 +86,9 @@ export async function create(
     progress.begin()
     await loadResources(game, container, progress)
     progress.end()
+
+    const painter = new Painter(screen)
+    const scene = new Scene({ width: 64, height: 64 }, painter)
 
     return {
         get<T>(id: Token<T>): T {
