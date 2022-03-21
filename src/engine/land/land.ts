@@ -6,7 +6,8 @@ import {
     ITerrain,
     Neighborhood,
     TileIndexGetter,
-    ILandTerrainGenerator
+    ILandTerrainGenerator,
+    ILandTerrainTilesProvider
 } from "./types"
 import {
     createPositionToIndexConverter,
@@ -49,13 +50,13 @@ export class Land<TerrainData extends ITerrainData> extends Entity implements IL
     private terrains_: Array<Terrain<TerrainData>> = []
     private view_: LandView<TerrainData>
 
-    chunkSize = { width: 16, height: 16 }
     fogImage: TileIndexGetter<TerrainData> = constant(-1)
     terrainImage: TileIndexGetter<TerrainData> = constant(-1)
     tiles: Array<Image> = []
 
     constructor(
-        generator: ILandTerrainGenerator<TerrainData>,
+        terrainGenerator: ILandTerrainGenerator<TerrainData>,
+        tilesProvider: ILandTerrainTilesProvider<TerrainData>,
         scene: IScene,
     ) {
         super()
@@ -68,10 +69,13 @@ export class Land<TerrainData extends ITerrainData> extends Entity implements IL
 
         this.emitter_ = emitter
         this.events_ = events
-        this.terrains_ = generator.generate(this.size_).map((data, index) => {
+        this.terrains_ = terrainGenerator.generate(this.size_).map((data, index) => {
             return new Terrain(this.indexToPosition_(index), data, this)
         })
-        this.view_ = new LandView(this, scene)
+
+        const chunkSize = { width: 16, height: 16 }
+
+        this.view_ = new LandView(this, tilesProvider, chunkSize, scene)
     }
 
     get events()

@@ -1,5 +1,5 @@
 import { IEntity } from "@/engine/entity"
-import { IScene } from "@/engine/scene"
+import { Image, IScene } from "@/engine/scene"
 
 import { Rect, IVector2D, ISize2D } from "@/maths"
 import { IObservable } from "@/utils"
@@ -37,6 +37,11 @@ export interface ILandConfigProvider<Config extends ILandConfig> {
 
 export interface ILandTerrainGenerator<Data extends ITerrainData = ITerrainData> {
     generate(size: ISize2D): Array<Data>
+}
+
+export interface ILandTerrainTilesProvider<Data extends ITerrainData = ITerrainData> {
+    getFogTile(terrain: ITerrain<Data>, neighbors: Neighborhood<Data>): Image | null
+    getTerrainTile(terrain: ITerrain<Data>, neighbors: Neighborhood<Data>): Image | null
 }
 
 export interface ILand<Data extends ITerrainData = ITerrainData> extends IEntity {

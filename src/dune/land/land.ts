@@ -1,7 +1,9 @@
 import { ITerrain, ITerrainData, TerrainType } from "./types"
 
-import { imageSet } from "@/dune2/data"
+import { TerrainImages } from "@/dune/resources"
+
 import * as Engine from "@/engine"
+import { Inject } from "@/engine/injector"
 
 import { reduceRight } from "lodash"
 
@@ -86,8 +88,23 @@ export function fogTileIndex(
     return revealMaskImageOffset > 0 ? 123 - revealMaskImageOffset : -1
 }
 
-export class Land extends Engine.Land<ITerrainData> {
-    tiles = imageSet("terrain")
-    terrainImage = terrainTileIndex
-    fogImage = fogTileIndex
+export class TileProvider implements Engine.ILandTerrainTilesProvider<ITerrainData> {
+    constructor(
+        @Inject(TerrainImages) private tiles_: Array<Engine.Image>,
+    ) { }
+
+    getFogTile(
+        terrain: ITerrain,
+        neighbors: Engine.Neighborhood<ITerrainData>,
+    ): Engine.Image | null {
+        const index = fogTileIndex(terrain, neighbors)
+        return index < 0 ? null : this.tiles_[index]
+    }
+
+    getTerrainTile(
+        terrain: ITerrain,
+        neighbors: Engine.Neighborhood<ITerrainData>,
+    ): Engine.Image {
+        return this.tiles_[terrainTileIndex(terrain, neighbors)]
+    }
 }

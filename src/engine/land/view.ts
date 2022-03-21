@@ -1,8 +1,10 @@
 import { Chunk } from "./chunk"
-import { Land } from "./land"
+// import { Land } from "./land"
 import {
     ITerrainData,
     ITerrain,
+    ILand,
+    ILandTerrainTilesProvider,
 } from "./types"
 import {
     createPositionToIndexConverter,
@@ -11,14 +13,13 @@ import {
 
 import { Image, IScene, SceneItem } from "@/engine/scene"
 import { Painter } from "@/graphics"
-import { Rect } from "@/maths"
+import { ISize2D, Rect } from "@/maths"
 
 import { chain, isNil, remove } from "lodash"
 
 export class LandView<
     TerrainData extends ITerrainData
 > extends SceneItem {
-    private land_: Land<TerrainData>
     private chunks_: Array<Chunk> = []
 
     private positionToChunkIndex_: PositionToIndexConverter
@@ -33,14 +34,14 @@ export class LandView<
                 const neighbors = this.land_.neighborhood(position)
                 const tiles: Array<Image> = []
 
-                const terrainTileIndex = this.land_.terrainImage(terrain, neighbors)
-                if (terrainTileIndex >= 0) {
-                    tiles.push(this.land_.tiles[terrainTileIndex])
+                const terrainTile = this.tilesProvider_.getTerrainTile(terrain, neighbors)
+                if (!isNil(terrainTile)) {
+                    tiles.push(terrainTile)
                 }
 
-                const fogTileIndex = this.land_.fogImage(terrain, neighbors)
-                if (fogTileIndex >= 0) {
-                    tiles.push(this.land_.tiles[fogTileIndex])
+                const fogTile = this.tilesProvider_.getFogTile(terrain, neighbors)
+                if (!isNil(fogTile)) {
+                    tiles.push(fogTile)
                 }
 
                 if (tiles.length > 0) {
@@ -56,22 +57,23 @@ export class LandView<
     }
 
     constructor(
-        land: Land<TerrainData>,
+        private land_: ILand<TerrainData>,
+        private tilesProvider_: ILandTerrainTilesProvider<TerrainData>,
+        private chunkSize_: ISize2D,
         scene: IScene,
     ) {
         super(scene)
 
-        this.land_ = land
         this.land_.events.on("terrainChanged", terrain => {
             this.onTerrainChanged_(terrain)
         })
 
         this.positionToChunkIndex_ = createPositionToIndexConverter(
             this.size,
-            land.chunkSize,
+            this.chunkSize_,
         )
 
-        for (const chunkRect of this.rect.partition(land.chunkSize)) {
+        for (const chunkRect of this.rect.partition(this.chunkSize_)) {
             this.chunks_.push(new Chunk(this.scene, chunkRect))
         }
     }
