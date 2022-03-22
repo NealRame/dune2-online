@@ -25,7 +25,7 @@ export interface ITerrain<Data extends ITerrainData> {
 export type TileIndexGetter<Data extends ITerrainData>
     = (t: ITerrain<Data>, n: Neighborhood<Data>) => number
 
-export interface ILandEvent<Data extends ITerrainData> {
+export interface ILandEvent<Data extends ITerrainData = ITerrainData> {
     terrainChanged: ITerrain<Data>
 }
 

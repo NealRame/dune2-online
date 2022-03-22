@@ -53,7 +53,7 @@ function terrainRevealMask(
     )
 }
 
-export function terrainTileIndex(
+function terrainTileIndex(
     terrain: ITerrain,
     neighbors: Engine.Neighborhood<ITerrainData>,
 ): number {
@@ -80,7 +80,7 @@ export function terrainTileIndex(
     }
 }
 
-export function fogTileIndex(
+function fogTileIndex(
     terrain: ITerrain,
     neighbors: Engine.Neighborhood<ITerrainData>
 ): number {

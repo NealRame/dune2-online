@@ -35,7 +35,9 @@ import * as Land from "./land"
         uri: "/assets/images.units.json.gz",
     }],
     land: {
+        id: Land.id,
         generator: Land.Generator,
+        tilesProvider: Land.TileProvider,
     }
 })
 export class Game {}

@@ -1,7 +1,7 @@
 import { Image, Palette } from "@/engine/scene"
 
 import { Token } from "@/engine/injector"
-import { ILandTerrainGenerator } from "./land"
+import { ILand, ILandTerrainGenerator, ILandTerrainTilesProvider, ITerrainData } from "./land"
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export interface TConstructor<T = any> {
@@ -39,14 +39,18 @@ export type GameResourceDescriptor<T extends GameResource> = {
     decoder: TConstructor<IGameResourceDecoder<T>>,
 }
 
-export type GameLandDescriptor = {
-    generator: TConstructor<ILandTerrainGenerator>,
+export type GameLandDescriptor<T extends ITerrainData> = {
+    id: Token<ILand<T>>,
+    generator: TConstructor<ILandTerrainGenerator<T>>,
+    tilesProvider: TConstructor<ILandTerrainTilesProvider<T>>,
 }
 
 /******************************************************************************
  * Game metadata types
  *****************************************************************************/
-export interface GameMetadata {
+export interface GameMetadata<
+    TerrainData extends ITerrainData = ITerrainData,
+> {
     resources?: Array<GameResourceDescriptor<GameResource>>,
-    land: GameLandDescriptor,
+    land: GameLandDescriptor<TerrainData>,
 }

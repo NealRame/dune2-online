@@ -5,7 +5,6 @@ import {
     ITerrainData,
     ITerrain,
     Neighborhood,
-    TileIndexGetter,
     ILandTerrainGenerator,
     ILandTerrainTilesProvider
 } from "./types"
@@ -18,11 +17,11 @@ import {
 import { LandView } from "./view"
 
 import { Entity } from "@/engine/entity"
-import { Image, IScene, ISceneItem } from "@/engine/scene"
+import { IScene, ISceneItem } from "@/engine/scene"
 
 import { ISize2D, IVector2D, Rect } from "@/maths"
 
-import { constant, isNil } from "lodash"
+import { isNil } from "lodash"
 import { createObservable, IEmitter, IObservable } from "@/utils"
 
 export class LandConfigurationError extends Error {
@@ -49,10 +48,6 @@ export class Land<TerrainData extends ITerrainData> extends Entity implements IL
 
     private terrains_: Array<Terrain<TerrainData>> = []
     private view_: LandView<TerrainData>
-
-    fogImage: TileIndexGetter<TerrainData> = constant(-1)
-    terrainImage: TileIndexGetter<TerrainData> = constant(-1)
-    tiles: Array<Image> = []
 
     constructor(
         terrainGenerator: ILandTerrainGenerator<TerrainData>,
