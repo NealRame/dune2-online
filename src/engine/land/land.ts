@@ -25,13 +25,14 @@ import {
 import { LandView } from "./view"
 
 import { Entity } from "@/engine/entity"
+import { Inject } from "@/engine/injector"
 import { IScene, ISceneItem } from "@/engine/scene"
 
 import { ISize2D, IVector2D, Rect } from "@/maths"
 
-import { isNil } from "lodash"
 import { createObservable, IEmitter, IObservable } from "@/utils"
-import { Inject } from "../injector"
+
+import { isNil } from "lodash"
 
 export class LandConfigurationError extends Error {
     constructor(m: string) {
