@@ -19,8 +19,8 @@ import {
 import {
     createPositionToIndexConverter,
     createIndexToPositionConverter,
-    PositionToIndexConverter,
     IndexToPositionConverter,
+    PositionToIndexConverter,
 } from "./utils"
 import { LandView } from "./view"
 
