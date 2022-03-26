@@ -3,12 +3,21 @@
 
 import {
     GameMetadataKeys,
-    GameLandMetadataKeys,
+    GameLandTerrainGenerator,
+    GameLandTilesProvider,
+    GameScene,
 } from "./constants"
+import {
+    Land,
+    LandConfigurationError
+} from "./land"
 import {
     Container,
     Token,
 } from "./injector"
+import {
+    Scene
+} from "./scene"
 import {
     GameMetadata,
     IProgressNotifier
@@ -23,7 +32,6 @@ import {
 } from "@/utils"
 
 import { isNil } from "lodash"
-import { Scene } from "./scene"
 
 export interface IEngine {
     get<T>(id: Token<T>): T
@@ -37,21 +45,27 @@ function getGameResourcesMetadata(game: any) {
 function getGameLandMetadata(game: any) {
     const landMeta = Reflect.getMetadata(GameMetadataKeys.land, game)
     if (isNil(landMeta)) {
-        throw new Error("missing land configuration")
+        throw new LandConfigurationError("Missing land configuration")
+    }
+    if (isNil(landMeta.id)) {
+        throw new LandConfigurationError("Land configuration miss id property")
     }
     if (isNil(landMeta.generator)) {
-        throw new Error("missing land.generator configuration")
+        throw new LandConfigurationError("Land configuration miss generator property")
+    }
+    if (isNil(landMeta.tilesProvider)) {
+        throw new LandConfigurationError("Land configuration miss tilesProvider property")
     }
     return landMeta as NonNullable<GameMetadata["land"]>
 }
 
-async function loadResources(
+async function initializeResources(
     game: any,
     container: Container,
     progress: IProgressNotifier,
 ): Promise<void> {
-    const metadata = getGameResourcesMetadata(game)
-    for (const rcDescriptor of metadata) {
+    progress.begin()
+    for (const rcDescriptor of getGameResourcesMetadata(game)) {
         const rcDecoder = container.get(rcDescriptor.decoder)
 
         progress.setLabel(`Downloading ${rcDescriptor.name}`)
@@ -66,14 +80,18 @@ async function loadResources(
 
         container.set(rcDescriptor.id, rc)
     }
+    progress.end()
 }
 
-function createLand(
+async function initializeLand(
     game: any,
     container: Container,
 ) {
-    const metadata = getGameLandMetadata(game)
-    // container.set(GameLandMetadataKeys.generator, metadata.generator)
+    const { id, generator, tilesProvider } = getGameLandMetadata(game)
+
+    container.set(GameLandTerrainGenerator, generator)
+    container.set(GameLandTilesProvider, tilesProvider)
+    container.set(id, Land)
 }
 
 export async function create(
@@ -83,12 +101,13 @@ export async function create(
 ): Promise<IEngine> {
     const container = new Container()
 
-    progress.begin()
-    await loadResources(game, container, progress)
-    progress.end()
-
     const painter = new Painter(screen)
     const scene = new Scene({ width: 64, height: 64 }, painter)
+
+    container.set(GameScene, scene)
+
+    await initializeResources(game, container, progress)
+    await initializeLand(game, container)
 
     return {
         get<T>(id: Token<T>): T {

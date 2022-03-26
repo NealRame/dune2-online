@@ -1,14 +1,5 @@
 import * as Engine from "@/engine"
 
-// import {
-//     Palette,
-//     PaletteDecoder,
-//     MiscImages,
-//     TerrainImages,
-//     UnitsImages,
-//     ImagesDecoder,
-// } from "./resources"
-
 import * as Resources from "./resources"
 import * as Land from "./land"
 
@@ -43,10 +34,4 @@ import * as Land from "./land"
 export class Game {}
 
 export * as Resources from "./resources"
-
-// export const Resources = {
-//     Palette,
-//     MiscImages,
-//     TerrainImages,
-//     UnitsImages,
-// }
+export * as Land from "./land"

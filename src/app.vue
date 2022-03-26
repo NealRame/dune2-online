@@ -38,6 +38,7 @@ export default defineComponent({
             })
 
             console.log(engine.get(Dune.Resources.TerrainImages))
+            console.log(engine.get(Dune.Land.id))
         })
 
         return {

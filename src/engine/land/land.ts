@@ -1,4 +1,12 @@
-import { Terrain } from "./terrain"
+import {
+    GameLandTerrainGenerator,
+    GameLandTilesProvider,
+    GameScene,
+} from "@/engine/constants"
+
+import {
+    Terrain
+} from "./terrain"
 import {
     ILand,
     ILandEvent,
@@ -23,6 +31,7 @@ import { ISize2D, IVector2D, Rect } from "@/maths"
 
 import { isNil } from "lodash"
 import { createObservable, IEmitter, IObservable } from "@/utils"
+import { Inject } from "../injector"
 
 export class LandConfigurationError extends Error {
     constructor(m: string) {
@@ -50,9 +59,9 @@ export class Land<TerrainData extends ITerrainData> extends Entity implements IL
     private view_: LandView<TerrainData>
 
     constructor(
-        terrainGenerator: ILandTerrainGenerator<TerrainData>,
-        tilesProvider: ILandTerrainTilesProvider<TerrainData>,
-        scene: IScene,
+        @Inject(GameLandTerrainGenerator) terrainGenerator: ILandTerrainGenerator<TerrainData>,
+        @Inject(GameLandTilesProvider) tilesProvider: ILandTerrainTilesProvider<TerrainData>,
+        @Inject(GameScene) scene: IScene,
     ) {
         super()
 
