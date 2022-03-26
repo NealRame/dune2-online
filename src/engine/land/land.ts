@@ -10,11 +10,11 @@ import {
 import {
     ILand,
     ILandEvent,
+    ILandTerrainGenerator,
+    ILandTerrainTilesProvider,
     ITerrainData,
     ITerrain,
     Neighborhood,
-    ILandTerrainGenerator,
-    ILandTerrainTilesProvider
 } from "./types"
 import {
     createPositionToIndexConverter,
