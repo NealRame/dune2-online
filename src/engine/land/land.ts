@@ -1,20 +1,14 @@
 import {
-    GameLandTerrainGenerator,
-    GameLandTilesProvider,
-    GameScene,
-} from "@/engine/constants"
-
-import {
     Terrain
 } from "./terrain"
 import {
-    ILand,
-    ILandEvent,
-    ILandTerrainGenerator,
-    ILandTerrainTilesProvider,
-    ITerrainData,
-    ITerrain,
-    Neighborhood,
+    type ILand,
+    type ILandEvent,
+    type ILandTerrainGenerator,
+    type ILandTerrainTilesProvider,
+    type ITerrainData,
+    type ITerrain,
+    type Neighborhood,
 } from "./types"
 import {
     createPositionToIndexConverter,
@@ -26,9 +20,21 @@ import { LandView } from "./view"
 
 import { Entity } from "@/engine/entity"
 import { Inject } from "@/engine/injector"
-import { IScene, ISceneItem } from "@/engine/scene"
+import {
+    GameLandTerrainGenerator,
+    GameLandTilesProvider,
+    GameScene,
+} from "@/engine/constants"
+import {
+    type IScene,
+    type ISceneItem
+} from "@/engine/scene"
 
-import { ISize2D, IVector2D, Rect } from "@/maths"
+import {
+    Rect,
+    type ISize2D,
+    type IVector2D,
+} from "@/maths"
 
 import { createObservable, IEmitter, IObservable } from "@/utils"
 
