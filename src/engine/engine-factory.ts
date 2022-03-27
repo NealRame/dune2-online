@@ -35,6 +35,8 @@ import { isNil } from "lodash"
 
 export interface IEngine {
     get<T>(id: Token<T>): T
+    start(): IEngine
+    stop(): IEngine
 }
 
 function getGameResourcesMetadata(game: any) {
@@ -100,6 +102,10 @@ export async function create(
     progress: IProgressNotifier,
 ): Promise<IEngine> {
     const container = new Container()
+    const state = {
+        animationRequestId: 0,
+        running: false,
+    }
 
     const painter = new Painter(screen)
     const scene = new Scene({ width: 64, height: 64 }, painter)
@@ -109,9 +115,34 @@ export async function create(
     await initializeResources(game, container, progress)
     await initializeLand(game, container)
 
+    scene.addItem(container.get(Land).view)
+
     return {
         get<T>(id: Token<T>): T {
             return container.get(id)
+        },
+        start(): IEngine {
+            if (!state.running) {
+                state.running = true
+
+                const land = container.get(Land)
+                scene.addItem(land.view)
+
+                const animationLoop = () => {
+                    scene.render()
+                    land.update()
+                    state.animationRequestId = requestAnimationFrame(animationLoop)
+                }
+
+                animationLoop()
+            }
+            return this as IEngine
+        },
+        stop(): IEngine {
+            cancelAnimationFrame(state.animationRequestId)
+            state.animationRequestId = 0
+            state.running = false
+            return this as IEngine
         }
     }
 }
