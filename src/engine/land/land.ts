@@ -19,7 +19,11 @@ import {
 import { LandView } from "./view"
 
 import { Entity } from "@/engine/entity"
-import { Inject } from "@/engine/injector"
+import {
+    Inject,
+    Service,
+    ServiceLifecycle,
+} from "@/engine/injector"
 import {
     GameLandTerrainGenerator,
     GameLandTilesProvider,
@@ -54,6 +58,9 @@ export class LandDataError extends Error {
     }
 }
 
+@Service({
+    lifecycle: ServiceLifecycle.Singleton,
+})
 export class Land<TerrainData extends ITerrainData> extends Entity implements ILand<TerrainData> {
     private size_: ISize2D
     private indexToPosition_: IndexToPositionConverter
