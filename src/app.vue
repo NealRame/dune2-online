@@ -1,6 +1,8 @@
 <script lang="ts">
 import { defineComponent, onMounted, ref, unref } from "vue"
 
+import { debounce } from "lodash"
+
 import * as Dune from "@/dune"
 
 import {
@@ -15,12 +17,28 @@ import ProgressBar from "@/components/ProgressBar.vue"
 export default defineComponent({
     components: { Modal, ProgressBar },
     setup() {
-        const screenRef = ref<HTMLCanvasElement | null>(null)
         const loadingRef = ref<boolean>(true)
         const loadingLabelRef = ref<string>("")
         const loadingValueRef = ref<number | null>(null)
 
+        const screenWidthRef = ref(0)
+        const screenHeightRef = ref(0)
+        const screenRef = ref<HTMLCanvasElement | null>(null)
+
+        // handle window resize event
+        const resize = () => {
+            const width = window.innerWidth
+            const height = window.innerHeight
+
+            screenWidthRef.value = width
+            screenHeightRef.value = height
+        }
+
         onMounted(async () => {
+            window.addEventListener("resize", debounce(resize, 60))
+
+            resize()
+
             const screen = unref(screenRef) as HTMLCanvasElement
             const engine = await create(Dune.Game, screen, {
                 begin() {
@@ -37,8 +55,12 @@ export default defineComponent({
                 },
             })
 
-            console.log(engine.get(Dune.Resources.TerrainImages))
-            console.log(engine.get(Dune.Land.id))
+            const land = engine.get(Dune.Land.id)
+
+            land.reveal({ x: 0, y: 0 }, land.size)
+            console.log(land)
+
+            engine.start()
         })
 
         return {
@@ -46,6 +68,8 @@ export default defineComponent({
             loadingLabel: loadingLabelRef,
             loadingValue: loadingValueRef,
             screen: screenRef,
+            screenWidth: screenWidthRef,
+            screenHeight: screenHeightRef,
         }
     }
 })
@@ -58,5 +82,10 @@ export default defineComponent({
             :label="loadingLabel"
         />
     </modal>
-    <canvas id="screen" ref="screen"/>
+    <canvas
+        id="screen"
+        ref="screen"
+        :width="screenWidth"
+        :height="screenHeight"
+    />
 </template>
