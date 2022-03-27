@@ -125,6 +125,7 @@ export class Scene implements IScene {
     }
 
     render(): IScene {
+        this.updateViewport_()
         if (!isNil(this.painter_)) {
             this.painter_.clear(this.backgroundColor_)
             if (this.visible) {
