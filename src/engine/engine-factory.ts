@@ -5,11 +5,12 @@ import {
     GameMetadataKeys,
     GameLandTerrainGenerator,
     GameLandTilesProvider,
+    GameMode,
     GameScene,
 } from "./constants"
 import {
     Land,
-    LandConfigurationError
+    LandConfigurationError,
 } from "./land"
 import {
     Container,
@@ -20,6 +21,7 @@ import {
     screenToSceneScale,
 } from "./scene"
 import {
+    GameEngineMode,
     GameMetadata,
     IProgressNotifier
 } from "./types"
@@ -128,6 +130,7 @@ async function initializeLand(
 
 export async function create(
     game: any,
+    mode: GameEngineMode,
     screen: HTMLCanvasElement,
     progress: IProgressNotifier,
 ): Promise<IEngine> {
@@ -136,6 +139,8 @@ export async function create(
         animationRequestId: 0,
         running: false,
     }
+
+    container.set(GameMode, mode)
 
     await initializeScene(container, screen)
     await initializeResources(game, container, progress)

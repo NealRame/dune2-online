@@ -1,10 +1,10 @@
 import { Chunk } from "./chunk"
-// import { Land } from "./land"
 import {
     ITerrainData,
     ITerrain,
     ILand,
     ILandTerrainTilesProvider,
+    ILandView,
 } from "./types"
 import {
     createPositionToIndexConverter,
@@ -17,9 +17,10 @@ import { ISize2D, Rect } from "@/maths"
 
 import { chain, isNil, remove } from "lodash"
 
-export class LandView<
+export class LandChunkView<
     TerrainData extends ITerrainData
-> extends SceneItem {
+> extends SceneItem implements ILandView {
+    private chunkSize_: ISize2D = { width: 16, height: 16 }
     private chunks_: Array<Chunk> = []
 
     private positionToChunkIndex_: PositionToIndexConverter
@@ -59,7 +60,6 @@ export class LandView<
     constructor(
         private land_: ILand<TerrainData>,
         private tilesProvider_: ILandTerrainTilesProvider<TerrainData>,
-        private chunkSize_: ISize2D,
         scene: IScene,
     ) {
         super(scene)
@@ -87,7 +87,7 @@ export class LandView<
     }
 
     render(painter: Painter, viewport: Rect)
-        : SceneItem {
+        : ILandView {
         for (const item of this.chunks_) {
             if (viewport.overlap(item.rect)) {
                 item.render(painter, viewport)
@@ -97,7 +97,7 @@ export class LandView<
     }
 
     update()
-        : SceneItem {
+        : ILandView {
         for (const chunk of this.chunks_) {
             chunk.update()
         }

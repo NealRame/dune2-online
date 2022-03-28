@@ -6,6 +6,7 @@ import {
     type ILandEvent,
     type ILandTerrainGenerator,
     type ILandTerrainTilesProvider,
+    type ILandView,
     type ITerrainData,
     type ITerrain,
     type Neighborhood,
@@ -16,7 +17,9 @@ import {
     IndexToPositionConverter,
     PositionToIndexConverter,
 } from "./utils"
-import { LandView } from "./view"
+
+import { LandChunkView } from "./chunk-view"
+import { LandEditorView } from "./editor-view"
 
 import { Entity } from "@/engine/entity"
 import {
@@ -27,12 +30,16 @@ import {
 import {
     GameLandTerrainGenerator,
     GameLandTilesProvider,
+    GameMode,
     GameScene,
 } from "@/engine/constants"
 import {
     type IScene,
     type ISceneItem
 } from "@/engine/scene"
+import {
+    GameEngineMode,
+} from "@/engine/types"
 
 import {
     Rect,
@@ -70,11 +77,12 @@ export class Land<TerrainData extends ITerrainData> extends Entity implements IL
     private emitter_: IEmitter<ILandEvent<TerrainData>>
 
     private terrains_: Array<Terrain<TerrainData>> = []
-    private view_: LandView<TerrainData>
+    private view_: ILandView
 
     constructor(
         @Inject(GameLandTerrainGenerator) terrainGenerator: ILandTerrainGenerator<TerrainData>,
         @Inject(GameLandTilesProvider) tilesProvider: ILandTerrainTilesProvider<TerrainData>,
+        @Inject(GameMode) gameMode: GameEngineMode,
         @Inject(GameScene) scene: IScene,
     ) {
         super()
@@ -91,9 +99,9 @@ export class Land<TerrainData extends ITerrainData> extends Entity implements IL
             return new Terrain(this.indexToPosition_(index), data, this)
         })
 
-        const chunkSize = { width: 16, height: 16 }
-
-        this.view_ = new LandView(this, tilesProvider, chunkSize, scene)
+        this.view_ = gameMode === GameEngineMode.Editor
+            ? new LandEditorView(this, tilesProvider, scene)
+            : new LandChunkView(this, tilesProvider, scene)
     }
 
     get events()

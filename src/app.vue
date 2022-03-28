@@ -13,6 +13,7 @@ import "@/styles/global.scss"
 
 import Modal from "@/components/Modal.vue"
 import ProgressBar from "@/components/ProgressBar.vue"
+import { GameEngineMode } from "./engine/types"
 
 export default defineComponent({
     components: { Modal, ProgressBar },
@@ -39,7 +40,7 @@ export default defineComponent({
             window.addEventListener("contextmenu", ev => ev.preventDefault(), false)
 
             const screen = unref(screenRef) as HTMLCanvasElement
-            const engine = await create(Dune.Game, screen, {
+            const engine = await create(Dune.Game, GameEngineMode.Editor, screen, {
                 begin() {
                     loadingRef.value = true
                 },
@@ -53,9 +54,6 @@ export default defineComponent({
                     loadingValueRef.value = value
                 },
             })
-
-            const land = engine.get(Dune.Land.id)
-            land.reveal({ x: 0, y: 0 }, land.size)
 
             engine.start()
             resize()

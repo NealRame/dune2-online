@@ -25,6 +25,11 @@ export type GameResourceIdentifier = string | symbol
 
 export type GameResource = Palette | Array<Image>
 
+export enum GameEngineMode {
+    Editor,
+    Game,
+}
+
 export interface IGameResourceDecoder<T extends GameResource> {
     decode(data: Uint8Array, identifier: Token<T>): Promise<T>
 }
