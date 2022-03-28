@@ -16,7 +16,8 @@ import {
     Token,
 } from "./injector"
 import {
-    Scene
+    Scene,
+    screenToSceneScale,
 } from "./scene"
 import {
     GameMetadata,
@@ -59,6 +60,35 @@ function getGameLandMetadata(game: any) {
         throw new LandConfigurationError("Land configuration miss tilesProvider property")
     }
     return landMeta as NonNullable<GameMetadata["land"]>
+}
+
+async function initializeScene(
+    container: Container,
+    screen: HTMLCanvasElement,
+) {
+    const painter = new Painter(screen)
+    const scene = new Scene({ width: 64, height: 64 }, painter)
+
+    screen.addEventListener("mousemove", (ev: MouseEvent) => {
+        const { buttons, ctrlKey, movementX, movementY } = ev
+        const { x: offsetX, y: offsetY } = screenToSceneScale(scene, {
+            x: -movementX,
+            y: -movementY,
+        })
+
+        // drag scene
+        if (ctrlKey && buttons === 1) {
+            if (offsetX !== 0 || offsetY !== 0) {
+                const { x, y } = scene.viewport.position
+                scene.viewport.position = {
+                    x: x + offsetX,
+                    y: y + offsetY,
+                }
+            }
+        }
+    })
+
+    container.set(GameScene, scene)
 }
 
 async function initializeResources(
@@ -107,15 +137,9 @@ export async function create(
         running: false,
     }
 
-    const painter = new Painter(screen)
-    const scene = new Scene({ width: 64, height: 64 }, painter)
-
-    container.set(GameScene, scene)
-
+    await initializeScene(container, screen)
     await initializeResources(game, container, progress)
     await initializeLand(game, container)
-
-    scene.addItem(container.get(Land).view)
 
     return {
         get<T>(id: Token<T>): T {
@@ -125,7 +149,9 @@ export async function create(
             if (!state.running) {
                 state.running = true
 
+                const scene = container.get(GameScene)
                 const land = container.get(Land)
+
                 scene.addItem(land.view)
 
                 const animationLoop = () => {
