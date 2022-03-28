@@ -36,6 +36,7 @@ export default defineComponent({
 
         onMounted(async () => {
             window.addEventListener("resize", debounce(resize, 60))
+            window.addEventListener("contextmenu", ev => ev.preventDefault(), false)
 
             const screen = unref(screenRef) as HTMLCanvasElement
             const engine = await create(Dune.Game, screen, {
