@@ -28,7 +28,7 @@ import * as Land from "./land"
     land: {
         id: Land.id,
         generator: Land.Generator,
-        tilesProvider: Land.TileProvider,
+        tilesProvider: Land.TilesProvider,
     }
 })
 export class Game {}

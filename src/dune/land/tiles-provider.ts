@@ -88,7 +88,7 @@ function fogTileIndex(
     return revealMaskImageOffset > 0 ? 123 - revealMaskImageOffset : -1
 }
 
-export class TileProvider implements Engine.ILandTerrainTilesProvider<ITerrainData> {
+export class TilesProvider implements Engine.ILandTerrainTilesProvider<ITerrainData> {
     constructor(
         @Inject(TerrainImages) private tiles_: Array<Engine.Image>,
     ) { }
