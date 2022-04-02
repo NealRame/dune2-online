@@ -80,8 +80,8 @@ export class Land<TerrainData extends ITerrainData> extends Entity implements IL
     private view_: ILandView
 
     constructor(
-        @Inject(GameLandTerrainGenerator) terrainGenerator: ILandTerrainGenerator<TerrainData>,
-        @Inject(GameLandTilesProvider) tilesProvider: ILandTerrainTilesProvider<TerrainData>,
+        @Inject(GameLandTerrainGenerator) private terrainGenerator_: ILandTerrainGenerator<TerrainData>,
+        @Inject(GameLandTilesProvider) private tilesProvider_: ILandTerrainTilesProvider<TerrainData>,
         @Inject(GameMode) gameMode: GameEngineMode,
         @Inject(GameScene) scene: IScene,
     ) {
@@ -95,13 +95,10 @@ export class Land<TerrainData extends ITerrainData> extends Entity implements IL
 
         this.emitter_ = emitter
         this.events_ = events
-        this.terrains_ = terrainGenerator.generate(this.size_).map((data, index) => {
-            return new Terrain(this.indexToPosition_(index), data, this)
-        })
 
         this.view_ = gameMode === GameEngineMode.Editor
-            ? new LandEditorView(this, tilesProvider, scene)
-            : new LandChunkView(this, tilesProvider, scene)
+            ? new LandEditorView(this, this.tilesProvider_, scene)
+            : new LandChunkView(this, this.tilesProvider_, scene)
     }
 
     get events()
@@ -130,6 +127,13 @@ export class Land<TerrainData extends ITerrainData> extends Entity implements IL
             this.terrain({ x, y: y + 1 }),
             this.terrain({ x: x - 1, y }),
         ]
+    }
+
+    reset(): this {
+        this.terrains_ = this.terrainGenerator_.generate(this.size_).map((data, index) => {
+            return new Terrain(this.indexToPosition_(index), data, this)
+        })
+        return this
     }
 
     reveal(position: IVector2D, size?: ISize2D): this {

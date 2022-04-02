@@ -157,6 +157,7 @@ export async function create(
                 const scene = container.get(GameScene)
                 const land = container.get(Land)
 
+                land.reset()
                 scene.addItem(land.view)
 
                 const animationLoop = () => {
