@@ -9,24 +9,32 @@ import {
     GameMinimap,
     GameMode,
     GameScene,
-} from "./constants"
+} from "@/engine/constants"
+
 import {
     Land,
     LandConfigurationError,
-} from "./land"
+} from "@/engine/land"
+
 import {
     Container,
     Token,
-} from "./injector"
+} from "@/engine/injector"
+
+import {
+    MiniMap
+} from "@/engine/mini-map"
+
 import {
     Scene,
     screenToSceneScale,
-} from "./scene"
+} from "@/engine/scene"
+
 import {
     GameEngineMode,
     GameMetadata,
     IProgressNotifier
-} from "./types"
+} from "@/engine/types"
 
 import {
     Painter
@@ -37,7 +45,6 @@ import {
 } from "@/utils"
 
 import { isNil } from "lodash"
-import { MiniMap } from "./mini-map"
 
 export interface IEngine {
     get<T>(id: Token<T>): T
@@ -97,8 +104,8 @@ async function initializeScene(
 }
 
 async function initializeResources(
-    game: any,
     container: Container,
+    game: any,
     progress: IProgressNotifier,
 ): Promise<void> {
     progress.begin()
@@ -121,8 +128,8 @@ async function initializeResources(
 }
 
 async function initializeLand(
-    game: any,
     container: Container,
+    game: any,
 ) {
     const { id, generator, colorsProvider, tilesProvider } = getGameLandMetadata(game)
 
@@ -148,8 +155,8 @@ export async function create(
     container.set(GameMode, mode)
 
     await initializeScene(container, screen)
-    await initializeResources(game, container, progress)
-    await initializeLand(game, container)
+    await initializeResources(container, game, progress)
+    await initializeLand(container, game)
 
     return {
         get<T>(id: Token<T>): T {
