@@ -3,9 +3,9 @@ import {
 } from "@/engine/constants"
 
 import {
-    ILandTerrainColorProvider,
-    ITerrain,
-    ITerrainData,
+    type ILandTerrainColorProvider,
+    type ITerrain,
+    type ITerrainData,
     Land
 } from "@/engine/land"
 
