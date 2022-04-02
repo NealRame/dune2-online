@@ -12,14 +12,14 @@ import {
 } from "@/engine/constants"
 
 import {
-    Land,
-    LandConfigurationError,
-} from "@/engine/land"
-
-import {
     Container,
     Token,
 } from "@/engine/injector"
+
+import {
+    Land,
+    LandConfigurationError,
+} from "@/engine/land"
 
 import { MiniMap } from "@/engine/mini-map"
 
