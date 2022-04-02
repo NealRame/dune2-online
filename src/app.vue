@@ -39,8 +39,10 @@ export default defineComponent({
             window.addEventListener("resize", debounce(resize, 60))
             window.addEventListener("contextmenu", ev => ev.preventDefault(), false)
 
+            resize()
+
             const screen = unref(screenRef) as HTMLCanvasElement
-            const engine = await create(Dune.Game, GameEngineMode.Editor, screen, {
+            const engine = await create(Dune.Game, GameEngineMode.Game, screen, {
                 begin() {
                     loadingRef.value = true
                 },
@@ -56,7 +58,9 @@ export default defineComponent({
             })
 
             engine.start()
-            resize()
+
+            const land = engine.get(Dune.Land.id)
+            land.reveal(land.position, land.size)
         })
 
         return {

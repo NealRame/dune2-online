@@ -5,7 +5,6 @@ import {
     ITerrain,
     ILand,
     ILandTerrainTilesProvider,
-    ILandView,
 } from "@/engine/land/types"
 
 import {
@@ -21,7 +20,7 @@ import { chain, isNil, remove } from "lodash"
 
 export class LandChunkView<
     TerrainData extends ITerrainData
-> extends SceneItem implements ILandView {
+> extends SceneItem {
     private chunkSize_: ISize2D = { width: 16, height: 16 }
     private chunks_: Array<Chunk> = []
 
@@ -89,19 +88,12 @@ export class LandChunkView<
     }
 
     render(painter: Painter, viewport: Rect)
-        : ILandView {
-        for (const item of this.chunks_) {
-            if (viewport.overlap(item.rect)) {
-                item.render(painter, viewport)
-            }
-        }
-        return this
-    }
-
-    update()
-        : ILandView {
+        : this {
         for (const chunk of this.chunks_) {
             chunk.update()
+            if (viewport.overlap(chunk.rect)) {
+                chunk.render(painter, viewport)
+            }
         }
         return this
     }

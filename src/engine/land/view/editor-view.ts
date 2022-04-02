@@ -2,7 +2,6 @@ import {
     type ITerrainData,
     type ILand,
     type ILandTerrainTilesProvider,
-    type ILandView
 } from "@/engine/land/types"
 
 import {
@@ -18,7 +17,7 @@ import { isNil } from "lodash"
 
 export class LandEditorView<
     TerrainData extends ITerrainData
-> extends SceneItem implements ILandView {
+> extends SceneItem {
     constructor(
         private land_: ILand<TerrainData>,
         private tilesProvider_: ILandTerrainTilesProvider<TerrainData>,
@@ -36,7 +35,7 @@ export class LandEditorView<
     }
 
     render(painter: Painter, viewport: Rect)
-        : ILandView {
+        : this {
         const gridSpacing = this.scene.gridSpacing
         const { x: viewportX, y: viewportY } = viewport.topLeft()
 
@@ -52,11 +51,6 @@ export class LandEditorView<
             }
         }
 
-        return this
-    }
-
-    update()
-        : ILandView {
         return this
     }
 }

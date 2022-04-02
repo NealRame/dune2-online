@@ -162,7 +162,6 @@ export async function create(
 
                 const animationLoop = () => {
                     scene.render()
-                    land.update()
                     state.animationRequestId = requestAnimationFrame(animationLoop)
                 }
 

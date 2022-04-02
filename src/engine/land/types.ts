@@ -2,7 +2,6 @@ import { IEntity } from "@/engine/entity"
 import {
     Image,
     IScene,
-    ISceneItem,
 } from "@/engine/scene"
 
 import { Rect, IVector2D, ISize2D } from "@/maths"
@@ -53,14 +52,11 @@ export interface ILand<Data extends ITerrainData = ITerrainData> extends IEntity
     readonly size: ISize2D
     readonly events: IObservable<ILandEvent<Data>>
     reset(): ILand<Data>
+    update(): ILand<Data>
     reveal(position?: IVector2D, size?: ISize2D): ILand<Data>
-    terrain(position: IVector2D): ITerrain<Data>|null
     neighborhood(position: IVector2D): Neighborhood<Data>
+    terrain(position: IVector2D): ITerrain<Data>|null
     terrains(rect?: Rect): Generator<ITerrain<Data>>
-}
-
-export interface ILandView extends ISceneItem {
-    update(): ILandView
 }
 
 export type LandDataGenerator<Data extends ITerrainData>

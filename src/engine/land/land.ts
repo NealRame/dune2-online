@@ -6,7 +6,6 @@ import {
     type ILandEvent,
     type ILandTerrainGenerator,
     type ILandTerrainTilesProvider,
-    type ILandView,
     type ITerrainData,
     type ITerrain,
     type Neighborhood,
@@ -77,7 +76,7 @@ export class Land<TerrainData extends ITerrainData> extends Entity implements IL
     private emitter_: IEmitter<ILandEvent<TerrainData>>
 
     private terrains_: Array<Terrain<TerrainData>> = []
-    private view_: ILandView
+    private view_: ISceneItem
 
     constructor(
         @Inject(GameLandTerrainGenerator) private terrainGenerator_: ILandTerrainGenerator<TerrainData>,
@@ -163,7 +162,7 @@ export class Land<TerrainData extends ITerrainData> extends Entity implements IL
         }
     }
 
-    update(): void {
-        this.view_.update()
+    update(): this {
+        return this
     }
 }
