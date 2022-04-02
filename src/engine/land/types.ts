@@ -1,8 +1,6 @@
 import { IEntity } from "@/engine/entity"
-import {
-    Image,
-    IScene,
-} from "@/engine/scene"
+import { Image } from "@/engine/scene"
+
 import { Color } from "@/graphics"
 
 import { Rect, IVector2D, ISize2D } from "@/maths"
@@ -17,7 +15,7 @@ export type Neighborhood<Data extends ITerrainData> = [
     ITerrain<Data>|null,
     ITerrain<Data>|null,
     ITerrain<Data>|null,
-    ITerrain<Data>|null
+    ITerrain<Data>|null,
 ]
 
 export interface ITerrain<Data extends ITerrainData> {
@@ -62,12 +60,3 @@ export interface ILand<Data extends ITerrainData = ITerrainData> extends IEntity
     terrain(position: IVector2D): ITerrain<Data>|null
     terrains(rect?: Rect): Generator<ITerrain<Data>>
 }
-
-export type LandDataGenerator<Data extends ITerrainData>
-    = (p: IVector2D) => Data
-
-export type LandInitialData<Data extends ITerrainData>
-    = Array<Data> | LandDataGenerator<Data>
-
-export type LandConstructor<Data extends ITerrainData>
-    = new (scene: IScene, data: LandInitialData<Data>) => ILand<Data>
