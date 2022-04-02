@@ -3,6 +3,7 @@ import {
     Image,
     IScene,
 } from "@/engine/scene"
+import { Color } from "@/graphics"
 
 import { Rect, IVector2D, ISize2D } from "@/maths"
 
@@ -46,6 +47,10 @@ export interface ILandTerrainGenerator<Data extends ITerrainData = ITerrainData>
 export interface ILandTerrainTilesProvider<Data extends ITerrainData = ITerrainData> {
     getFogTile(terrain: ITerrain<Data>, neighbors: Neighborhood<Data>): Image | null
     getTerrainTile(terrain: ITerrain<Data>, neighbors: Neighborhood<Data>): Image | null
+}
+
+export interface ILandTerrainColorProvider<Data extends ITerrainData = ITerrainData> {
+    getTerrainColor(terrain: ITerrain<Data>): Color.RGBA
 }
 
 export interface ILand<Data extends ITerrainData = ITerrainData> extends IEntity {

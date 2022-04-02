@@ -4,7 +4,9 @@
 import {
     GameMetadataKeys,
     GameLandTerrainGenerator,
+    GameLandTerrainColorProvider,
     GameLandTilesProvider,
+    GameMinimap,
     GameMode,
     GameScene,
 } from "./constants"
@@ -35,6 +37,7 @@ import {
 } from "@/utils"
 
 import { isNil } from "lodash"
+import { MiniMap } from "./mini-map"
 
 export interface IEngine {
     get<T>(id: Token<T>): T
@@ -121,11 +124,13 @@ async function initializeLand(
     game: any,
     container: Container,
 ) {
-    const { id, generator, tilesProvider } = getGameLandMetadata(game)
+    const { id, generator, colorsProvider, tilesProvider } = getGameLandMetadata(game)
 
     container.set(GameLandTerrainGenerator, generator)
     container.set(GameLandTilesProvider, tilesProvider)
+    container.set(GameLandTerrainColorProvider, colorsProvider)
     container.set(id, Land)
+    container.set(GameMinimap, MiniMap)
 }
 
 export async function create(

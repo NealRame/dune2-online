@@ -1,4 +1,5 @@
 import { Token } from "./injector"
+import { IMiniMap } from "./mini-map"
 import { Scene } from "./scene"
 import { GameEngineMode } from "./types"
 
@@ -23,6 +24,8 @@ export const GameResourcesMetadataKeys = {
 
 export const GameMode = new Token<GameEngineMode>("game:mode")
 export const GameScene = new Token<Scene>("game:scene")
+export const GameMinimap = new Token<IMiniMap>("game:minimap")
 
-export const GameLandTerrainGenerator = Symbol("game:land:terrain:generator")
-export const GameLandTilesProvider = Symbol("game:land:tiles:provider")
+export const GameLandTerrainGenerator = Symbol("game:land:terrainGenerator")
+export const GameLandTilesProvider = Symbol("game:land:terrainTilesProvider")
+export const GameLandTerrainColorProvider = Symbol("game:land:terrainColorProvider")

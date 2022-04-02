@@ -1,7 +1,13 @@
 import { Image, Palette } from "@/engine/scene"
 
 import { Token } from "@/engine/injector"
-import { ILand, ILandTerrainGenerator, ILandTerrainTilesProvider, ITerrainData } from "./land"
+import {
+    ILand,
+    ILandTerrainGenerator,
+    ILandTerrainColorProvider,
+    ILandTerrainTilesProvider,
+    ITerrainData
+} from "./land"
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export interface TConstructor<T = any> {
@@ -47,6 +53,7 @@ export type GameResourceDescriptor<T extends GameResource> = {
 export type GameLandDescriptor<T extends ITerrainData> = {
     id: Token<ILand<T>>,
     generator: TConstructor<ILandTerrainGenerator<T>>,
+    colorsProvider: TConstructor<ILandTerrainColorProvider<T>>,
     tilesProvider: TConstructor<ILandTerrainTilesProvider<T>>,
 }
 

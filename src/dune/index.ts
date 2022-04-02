@@ -28,6 +28,7 @@ import * as Land from "./land"
     land: {
         id: Land.id,
         generator: Land.Generator,
+        colorsProvider: Land.ColorsProvider,
         tilesProvider: Land.TilesProvider,
     }
 })
