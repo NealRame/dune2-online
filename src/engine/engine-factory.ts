@@ -130,8 +130,8 @@ async function initializeLand(
     container.set(GameLandTerrainGenerator, generator)
     container.set(GameLandTilesProvider, tilesProvider)
     container.set(GameLandTerrainColorProvider, colorsProvider)
-    container.set(id, Land)
     container.set(GameMinimap, MiniMap)
+    container.set(id, Land)
 }
 
 export async function create(
