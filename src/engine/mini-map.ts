@@ -10,8 +10,6 @@ import {
 
 import {
     type ILandTerrainColorProvider,
-    type ITerrain,
-    type ITerrainData,
     Land
 } from "@/engine/land"
 
@@ -19,9 +17,6 @@ import { Color } from "@/graphics"
 import { createObservable, IObservable } from "@/utils"
 
 import { isNil } from "lodash"
-
-export type TerrainColorGetter<TerrainData extends ITerrainData = ITerrainData>
-    = (t: ITerrain<TerrainData>) => Color.RGBA
 
 export interface IMiniMapEvent {
     changed: null
