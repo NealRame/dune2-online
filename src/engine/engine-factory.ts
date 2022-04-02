@@ -21,9 +21,7 @@ import {
     Token,
 } from "@/engine/injector"
 
-import {
-    MiniMap
-} from "@/engine/mini-map"
+import { MiniMap } from "@/engine/mini-map"
 
 import {
     Scene,
@@ -36,13 +34,9 @@ import {
     IProgressNotifier
 } from "@/engine/types"
 
-import {
-    Painter
-} from "@/graphics"
+import { Painter } from "@/graphics"
 
-import {
-    fetchData
-} from "@/utils"
+import { fetchData } from "@/utils"
 
 import { isNil } from "lodash"
 
