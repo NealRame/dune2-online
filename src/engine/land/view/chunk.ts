@@ -1,5 +1,9 @@
-import { createPositionToIndexConverter, PositionToIndexConverter } from "./utils"
 import { renderImage } from "./workers"
+
+import {
+    createPositionToIndexConverter,
+    PositionToIndexConverter
+} from "@/engine/land/utils"
 
 import { SceneItem } from "@/engine/scene/item"
 import { Image, IScene } from "@/engine/scene/types"

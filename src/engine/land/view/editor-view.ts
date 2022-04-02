@@ -3,7 +3,7 @@ import {
     type ILand,
     type ILandTerrainTilesProvider,
     type ILandView
-} from "./types"
+} from "@/engine/land/types"
 
 import {
     IScene,

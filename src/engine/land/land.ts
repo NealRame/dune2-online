@@ -18,8 +18,8 @@ import {
     PositionToIndexConverter,
 } from "./utils"
 
-import { LandChunkView } from "./chunk-view"
-import { LandEditorView } from "./editor-view"
+import { LandChunkView } from "./view/chunk-view"
+import { LandEditorView } from "./view/editor-view"
 
 import { Entity } from "@/engine/entity"
 import {

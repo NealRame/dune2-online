@@ -1,15 +1,17 @@
 import { Chunk } from "./chunk"
+
 import {
     ITerrainData,
     ITerrain,
     ILand,
     ILandTerrainTilesProvider,
     ILandView,
-} from "./types"
+} from "@/engine/land/types"
+
 import {
     createPositionToIndexConverter,
     PositionToIndexConverter,
-} from "./utils"
+} from "@/engine/land/utils"
 
 import { Image, IScene, SceneItem } from "@/engine/scene"
 import { Painter } from "@/graphics"
