@@ -161,8 +161,4 @@ export class Land<TerrainData extends ITerrainData> extends Entity implements IL
             yield * this.terrains_
         }
     }
-
-    update(): this {
-        return this
-    }
 }

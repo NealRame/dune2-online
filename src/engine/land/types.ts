@@ -52,7 +52,6 @@ export interface ILand<Data extends ITerrainData = ITerrainData> extends IEntity
     readonly size: ISize2D
     readonly events: IObservable<ILandEvent<Data>>
     reset(): ILand<Data>
-    update(): ILand<Data>
     reveal(position?: IVector2D, size?: ISize2D): ILand<Data>
     neighborhood(position: IVector2D): Neighborhood<Data>
     terrain(position: IVector2D): ITerrain<Data>|null

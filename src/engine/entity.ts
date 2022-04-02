@@ -20,7 +20,7 @@ export interface IEntity {
 
     readonly view: ISceneItem
 
-    update(): void
+    update(): IEntity
 }
 
 export abstract class Entity implements IEntity {
@@ -43,8 +43,9 @@ export abstract class Entity implements IEntity {
         return new Vector(this.x, this.y)
     }
 
-    abstract get view(): ISceneItem
+    update(): IEntity {
+        return this
+    }
 
-    // eslint-disable-next-line @typescript-eslint/no-empty-function
-    update(): void { }
+    abstract get view(): ISceneItem
 }
