@@ -67,7 +67,7 @@ export class LandDataError extends Error {
 @Service({
     lifecycle: ServiceLifecycle.Singleton,
 })
-export class Land<TerrainData extends ITerrainData> extends Entity implements ILand<TerrainData> {
+export class Land<TerrainData extends ITerrainData = ITerrainData> extends Entity implements ILand<TerrainData> {
     private size_: ISize2D
     private indexToPosition_: IndexToPositionConverter
     private positionToIndex_: PositionToIndexConverter
