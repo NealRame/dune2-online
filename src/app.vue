@@ -4,10 +4,7 @@ import { defineComponent, onMounted, ref, unref } from "vue"
 import { debounce } from "lodash"
 
 import * as Dune from "@/dune"
-
-import {
-    create
-} from "@/engine/engine-factory"
+import * as Engine from "@/engine"
 
 import "@/styles/global.scss"
 
@@ -42,7 +39,7 @@ export default defineComponent({
             resize()
 
             const screen = unref(screenRef) as HTMLCanvasElement
-            const engine = await create(Dune.Game, GameEngineMode.Game, screen, {
+            const engine = await Engine.create(Dune.Game, GameEngineMode.Game, screen, {
                 begin() {
                     loadingRef.value = true
                 },

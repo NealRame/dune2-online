@@ -1,6 +1,6 @@
 export * from "./animation"
 export * from "./entity"
-export * from "./engine"
+export * from "./engine-factory"
 export * from "./grid"
 export * from "./land"
 export * from "./mini-map"
