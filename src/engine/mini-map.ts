@@ -3,17 +3,17 @@ import {
 } from "@/engine/constants"
 
 import {
+    Inject,
+    Service,
+    ServiceLifecycle,
+} from "@/engine/injector"
+
+import {
     type ILandTerrainColorProvider,
     type ITerrain,
     type ITerrainData,
     Land
 } from "@/engine/land"
-
-import {
-    Inject,
-    Service,
-    ServiceLifecycle,
-} from "@/engine/injector"
 
 import { Color } from "@/graphics"
 import { createObservable, IObservable } from "@/utils"
