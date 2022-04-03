@@ -1,7 +1,7 @@
 <script lang="ts">
 import { defineComponent, onMounted, ref, unref } from "vue"
 
-import { debounce } from "lodash"
+import { debounce, isNil } from "lodash"
 
 import * as Dune from "@/dune"
 import * as Engine from "@/engine"
@@ -10,7 +10,6 @@ import "@/styles/global.scss"
 
 import Modal from "@/components/Modal.vue"
 import ProgressBar from "@/components/ProgressBar.vue"
-import { GameEngineMode } from "./engine/types"
 
 export default defineComponent({
     components: { Modal, ProgressBar },
@@ -39,21 +38,27 @@ export default defineComponent({
             resize()
 
             const screen = unref(screenRef) as HTMLCanvasElement
-            const engine = await Engine.create(Dune.Game, GameEngineMode.Game, screen, {
-                begin() {
-                    loadingRef.value = true
-                },
-                end() {
-                    loadingRef.value = false
-                },
-                setLabel(label) {
-                    loadingLabelRef.value = label
-                },
-                setValue(value) {
-                    loadingValueRef.value = value
-                },
-            })
+            const engine = await Engine.create(Dune.Game, Engine.Mode.Game, screen)
 
+            engine.events
+                .on("stateChanged", state => {
+                    loadingRef.value = state === Engine.GameState.Initializing
+                })
+                .on("downloadingResourceBegin", ({ name }) => {
+                    loadingLabelRef.value = `Downloading ${name}...`
+                    loadingValueRef.value = null
+                })
+                .on("decodingResourceBegin", ({ name }) => {
+                    loadingLabelRef.value = `Decoding ${name}...`
+                    loadingValueRef.value = null
+                })
+                .on("downloadingResourceProgress", ({ current, total }) => {
+                    if (!(isNil(current) || isNil(total))) {
+                        loadingValueRef.value = current/total
+                    }
+                })
+
+            await engine.initialize()
             engine.start()
 
             const land = engine.get(Dune.Land.id)

@@ -37,7 +37,7 @@ import {
     type ISceneItem
 } from "@/engine/scene"
 import {
-    GameEngineMode,
+    Mode,
 } from "@/engine/types"
 
 import {
@@ -81,7 +81,7 @@ export class Land<TerrainData extends ITerrainData = ITerrainData> extends Entit
     constructor(
         @Inject(GameLandTerrainGenerator) private terrainGenerator_: ILandTerrainGenerator<TerrainData>,
         @Inject(GameLandTilesProvider) private tilesProvider_: ILandTerrainTilesProvider<TerrainData>,
-        @Inject(GameMode) gameMode: GameEngineMode,
+        @Inject(GameMode) gameMode: Mode,
         @Inject(GameScene) scene: IScene,
     ) {
         super()
@@ -95,7 +95,7 @@ export class Land<TerrainData extends ITerrainData = ITerrainData> extends Entit
         this.emitter_ = emitter
         this.events_ = events
 
-        this.view_ = gameMode === GameEngineMode.Editor
+        this.view_ = gameMode === Mode.Editor
             ? new LandEditorView(this, this.tilesProvider_, scene)
             : new LandChunkView(this, this.tilesProvider_, scene)
     }

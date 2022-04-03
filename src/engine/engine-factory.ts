@@ -29,19 +29,29 @@ import {
 } from "@/engine/scene"
 
 import {
-    GameEngineMode,
-    GameMetadata,
-    IProgressNotifier
+    Mode,
+    type GameEvents,
+    type GameMetadata,
 } from "@/engine/types"
 
 import { Painter } from "@/graphics"
 
-import { fetchData } from "@/utils"
+import {
+    createObservable,
+    fetchData,
+    IEmitter,
+    type IObservable,
+} from "@/utils"
 
 import { isNil } from "lodash"
+import { GameState } from "."
+
+const GameEventsEmitter = new Token<IEmitter<GameEvents>>("game:events:emitter")
 
 export interface IEngine {
+    readonly events: IObservable<GameEvents>
     get<T>(id: Token<T>): T
+    initialize(): Promise<IEngine>
     start(): IEngine
     stop(): IEngine
 }
@@ -100,25 +110,31 @@ async function initializeScene(
 async function initializeResources(
     container: Container,
     game: any,
-    progress: IProgressNotifier,
 ): Promise<void> {
-    progress.begin()
+    const emitter = container.get(GameEventsEmitter)
+
     for (const rcDescriptor of getGameResourcesMetadata(game)) {
         const rcDecoder = container.get(rcDescriptor.decoder)
+        const { id, name } = rcDescriptor
 
-        progress.setLabel(`Downloading ${rcDescriptor.name}`)
-        progress.setValue(0)
+        emitter.emit("downloadingResourceBegin", { id, name })
         const rcData = await fetchData(rcDescriptor.uri, (current, total) => {
-            progress.setValue(current/total)
+            emitter.emit("downloadingResourceProgress", {
+                id,
+                name,
+                current,
+                total,
+            })
         })
+        emitter.emit("downloadingResourceEnd", { id, name })
 
-        progress.setLabel(`Decoding ${rcDescriptor.name}`)
-        progress.setValue(null)
+        emitter.emit("decodingResourceBegin", { id, name })
         const rc = await rcDecoder.decode(rcData, rcDescriptor.id)
+        emitter.emit("decodingResourceEnd", { id, name })
 
         container.set(rcDescriptor.id, rc)
     }
-    progress.end()
+    // progress.end()
 }
 
 async function initializeLand(
@@ -134,31 +150,42 @@ async function initializeLand(
     container.set(id, Land)
 }
 
-export async function create(
+export function create(
     game: any,
-    mode: GameEngineMode,
+    mode: Mode,
     screen: HTMLCanvasElement,
-    progress: IProgressNotifier,
-): Promise<IEngine> {
+): IEngine {
     const container = new Container()
     const state = {
         animationRequestId: 0,
         running: false,
     }
 
+    const [emitter, events] = createObservable<GameEvents>()
+
+    container.set(GameEventsEmitter, emitter)
     container.set(GameMode, mode)
 
-    await initializeScene(container, screen)
-    await initializeResources(container, game, progress)
-    await initializeLand(container, game)
-
     return {
+        get events()
+            : IObservable<GameEvents> {
+            return events
+        },
         get<T>(id: Token<T>): T {
             return container.get(id)
+        },
+        async initialize() {
+            emitter.emit("stateChanged", GameState.Initializing)
+            await initializeScene(container, screen)
+            await initializeResources(container, game)
+            await initializeLand(container, game)
+            emitter.emit("stateChanged", GameState.Stopped)
+            return this
         },
         start(): IEngine {
             if (!state.running) {
                 state.running = true
+                emitter.emit("stateChanged", GameState.Running)
 
                 const scene = container.get(GameScene)
                 const land = container.get(Land)
@@ -177,8 +204,9 @@ export async function create(
         },
         stop(): IEngine {
             cancelAnimationFrame(state.animationRequestId)
-            state.animationRequestId = 0
             state.running = false
+            state.animationRequestId = 0
+            emitter.emit("stateChanged", GameState.Stopped)
             return this as IEngine
         }
     }

@@ -25,16 +25,46 @@ export interface IProgressNotifier {
 }
 
 /******************************************************************************
+ * Game state
+ *****************************************************************************/
+
+export enum Mode {
+    Editor,
+    Game,
+}
+
+export enum GameState {
+    Initializing,
+    Running,
+    Paused,
+    Stopped,
+}
+
+export interface GameResourceEvent {
+    id: Token<GameResource>
+    name: string
+    current?: number
+    total?: number
+}
+
+export interface GameEvents {
+    downloadingResourceBegin: GameResourceEvent
+    downloadingResourceProgress: GameResourceEvent
+    downloadingResourceEnd: GameResourceEvent
+
+    decodingResourceBegin: GameResourceEvent
+    decodingResourceProgress: GameResourceEvent
+    decodingResourceEnd: GameResourceEvent
+
+    stateChanged: GameState
+}
+
+/******************************************************************************
  * Game resources
  *****************************************************************************/
 export type GameResourceIdentifier = string | symbol
 
 export type GameResource = Palette | Array<Image>
-
-export enum GameEngineMode {
-    Editor,
-    Game,
-}
 
 export interface IGameResourceDecoder<T extends GameResource> {
     decode(data: Uint8Array, identifier: Token<T>): Promise<T>

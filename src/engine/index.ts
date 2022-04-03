@@ -6,6 +6,7 @@ export * from "./land"
 export * from "./mini-map"
 export * from "./scale"
 export * from "./scene"
+export * from "./types"
 export * from "./unit"
 export * from "./viewport"
 
