@@ -10,7 +10,7 @@
     transform: translate(-50%, -50%);
 
     & > h1 {
-        border-bottom: 1px solid $fg-color;
+        border-bottom: 1px solid sandybrown;
 
         color: $fg-color;
 
@@ -22,6 +22,7 @@
         padding: 0 0 .5rem;
 
         text-align: center;
+        text-transform: uppercase;
     }
 
     & > ul {
@@ -32,14 +33,18 @@
 
         & > li > a {
             border: 1px solid transparent;
+
+            color: $fg-color;
+
             display: block;
+
             height: 100%;
 
             text-transform: uppercase;
 
             &:hover {
-                background-color: darken($color: $link-color, $amount: 45%);
-                border: 1px solid darken($color: $link-color, $amount: 35%);
+                background-color: darken($color: sandybrown, $amount: 60%);
+                border-color: sandybrown;
             }
         }
     }
