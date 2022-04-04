@@ -1,5 +1,5 @@
 import App from "@/app.vue"
-// import router from "@/router"
+import router from "@/router"
 
 import { createApp } from "vue"
 
@@ -15,6 +15,6 @@ import {
 faLibrary.add(faSyncAlt, faWrench, faSearchMinus, faSearchPlus)
 
 createApp(App)
-    // .use(router)
+    .use(router)
     .component("font-awesome-icon", FontAwesomeIcon)
     .mount("#app")
