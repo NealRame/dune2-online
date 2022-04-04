@@ -15,13 +15,13 @@
         color: $fg-color;
 
         font-family: "dune-rise";
-        font-size: 4rem;
+        font-size: 6rem;
         font-weight: 100;
-
-        text-align: center;
 
         margin: 0 0 2rem;
         padding: 0 0 .5rem;
+
+        text-align: center;
     }
 
     & > ul {

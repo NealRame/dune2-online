@@ -1,4 +1,5 @@
 import Game from "@/components/Game.vue"
+import Editor from "@/components/Editor.vue"
 import Home from "@/components/Home.vue"
 
 import { createRouter, createWebHistory, RouteRecordRaw } from "vue-router"
@@ -11,6 +12,10 @@ const routes: Array<RouteRecordRaw> = [{
     component: Game,
     name: "Game",
     path: "/game",
+}, {
+    component: Editor,
+    name: "Editor",
+    path: "/editor",
 }]
 
 const router = createRouter({
