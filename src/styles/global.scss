@@ -1,4 +1,6 @@
 @import "./variables";
+@import "./fonts";
+
 body {
   background-color: $bg-color;
   color: $fg-color;
@@ -16,19 +18,4 @@ body {
 a {
   color: $link-color;
   text-decoration: none;
-}
-
-// center the content horizontaly
-ul.game-menu {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-
-  transform: translate(-50%, -50%);
-
-
-  list-style: none;
-
-  margin: 0 auto;
-  padding: 0;
 }
