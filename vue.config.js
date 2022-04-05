@@ -11,7 +11,7 @@ module.exports = {
                 implementation: require("sass"),
                 prependData: `
                     @use 'sass:math';
-                    @import "@/styles/variables.scss";
+                    @import "@/styles/_variables.scss";
                 `
             }
         }
