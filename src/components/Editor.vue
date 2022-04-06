@@ -58,6 +58,9 @@ export default defineComponent({
 
             await engine.initialize()
             engine.start()
+
+            const land = engine.get(Dune.Land.id)
+            land.generate({ size: { width: 32, height: 32 } })
         })
 
         return {
@@ -72,10 +75,52 @@ export default defineComponent({
 })
 </script>
 
+<style lang="scss" scoped>
+.land-inspector {
+    border: 2px solid sandybrown;
+    border-radius: 8px;
+    background-color: rgba($color: black, $alpha: .5);
+
+    display: grid;
+    grid-template-columns: auto 100fr;
+
+    padding: 1ch;
+
+    position: absolute;
+
+    bottom: 12px;
+    right: 12px;
+
+    & > label {
+        justify-self: right;
+        margin-right: 1ch;
+
+        &::after {
+            content: ":";
+        }
+    }
+
+    & > hr {
+        grid-column: 1 / span 2;
+        width: 100%;
+    }
+}
+</style>
+
 <template>
     <modal :show="loading">
         <progress-bar :current="loadingValue" :label="loadingLabel"/>
     </modal>
+    <div class="land-inspector">
+        <label for="width">Width</label>
+        <input name="width" type="range" min="16" max="256" v-model="width"/>
+
+        <label for="height">Height</label>
+        <input name="height" type="range" min="16" max="256" v-model="height"/>
+
+        <hr>
+
+    </div>
     <canvas
         id="screen"
         ref="screen"

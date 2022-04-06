@@ -3,6 +3,7 @@ import {
 } from "./terrain"
 import {
     type ILand,
+    type ILandConfig,
     type ILandEvent,
     type ILandTerrainGenerator,
     type ILandTerrainTilesProvider,
@@ -77,30 +78,33 @@ export class LandDataSizeError extends Error {
 @Service({
     lifecycle: ServiceLifecycle.Singleton,
 })
-export class Land<TerrainData extends ITerrainData = ITerrainData> extends Entity implements ILand<TerrainData> {
+export class Land<
+    TerrainDataType extends ITerrainData = ITerrainData,
+    LandConfigType extends ILandConfig = ILandConfig,
+> extends Entity implements ILand<TerrainDataType, LandConfigType> {
     private size_: ISize2D
     private indexToPosition_: IndexToPositionConverter
     private positionToIndex_: PositionToIndexConverter
 
-    private events_: IObservable<ILandEvent<TerrainData>>
-    private emitter_: IEmitter<ILandEvent<TerrainData>>
+    private events_: IObservable<ILandEvent<TerrainDataType>>
+    private emitter_: IEmitter<ILandEvent<TerrainDataType>>
 
-    private terrains_: Array<Terrain<TerrainData>> = []
+    private terrains_: Array<Terrain<TerrainDataType>> = []
     private view_: ISceneItem
 
     constructor(
-        @Inject(GameLandTerrainGenerator) private terrainGenerator_: ILandTerrainGenerator<TerrainData>,
-        @Inject(GameLandTilesProvider) private tilesProvider_: ILandTerrainTilesProvider<TerrainData>,
+        @Inject(GameLandTerrainGenerator) private terrainGenerator_: ILandTerrainGenerator<TerrainDataType>,
+        @Inject(GameLandTilesProvider) private tilesProvider_: ILandTerrainTilesProvider<TerrainDataType>,
         @Inject(GameMode) gameMode: Mode,
         @Inject(GameScene) scene: IScene,
     ) {
         super()
 
-        this.size_ = scene.size
+        this.size_ = { width: 0, height: 0 }
         this.indexToPosition_ = createIndexToPositionConverter(this.size_)
         this.positionToIndex_ = createPositionToIndexConverter(this.size_)
 
-        const [emitter, events] = createObservable<ILandEvent<TerrainData>>()
+        const [emitter, events] = createObservable<ILandEvent<TerrainDataType>>()
 
         this.emitter_ = emitter
         this.events_ = events
@@ -111,12 +115,12 @@ export class Land<TerrainData extends ITerrainData = ITerrainData> extends Entit
     }
 
     get events()
-        : IObservable<ILandEvent<TerrainData>> {
+        : IObservable<ILandEvent<TerrainDataType>> {
         return this.events_
     }
 
     get emitter()
-        : IEmitter<ILandEvent<TerrainData>> {
+        : IEmitter<ILandEvent<TerrainDataType>> {
         return this.emitter_
     }
 
@@ -124,32 +128,40 @@ export class Land<TerrainData extends ITerrainData = ITerrainData> extends Entit
         return this.size_
     }
 
+    get width(): number {
+        return this.size_.width
+    }
+
+    get height(): number {
+        return this.size_.height
+    }
+
     get view(): ISceneItem {
         return this.view_
     }
 
-    load(terrains: TerrainData[]): this {
+    load(size: ISize2D, terrains: TerrainDataType[]): this {
         const terrainsLength = terrains.length
-        const landArea = this.size_.width*this.size_.height
+        const landArea = size.width*size.height
         if (terrainsLength === landArea) {
+            this.indexToPosition_ = createIndexToPositionConverter(size)
+            this.positionToIndex_ = createPositionToIndexConverter(size)
+            this.size_ = size
             this.terrains_ = terrains.map((data, index) => {
                 return new Terrain(this.indexToPosition_(index), data, this)
             })
+            this.emitter_.emit("reset", this.size_)
             return this
         }
         throw new LandDataSizeError(terrainsLength, landArea)
     }
 
-    generate(): this {
-        return this.load(this.terrainGenerator_.generate(this.size_))
-    }
-
-    reset(): this {
-        return this.generate()
+    generate(config: LandConfigType): this {
+        return this.load(config.size, this.terrainGenerator_.generate(config))
     }
 
     neighborhood({ x, y }: IVector2D)
-        : Neighborhood<TerrainData> {
+        : Neighborhood<TerrainDataType> {
         return [
             this.terrain({ x, y: y - 1 }),
             this.terrain({ x: x + 1, y }),
@@ -161,23 +173,23 @@ export class Land<TerrainData extends ITerrainData = ITerrainData> extends Entit
     reveal(position: IVector2D, size?: ISize2D): this {
         size = size ?? { width: 1, height: 1 }
         for (const terrain of this.terrains(new Rect(position, size))) {
-            terrain.set({ revealed: true } as Partial<TerrainData>)
+            terrain.set({ revealed: true } as Partial<TerrainDataType>)
         }
         return this
     }
 
     terrain(position: IVector2D)
-        : ITerrain<TerrainData>|null {
+        : ITerrain<TerrainDataType>|null {
         return this.terrains_[this.positionToIndex_(position)] ?? null
     }
 
     * terrains(zone?: Rect)
-        : Generator<ITerrain<TerrainData>, void, undefined> {
+        : Generator<ITerrain<TerrainDataType>, void, undefined> {
         if (!isNil(zone)) {
             const rect = Rect.intersection(this.view.rect, zone)
             if (!isNil(rect)) {
                 for (const { x, y } of rect.partition()) {
-                    yield this.terrain({ x, y }) as ITerrain<TerrainData>
+                    yield this.terrain({ x, y }) as ITerrain<TerrainDataType>
                 }
             }
         } else {

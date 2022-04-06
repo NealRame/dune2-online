@@ -27,13 +27,13 @@ export class Scene implements IScene {
         this.viewport_.size = this.painter_.rect.scaled(1/this.gridSpacing).size
     }
 
-    constructor(size: ISize2D, painter: Painter) {
+    constructor(painter: Painter) {
         this.backgroundColor_ = cssHex([0, 0, 0])
-        this.width_ = size.width
-        this.height_ = size.height
+        this.width_ = 0
+        this.height_ = 0
         this.scale_ = 3
         this.painter_ = painter
-        this.viewport_ = createViewport(size)
+        this.viewport_ = createViewport(this.painter_.size)
 
         this.updateViewport_()
     }
@@ -86,6 +86,12 @@ export class Scene implements IScene {
             width: this.width_,
             height: this.height_,
         }
+    }
+
+    set size(size: ISize2D) {
+        this.width_ = size.width
+        this.height_ = size.height
+        this.updateViewport_()
     }
 
     get rect(): Rect {

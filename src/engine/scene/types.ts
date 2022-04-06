@@ -13,6 +13,7 @@ export interface IScene extends ISceneLayer {
     readonly viewport: IViewport
     readonly gridUnit: number
     readonly gridSpacing: number
+    size: ISize2D
     scale: ScaleFactor
     zoomIn(): IScene
     zoomOut(): IScene

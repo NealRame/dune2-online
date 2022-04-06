@@ -16,7 +16,7 @@ import { Image, IScene, SceneItem } from "@/engine/scene"
 import { Painter } from "@/graphics"
 import { ISize2D, Rect } from "@/maths"
 
-import { chain, isNil, remove } from "lodash"
+import { chain, constant, isNil, remove } from "lodash"
 
 export class LandChunkView<
     TerrainData extends ITerrainData
@@ -24,7 +24,8 @@ export class LandChunkView<
     private chunkSize_: ISize2D = { width: 16, height: 16 }
     private chunks_: Array<Chunk> = []
 
-    private positionToChunkIndex_: PositionToIndexConverter
+    private positionToChunkIndex_: PositionToIndexConverter = constant(0)
+
     private onTerrainChanged_(terrain: ITerrain<TerrainData>) {
         const neighbors = this.land_.neighborhood(terrain.position)
 
@@ -69,22 +70,25 @@ export class LandChunkView<
             this.onTerrainChanged_(terrain)
         })
 
-        this.positionToChunkIndex_ = createPositionToIndexConverter(
-            this.size,
-            this.chunkSize_,
-        )
+        this.land_.events.on("reset", () => {
+            this.chunks_ = []
+            this.positionToChunkIndex_ = createPositionToIndexConverter(
+                this.size,
+                this.chunkSize_,
+            )
 
-        for (const chunkRect of this.rect.partition(this.chunkSize_)) {
-            this.chunks_.push(new Chunk(this.scene, chunkRect))
-        }
+            for (const chunkRect of this.rect.partition(this.chunkSize_)) {
+                this.chunks_.push(new Chunk(this.scene, chunkRect))
+            }
+        })
     }
 
     get width(): number {
-        return this.scene.width
+        return this.land_.width
     }
 
     get height(): number {
-        return this.scene.height
+        return this.land_.height
     }
 
     render(painter: Painter, viewport: Rect)

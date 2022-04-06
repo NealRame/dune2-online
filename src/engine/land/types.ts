@@ -29,17 +29,19 @@ export type TileIndexGetter<Data extends ITerrainData>
     = (t: ITerrain<Data>, n: Neighborhood<Data>) => number
 
 export interface ILandEvent<Data extends ITerrainData = ITerrainData> {
+    reset: ISize2D
     terrainChanged: ITerrain<Data>
 }
 
-export type ILandConfig = Record<string, unknown>
-
-export interface ILandConfigProvider<Config extends ILandConfig> {
-    getConfig(): Config
+export interface ILandConfig {
+    size: ISize2D
 }
 
-export interface ILandTerrainGenerator<Data extends ITerrainData = ITerrainData> {
-    generate(size: ISize2D): Array<Data>
+export interface ILandTerrainGenerator<
+    TerrainDataType extends ITerrainData = ITerrainData,
+    LandConfigType extends ILandConfig = ILandConfig,
+> {
+    generate(config: LandConfigType): Array<TerrainDataType>
 }
 
 export interface ILandTerrainTilesProvider<Data extends ITerrainData = ITerrainData> {
@@ -51,15 +53,20 @@ export interface ILandTerrainColorProvider<Data extends ITerrainData = ITerrainD
     getTerrainColor(terrain: ITerrain<Data>): Color.RGBA
 }
 
-export interface ILand<Data extends ITerrainData = ITerrainData> extends IEntity {
+export interface ILand<
+    TerrainDataType extends ITerrainData = ITerrainData,
+    LandConfigType extends ILandConfig = ILandConfig,
+> extends IEntity {
+    readonly width: number
+    readonly height: number
     readonly size: ISize2D
-    readonly events: IObservable<ILandEvent<Data>>
+    readonly events: IObservable<ILandEvent<TerrainDataType>>
 
-    generate(): ILand<Data>
-    load(terrains: Array<Data>): ILand<Data>
+    generate(config: LandConfigType): ILand<TerrainDataType>
+    load(size: ISize2D, terrains: Array<TerrainDataType>): ILand<TerrainDataType>
 
-    reveal(position?: IVector2D, size?: ISize2D): ILand<Data>
-    neighborhood(position: IVector2D): Neighborhood<Data>
-    terrain(position: IVector2D): ITerrain<Data>|null
-    terrains(rect?: Rect): Generator<ITerrain<Data>>
+    reveal(position?: IVector2D, size?: ISize2D): ILand<TerrainDataType>
+    neighborhood(position: IVector2D): Neighborhood<TerrainDataType>
+    terrain(position: IVector2D): ITerrain<TerrainDataType> | null
+    terrains(rect?: Rect): Generator<ITerrain<TerrainDataType>>
 }

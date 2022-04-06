@@ -1,11 +1,34 @@
 import { ILandConfig, ITerrainData, TerrainType } from "./types"
 
 import * as Engine from "@/engine"
-import { Inject } from "@/engine/injector"
-import { createIndexToPositionConverter } from "@/engine/land/utils"
-import { createNoise2DGenerator, createRangeMapper, ISize2D, IVector2D } from "@/maths"
 
-import { chain, flow, isNil, omit, times } from "lodash"
+import { createIndexToPositionConverter } from "@/engine/land/utils"
+import { createNoise2DGenerator, createRangeMapper, IVector2D } from "@/maths"
+
+import { chain, clamp, flow, isNil, omit, times } from "lodash"
+
+function ensureConfig(config: ILandConfig)
+    : Required<ILandConfig> {
+    const spiceThreshold = clamp(config.spiceThreshold ?? 0.6, 0, 1)
+    const spiceSaturationThreshold = clamp(config.spiceSaturationThreshold ?? (1 + spiceThreshold)/2, spiceThreshold, 1)
+    return {
+        // Land size
+        size: config.size,
+        // Generator seed
+        seed: config.seed ?? Date.now(),
+        // Terrain values
+        terrainScale: clamp(Math.floor(config.terrainScale ?? 32), 16, 64),
+        terrainDetails: clamp(Math.floor(config.terrainDetails ?? 1), 1, 6),
+        terrainSandThreshold: clamp(config.terrainSandThreshold ?? 2/5, 0, 1),
+        terrainRockThreshold: clamp(config.terrainRockThreshold ?? 5/8, 0, 1),
+        terrainMountainsThreshold: clamp(config.terrainMountainsThreshold ?? 7/8, 0, 1),
+        // Spice field values
+        spiceScale: clamp(Math.floor(config.spiceScale ?? 16), 16, 64),
+        spiceDetails: clamp(Math.floor(config.spiceDetails ?? 1), 1, 6),
+        spiceThreshold,
+        spiceSaturationThreshold,
+    }
+}
 
 function createTerrainTypeGenerator(config: Required<ILandConfig>)
     : (t: Partial<ITerrainData> & IVector2D) => Partial<ITerrainData> {
@@ -68,7 +91,7 @@ function createSpiceFieldGenerator(config: Required<ILandConfig>)
     }
 }
 
-function createLandDataGenerator(landConfig: ILandConfig)
+function createLandDataGenerator(landConfig: Required<ILandConfig>)
     : (p: IVector2D) => ITerrainData {
     const generateTerrainType = createTerrainTypeGenerator(landConfig)
     const generateSpiceField = createSpiceFieldGenerator(landConfig)
@@ -84,45 +107,14 @@ function createLandDataGenerator(landConfig: ILandConfig)
     }
 }
 
-@Engine.Decorators.LandConfigurationProvider()
-export class ConfigProvider implements Engine.ILandConfigProvider<ILandConfig> {
-    private config_: ILandConfig
-
-    constructor() {
-        this.config_ = {
-            // Noise seed
-            seed: Date.now(),
-            // Terrain values
-            terrainScale: 32,
-            terrainDetails: 1,
-            terrainSandThreshold: 2/5,
-            terrainRockThreshold: 5/8,
-            terrainMountainsThreshold: 7/8,
-            // Spice field values
-            spiceScale: 16,
-            spiceDetails: 1,
-            spiceThreshold: 0.6,
-            spiceSaturationThreshold: 0.8,
-        }
-    }
-
-    getConfig(): ILandConfig {
-        return { ...this.config_ }
-    }
-}
-
 @Engine.Decorators.LandGenerator()
 export class Generator {
-    constructor(
-        @Inject(ConfigProvider) private configProvider_: ConfigProvider,
-    ) { }
+    generate(config: ILandConfig): Array<ITerrainData> {
+        const { size } = config
+        const generateTerrain = createLandDataGenerator(ensureConfig(config))
+        const indexToPosition = createIndexToPositionConverter(size)
 
-    generate(landSize: ISize2D): Array<ITerrainData> {
-        const landConfig = this.configProvider_.getConfig()
-        const generateTerrain = createLandDataGenerator(landConfig)
-        const indexToPosition = createIndexToPositionConverter(landSize)
-
-        return times(landSize.width*landSize.height, flow(
+        return times(size.width*size.height, flow(
             indexToPosition,
             generateTerrain,
         ))

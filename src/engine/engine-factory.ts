@@ -30,6 +30,7 @@ import {
 
 import {
     Mode,
+    GameState,
     type GameEvents,
     type GameMetadata,
 } from "@/engine/types"
@@ -43,8 +44,7 @@ import {
     type IObservable,
 } from "@/utils"
 
-import { isNil } from "lodash"
-import { GameState } from "."
+import { clamp, isNil } from "lodash"
 
 const GameEventsEmitter = new Token<IEmitter<GameEvents>>("game:events:emitter")
 
@@ -83,7 +83,7 @@ async function initializeScene(
     screen: HTMLCanvasElement,
 ) {
     const painter = new Painter(screen)
-    const scene = new Scene({ width: 64, height: 64 }, painter)
+    const scene = new Scene(painter)
 
     screen.addEventListener("mousemove", (ev: MouseEvent) => {
         const { buttons, ctrlKey, movementX, movementY } = ev
@@ -95,10 +95,10 @@ async function initializeScene(
         // drag scene
         if (ctrlKey && buttons === 1) {
             if (offsetX !== 0 || offsetY !== 0) {
-                const { x, y } = scene.viewport.position
+                const { x, y, width, height } = scene.viewport.rect
                 scene.viewport.position = {
-                    x: x + offsetX,
-                    y: y + offsetY,
+                    x: clamp(x + offsetX, 0, scene.width - width),
+                    y: clamp(y + offsetY, 0, scene.height - height),
                 }
             }
         }
@@ -134,7 +134,6 @@ async function initializeResources(
 
         container.set(rcDescriptor.id, rc)
     }
-    // progress.end()
 }
 
 async function initializeLand(
@@ -148,6 +147,12 @@ async function initializeLand(
     container.set(GameLandTerrainColorProvider, colorsProvider)
     container.set(GameMinimap, MiniMap)
     container.set(id, Land)
+
+    const land = container.get(id)
+
+    land.events.on("reset", size => {
+        container.get(GameScene).size = size
+    })
 }
 
 export function create(
@@ -190,7 +195,6 @@ export function create(
                 const scene = container.get(GameScene)
                 const land = container.get(Land)
 
-                land.reset()
                 scene.addItem(land.view)
 
                 const animationLoop = () => {

@@ -60,6 +60,7 @@ export default defineComponent({
             engine.start()
 
             const land = engine.get(Dune.Land.id)
+            land.generate({ size: { width: 32, height: 32 } })
             land.reveal(land.position, land.size)
         })
 
