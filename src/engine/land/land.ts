@@ -64,6 +64,16 @@ export class LandDataError extends Error {
     }
 }
 
+export class LandDataSizeError extends Error {
+    constructor(
+        public current: number,
+        public expected: number
+    ) {
+        super("Land data size error")
+        Object.setPrototypeOf(this, LandDataSizeError.prototype)
+    }
+}
+
 @Service({
     lifecycle: ServiceLifecycle.Singleton,
 })
@@ -118,6 +128,26 @@ export class Land<TerrainData extends ITerrainData = ITerrainData> extends Entit
         return this.view_
     }
 
+    load(terrains: TerrainData[]): this {
+        const terrainsLength = terrains.length
+        const landArea = this.size_.width*this.size_.height
+        if (terrainsLength === landArea) {
+            this.terrains_ = terrains.map((data, index) => {
+                return new Terrain(this.indexToPosition_(index), data, this)
+            })
+            return this
+        }
+        throw new LandDataSizeError(terrainsLength, landArea)
+    }
+
+    generate(): this {
+        return this.load(this.terrainGenerator_.generate(this.size_))
+    }
+
+    reset(): this {
+        return this.generate()
+    }
+
     neighborhood({ x, y }: IVector2D)
         : Neighborhood<TerrainData> {
         return [
@@ -126,13 +156,6 @@ export class Land<TerrainData extends ITerrainData = ITerrainData> extends Entit
             this.terrain({ x, y: y + 1 }),
             this.terrain({ x: x - 1, y }),
         ]
-    }
-
-    reset(): this {
-        this.terrains_ = this.terrainGenerator_.generate(this.size_).map((data, index) => {
-            return new Terrain(this.indexToPosition_(index), data, this)
-        })
-        return this
     }
 
     reveal(position: IVector2D, size?: ISize2D): this {

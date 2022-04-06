@@ -54,7 +54,10 @@ export interface ILandTerrainColorProvider<Data extends ITerrainData = ITerrainD
 export interface ILand<Data extends ITerrainData = ITerrainData> extends IEntity {
     readonly size: ISize2D
     readonly events: IObservable<ILandEvent<Data>>
-    reset(): ILand<Data>
+
+    generate(): ILand<Data>
+    load(terrains: Array<Data>): ILand<Data>
+
     reveal(position?: IVector2D, size?: ISize2D): ILand<Data>
     neighborhood(position: IVector2D): Neighborhood<Data>
     terrain(position: IVector2D): ITerrain<Data>|null
