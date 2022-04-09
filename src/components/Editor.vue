@@ -1,5 +1,5 @@
 <script lang="ts">
-import { defineComponent, onMounted, ref, unref } from "vue"
+import { defineComponent, onMounted, reactive, ref, unref, watch } from "vue"
 
 import { debounce, isNil } from "lodash"
 
@@ -20,6 +20,14 @@ export default defineComponent({
         const screenHeightRef = ref(0)
         const screenRef = ref<HTMLCanvasElement | null>(null)
 
+        const landConfig = reactive<Dune.Land.Config>({
+            seed: Date.now(),
+            size: {
+                width: 32,
+                height: 32,
+            },
+        })
+
         // handle window resize event
         const resize = () => {
             const width = window.innerWidth
@@ -37,6 +45,10 @@ export default defineComponent({
 
             const screen = unref(screenRef) as HTMLCanvasElement
             const engine = await Engine.create(Dune.Game, Engine.Mode.Editor, screen)
+
+            watch(landConfig, value => {
+                engine.get(Dune.Land.id).generate(value)
+            })
 
             engine.events
                 .on("stateChanged", state => {
@@ -70,6 +82,7 @@ export default defineComponent({
             screen: screenRef,
             screenWidth: screenWidthRef,
             screenHeight: screenHeightRef,
+            landConfig,
         }
     }
 })
@@ -82,7 +95,7 @@ export default defineComponent({
     background-color: rgba($color: black, $alpha: .5);
 
     display: grid;
-    grid-template-columns: auto 100fr;
+    grid-template-columns: auto 100fr min(3ch);
 
     padding: 1ch;
 
@@ -100,8 +113,17 @@ export default defineComponent({
         }
     }
 
+    & > span {
+        justify-self: left;
+    }
+
+    & > button {
+        grid-column: 1 / span 3;
+        width: 100%;
+    }
+
     & > hr {
-        grid-column: 1 / span 2;
+        grid-column: 1 / span 3;
         width: 100%;
     }
 }
@@ -113,13 +135,16 @@ export default defineComponent({
     </modal>
     <div class="land-inspector">
         <label for="width">Width</label>
-        <input name="width" type="range" min="16" max="256" v-model="width"/>
+        <input name="width" type="range" min="16" max="256" v-model="landConfig.size.width"/>
+        <span>&nbsp;{{landConfig.size.width}}</span>
 
         <label for="height">Height</label>
-        <input name="height" type="range" min="16" max="256" v-model="height"/>
+        <input name="height" type="range" min="16" max="256" v-model="landConfig.size.height"/>
+        <span>&nbsp;{{landConfig.size.height}}</span>
 
         <hr>
 
+        <button @click="landConfig.seed = Date.now()">Seed</button>
     </div>
     <canvas
         id="screen"

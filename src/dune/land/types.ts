@@ -17,7 +17,7 @@ export interface ITerrainData extends Engine.ITerrainData {
 
 export type ITerrain = Engine.ITerrain<ITerrainData>
 
-export interface ILandConfig extends Engine.ILandConfig {
+export interface Config extends Engine.ILandConfig {
     // Land size
     size: ISize2D
     // Generation seed

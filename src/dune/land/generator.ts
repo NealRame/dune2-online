@@ -1,4 +1,8 @@
-import { ILandConfig, ITerrainData, TerrainType } from "./types"
+import {
+    type Config,
+    type ITerrainData,
+    TerrainType,
+} from "./types"
 
 import * as Engine from "@/engine"
 
@@ -7,8 +11,8 @@ import { createNoise2DGenerator, createRangeMapper, IVector2D } from "@/maths"
 
 import { chain, clamp, flow, isNil, omit, times } from "lodash"
 
-function ensureConfig(config: ILandConfig)
-    : Required<ILandConfig> {
+function ensureConfig(config: Config)
+    : Required<Config> {
     const spiceThreshold = clamp(config.spiceThreshold ?? 0.6, 0, 1)
     const spiceSaturationThreshold = clamp(config.spiceSaturationThreshold ?? (1 + spiceThreshold)/2, spiceThreshold, 1)
     return {
@@ -30,7 +34,7 @@ function ensureConfig(config: ILandConfig)
     }
 }
 
-function createTerrainTypeGenerator(config: Required<ILandConfig>)
+function createTerrainTypeGenerator(config: Required<Config>)
     : (t: Partial<ITerrainData> & IVector2D) => Partial<ITerrainData> {
     const terrainNoise = flow(
         createNoise2DGenerator({
@@ -57,7 +61,7 @@ function createTerrainTypeGenerator(config: Required<ILandConfig>)
     }
 }
 
-function createSpiceFieldGenerator(config: Required<ILandConfig>)
+function createSpiceFieldGenerator(config: Required<Config>)
     : (t: Partial<ITerrainData> & IVector2D) => Partial<ITerrainData> {
     const spiceNoise = flow(
         createNoise2DGenerator({
@@ -91,7 +95,7 @@ function createSpiceFieldGenerator(config: Required<ILandConfig>)
     }
 }
 
-function createLandDataGenerator(landConfig: Required<ILandConfig>)
+function createLandDataGenerator(landConfig: Required<Config>)
     : (p: IVector2D) => ITerrainData {
     const generateTerrainType = createTerrainTypeGenerator(landConfig)
     const generateSpiceField = createSpiceFieldGenerator(landConfig)
@@ -109,7 +113,7 @@ function createLandDataGenerator(landConfig: Required<ILandConfig>)
 
 @Engine.Decorators.LandGenerator()
 export class Generator {
-    generate(config: ILandConfig): Array<ITerrainData> {
+    generate(config: Config): Array<ITerrainData> {
         const { size } = config
         const generateTerrain = createLandDataGenerator(ensureConfig(config))
         const indexToPosition = createIndexToPositionConverter(size)
