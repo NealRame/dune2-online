@@ -11,29 +11,6 @@ import { createNoise2DGenerator, createRangeMapper, IVector2D } from "@/maths"
 
 import { chain, clamp, flow, isNil, omit, times } from "lodash"
 
-function ensureConfig(config: Config)
-    : Required<Config> {
-    const spiceThreshold = clamp(config.spiceThreshold ?? 0.6, 0, 1)
-    const spiceSaturationThreshold = clamp(config.spiceSaturationThreshold ?? (1 + spiceThreshold)/2, spiceThreshold, 1)
-    return {
-        // Land size
-        size: config.size,
-        // Generator seed
-        seed: config.seed ?? Date.now(),
-        // Terrain values
-        terrainScale: clamp(Math.floor(config.terrainScale ?? 32), 16, 64),
-        terrainDetails: clamp(Math.floor(config.terrainDetails ?? 1), 1, 6),
-        terrainSandThreshold: clamp(config.terrainSandThreshold ?? 2/5, 0, 1),
-        terrainRockThreshold: clamp(config.terrainRockThreshold ?? 5/8, 0, 1),
-        terrainMountainsThreshold: clamp(config.terrainMountainsThreshold ?? 7/8, 0, 1),
-        // Spice field values
-        spiceScale: clamp(Math.floor(config.spiceScale ?? 16), 16, 64),
-        spiceDetails: clamp(Math.floor(config.spiceDetails ?? 1), 1, 6),
-        spiceThreshold,
-        spiceSaturationThreshold,
-    }
-}
-
 function createTerrainTypeGenerator(config: Required<Config>)
     : (t: Partial<ITerrainData> & IVector2D) => Partial<ITerrainData> {
     const terrainNoise = flow(
@@ -108,6 +85,29 @@ function createLandDataGenerator(landConfig: Required<Config>)
                 .value(),
             ["x", "y"]
         ) as ITerrainData
+    }
+}
+
+export function ensureConfig(config: Config)
+    : Required<Config> {
+    const spiceThreshold = clamp(config.spiceThreshold ?? 0.6, 0, 1)
+    const spiceSaturationThreshold = clamp(config.spiceSaturationThreshold ?? (1 + spiceThreshold)/2, spiceThreshold, 1)
+    return {
+        // Land size
+        size: config.size,
+        // Generator seed
+        seed: config.seed ?? Date.now(),
+        // Terrain values
+        terrainScale: clamp(Math.floor(config.terrainScale ?? 32), 16, 64),
+        terrainDetails: clamp(Math.floor(config.terrainDetails ?? 1), 1, 6),
+        terrainSandThreshold: clamp(config.terrainSandThreshold ?? 2/5, 0, 1),
+        terrainRockThreshold: clamp(config.terrainRockThreshold ?? 5/8, 0, 1),
+        terrainMountainsThreshold: clamp(config.terrainMountainsThreshold ?? 7/8, 0, 1),
+        // Spice field values
+        spiceScale: clamp(Math.floor(config.spiceScale ?? 16), 16, 64),
+        spiceDetails: clamp(Math.floor(config.spiceDetails ?? 1), 1, 6),
+        spiceThreshold,
+        spiceSaturationThreshold,
     }
 }
 
