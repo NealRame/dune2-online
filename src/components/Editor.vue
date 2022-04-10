@@ -1,7 +1,7 @@
 <script lang="ts">
 import { defineComponent, onMounted, reactive, ref, unref, watch } from "vue"
 
-import { debounce, isNil, noop } from "lodash"
+import { debounce, isNil } from "lodash"
 
 import * as Dune from "@/dune"
 import * as Engine from "@/engine"
@@ -96,13 +96,13 @@ export default defineComponent({
         })
 
         return {
+            landConfig,
             loading: loadingRef,
             loadingLabel: loadingLabelRef,
             loadingValue: loadingValueRef,
             screen: screenRef,
             screenWidth: screenWidthRef,
             screenHeight: screenHeightRef,
-            landConfig,
             showInspector,
             zoomIn,
             zoomOut,
@@ -192,14 +192,13 @@ export default defineComponent({
 #settings {
     display: flex;
 
-    gap: .5rem;
-
     align-items: flex-end;
+    gap: 16px;
     flex-direction: row;
 
     position: fixed;
-    bottom: 32px;
-    right: 24px;
+    bottom: 16px;
+    right: 16px;
 }
 #fabs {
     display: flex;
@@ -212,11 +211,14 @@ export default defineComponent({
         background-color: rgba($color: black, $alpha: .5);
         border: 2px solid sandybrown;
         border-radius: 100%;
+
         color: whitesmoke;
+
         font-size: 1.5rem;
-        float: right;
+
         height: 64px;
         width: 64px;
+
         &:hover {
             background-color: rgba(245, 245, 245, .25);
         }
@@ -226,9 +228,11 @@ export default defineComponent({
     }
 }
 #land-inspector {
+    background-color: rgba($color: black, $alpha: .5);
     border: 2px solid sandybrown;
     border-radius: 8px;
-    background-color: rgba($color: black, $alpha: .5);
+
+    font-size: .75rem;
 
     display: grid;
     grid-template-columns: auto 100fr min(6ch);
@@ -238,14 +242,11 @@ export default defineComponent({
     & > label {
         justify-self: right;
         margin-right: 1ch;
-
-        &::after {
-            content: ":";
-        }
     }
 
     & > span {
         justify-self: left;
+        margin-left: 1ch;
     }
 
     & > button,
@@ -256,7 +257,7 @@ export default defineComponent({
 
     & > h2 {
         background-color: rgba($color: black, $alpha: .25);
-        font-size: 1.25rem;
+        font-size: 1rem;
         margin: .25rem 0;
     }
 }
