@@ -43,7 +43,7 @@ export default defineComponent({
 </script>
 
 <template>
-    <label v-if="label" for="name">{{label}}</label>
+    <label v-if="label" :for="name">{{label}}</label>
     <input
         ref="input"
         type="range"
@@ -56,3 +56,14 @@ export default defineComponent({
     >
     <span>{{modelValue}}</span>
 </template>
+
+<style lang="scss" scoped>
+    label {
+        justify-self: right;
+        margin-right: 1ch;
+    }
+    span {
+        justify-self: left;
+        margin-left: 1ch;
+    }
+</style>

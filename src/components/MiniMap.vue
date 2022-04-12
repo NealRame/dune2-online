@@ -21,9 +21,6 @@ export default defineComponent({
 
             if (isNil(screen)) return
 
-            screen.width = 2*width
-            screen.height = 2*height
-
             const miniMap = engine.get(Engine.GameMinimap)
             const painter = new Painter(screen)
             const image = miniMap.image
@@ -33,9 +30,15 @@ export default defineComponent({
             if (!isNil(image)) {
                 painter.drawImageBitmap(
                     image,
-                    { x: 0, y: 0 },
+                    {
+                        x: screen.width/2 - width,
+                        y: screen.height/2 - height,
+                    },
                     new Rect({ x: 0, y: 0 }, image),
-                    painter.size,
+                    {
+                        width: 2*width,
+                        height: 2*height,
+                    }
                 )
             }
 
@@ -64,7 +67,7 @@ export default defineComponent({
 </script>
 
 <template>
-    <canvas id="minimap" ref="screen"/>
+    <canvas id="minimap" ref="screen" width="256" height="256"/>
 </template>
 
 <style lang="scss" scoped>
@@ -72,5 +75,7 @@ export default defineComponent({
     background-color: rgba($color: black, $alpha: .5);
     border: 2px solid sandybrown;
     border-radius: 8px;
+
+    padding: 1ch;
 }
 </style>

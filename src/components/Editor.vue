@@ -127,7 +127,6 @@ export default defineComponent({
         :height="screenHeight"
     />
     <div id="settings" v-if="engine">
-        <mini-map :engine="engine" />
         <div id="land-inspector" v-show="showInspector">
             <h2>Size</h2>
             <input-range
@@ -157,15 +156,15 @@ export default defineComponent({
                 :step="1"
             />
             <input-range
-                label="Sand threshold"
+                label="Sand"
                 v-model="landConfig.terrainSandThreshold"
             />
             <input-range
-                label="Rock threshold"
+                label="Rock"
                 v-model="landConfig.terrainRockThreshold"
             />
             <input-range
-                label="Mountain threshold"
+                label="Mountain"
                 v-model="landConfig.terrainMountainsThreshold"
             />
 
@@ -188,11 +187,12 @@ export default defineComponent({
                 v-model="landConfig.spiceThreshold"
             />
             <input-range
-                label="Saturation threshold"
+                label="Saturation"
                 :step="0.001"
                 v-model="landConfig.spiceSaturationThreshold"
             />
         </div>
+        <mini-map :engine="engine" />
         <div id="fabs">
             <button id="open-settings" @click="showInspector=!showInspector">
                 <font-awesome-icon icon="wrench"/>
@@ -215,7 +215,7 @@ export default defineComponent({
 #settings {
     display: flex;
 
-    align-items: flex-end;
+    align-items: stretch;
 
     flex-direction: column;
 
@@ -235,35 +235,24 @@ export default defineComponent({
     display: grid;
     grid-template-columns: auto 100fr min(6ch);
 
+    justify-items: stretch;
+    align-items: center;
+
     padding: 1ch;
-
-    & > label {
-        justify-self: right;
-        margin-right: 1ch;
-    }
-
-    & > span {
-        justify-self: left;
-        margin-left: 1ch;
-    }
-
-    & > button,
-    & > h2 {
-        grid-column: 1 / span 3;
-        width: 100%;
-    }
 
     & > h2 {
         background-color: rgba($color: black, $alpha: .25);
         font-size: 1rem;
+        grid-column: 1 / span 3;
         margin: .25rem 0;
+        width: 100%;
     }
 }
 #fabs {
     display: flex;
 
-    gap: .25rem;
     flex-direction: row;
+    justify-content: space-between;
 
     button {
         background-color: rgba($color: black, $alpha: .5);
