@@ -1,4 +1,5 @@
 export * from "./animation"
+export * from "./constants"
 export * from "./entity"
 export * from "./engine-factory"
 export * from "./grid"

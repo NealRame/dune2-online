@@ -8,18 +8,20 @@ import {
 } from "@/dune/resources"
 
 import * as Engine from "@/engine"
+import { GameMode } from "@/engine"
 import { Inject } from "@/engine/injector"
 
 import { RGBA } from "@/graphics/color"
 
 export class ColorsProvider implements Engine.ILandTerrainColorProvider<ITerrainData> {
     constructor(
+        @Inject(GameMode) private mode_: Engine.Mode,
         @Inject(Palette) private palette_: Engine.Palette,
     ) { }
 
     getTerrainColor(terrain: Engine.ITerrain<ITerrainData>): RGBA {
         const { revealed, type } = terrain.data
-        if (revealed) {
+        if (revealed || this.mode_ === Engine.Mode.Editor) {
             switch (type) {
             case TerrainType.Sand:
                 return this.palette_[13*8 + 4]

@@ -6,14 +6,17 @@ import { debounce, isNil } from "lodash"
 import * as Dune from "@/dune"
 import * as Engine from "@/engine"
 
+import InputRange from "@/components/InputRange.vue"
+import MiniMap from "@/components/MiniMap.vue"
 import Modal from "@/components/Modal.vue"
 import ProgressBar from "@/components/ProgressBar.vue"
+
 import { GameScene } from "@/engine/constants"
 
 export default defineComponent({
-    components: { Modal, ProgressBar },
+    components: { MiniMap, Modal, ProgressBar, InputRange },
     setup() {
-        let engine: Engine.IEngine | null = null
+        const engineRef = ref<Engine.IEngine | null>(null)
 
         const loadingRef = ref<boolean>(true)
         const loadingLabelRef = ref<string>("")
@@ -34,12 +37,14 @@ export default defineComponent({
 
         // zoom event handler
         const zoomIn = () => {
+            const engine = unref(engineRef)
             if (!isNil(engine)) {
                 engine.get(GameScene).zoomIn()
             }
         }
 
         const zoomOut = () => {
+            const engine = unref(engineRef)
             if (!isNil(engine)) {
                 engine.get(GameScene).zoomOut()
             }
@@ -61,8 +66,7 @@ export default defineComponent({
             resize()
 
             const screen = unref(screenRef) as HTMLCanvasElement
-
-            engine = await Engine.create(Dune.Game, Engine.Mode.Editor, screen)
+            const engine = await Engine.create(Dune.Game, Engine.Mode.Editor, screen)
 
             watch(landConfig, value => {
                 if (!isNil(engine)) {
@@ -90,12 +94,13 @@ export default defineComponent({
 
             await engine.initialize()
             engine.start()
+            engine.get(Dune.Land.id).generate({ size: { width: 32, height: 32 } })
 
-            const land = engine.get(Dune.Land.id)
-            land.generate({ size: { width: 32, height: 32 } })
+            engineRef.value = engine
         })
 
         return {
+            engine: engineRef,
             landConfig,
             loading: loadingRef,
             loadingLabel: loadingLabelRef,
@@ -121,55 +126,72 @@ export default defineComponent({
         :width="screenWidth"
         :height="screenHeight"
     />
-    <div id="settings">
+    <div id="settings" v-if="engine">
+        <mini-map :engine="engine" />
         <div id="land-inspector" v-show="showInspector">
             <h2>Size</h2>
-
-            <label for="width">Width</label>
-            <input name="width" type="range" min="16" max="256" v-model="landConfig.size.width"/>
-            <span>{{landConfig.size.width}}</span>
-
-            <label for="height">Height</label>
-            <input name="height" type="range" min="16" max="256" v-model="landConfig.size.height"/>
-            <span>{{landConfig.size.height}}</span>
+            <input-range
+                label="Width"
+                v-model="landConfig.size.width"
+                :range="[16, 128]"
+                :step="1"
+            />
+            <input-range
+                label="Height"
+                v-model="landConfig.size.height"
+                :range="[16, 128]"
+                :step="1"
+            />
 
             <h2>Terrain</h2>
-
-            <label for="terrain-scale">Scale</label>
-            <input name="terrain-scale" type="range" min="16" max="64" step="1" v-model="landConfig.terrainScale"/>
-            <span>{{landConfig.terrainScale}}</span>
-
-            <label for="terrain-details">Details</label>
-            <input name="terrain-scale" type="range" min="1" max="6" step="1" v-model="landConfig.terrainDetails"/>
-            <span>{{landConfig.terrainDetails}}</span>
-
-            <label for="terrain-sand-threshold">Sand threshold</label>
-            <input name="terrain-sand-threshold" type="range" min="0" max="1" step="0.01" v-model="landConfig.terrainSandThreshold"/>
-            <span>{{landConfig.terrainSandThreshold}}</span>
-
-            <label for="terrain-rock-threshold">Rock threshold</label>
-            <input name="terrain-rock-threshold" type="range" min="0" max="1" step="0.01" v-model="landConfig.terrainRockThreshold"/>
-            <span>{{landConfig.terrainRockThreshold}}</span>
-
-            <label for="terrain-mountains-threshold">Mountains Threshold</label>
-            <input name="terrain-mountains-threshold" type="range" min="0" max="1" step="0.01" v-model="landConfig.terrainMountainsThreshold"/>
-            <span>{{landConfig.terrainMountainsThreshold}}</span>
+            <input-range
+                label="Scale"
+                v-model="landConfig.terrainScale"
+                :range="[16, 64]"
+                :step="1"
+            />
+            <input-range
+                label="Details"
+                v-model="landConfig.terrainDetails"
+                :range="[1, 6]"
+                :step="1"
+            />
+            <input-range
+                label="Sand threshold"
+                v-model="landConfig.terrainSandThreshold"
+            />
+            <input-range
+                label="Rock threshold"
+                v-model="landConfig.terrainRockThreshold"
+            />
+            <input-range
+                label="Mountain threshold"
+                v-model="landConfig.terrainMountainsThreshold"
+            />
 
             <h2>Spice</h2>
-
-            <label for="spice-scale">Scale</label>
-            <input name="spice-scale" type="range" min="16" max="64" step="1" v-model="landConfig.spiceScale"/>
-            <span>{{landConfig.spiceScale}}</span>
-
-            <label for="spice-details">Details</label>
-            <input name="spice-details" type="range" min="1" max="6" step="1" v-model="landConfig.spiceDetails"/>
-            <span>{{landConfig.spiceDetails}}</span>
-
-            <label for="spice-threshold">Threshold</label>
-            <input name="spice-threshold" type="range" min="0" max="1" step="0.01" v-model="landConfig.spiceThreshold"/>
-            <span>{{landConfig.spiceThreshold}}</span>
-
-            <!-- spiceSaturationThreshold, -->
+            <input-range
+                label="Scale"
+                v-model="landConfig.spiceScale"
+                :range="[16, 64]"
+                :step="1"
+            />
+            <input-range
+                label="Details"
+                v-model="landConfig.spiceDetails"
+                :range="[1, 6]"
+                :step="1"
+            />
+            <input-range
+                label="Threshold"
+                :step="0.001"
+                v-model="landConfig.spiceThreshold"
+            />
+            <input-range
+                label="Saturation threshold"
+                :step="0.001"
+                v-model="landConfig.spiceSaturationThreshold"
+            />
         </div>
         <div id="fabs">
             <button id="open-settings" @click="showInspector=!showInspector">
@@ -186,6 +208,7 @@ export default defineComponent({
             </button>
         </div>
     </div>
+
 </template>
 
 <style lang="scss" scoped>
@@ -193,39 +216,14 @@ export default defineComponent({
     display: flex;
 
     align-items: flex-end;
-    gap: 16px;
-    flex-direction: row;
+
+    flex-direction: column;
+
+    gap: .5rem;
 
     position: fixed;
     bottom: 16px;
     right: 16px;
-}
-#fabs {
-    display: flex;
-
-    gap: .5rem;
-
-    flex-direction: column;
-
-    button {
-        background-color: rgba($color: black, $alpha: .5);
-        border: 2px solid sandybrown;
-        border-radius: 100%;
-
-        color: whitesmoke;
-
-        font-size: 1.5rem;
-
-        height: 64px;
-        width: 64px;
-
-        &:hover {
-            background-color: rgba(245, 245, 245, .25);
-        }
-        &:active {
-            background-color: rgba(245, 245, 245, .5);
-        }
-    }
 }
 #land-inspector {
     background-color: rgba($color: black, $alpha: .5);
@@ -259,6 +257,33 @@ export default defineComponent({
         background-color: rgba($color: black, $alpha: .25);
         font-size: 1rem;
         margin: .25rem 0;
+    }
+}
+#fabs {
+    display: flex;
+
+    gap: .25rem;
+    flex-direction: row;
+
+    button {
+        background-color: rgba($color: black, $alpha: .5);
+        border: 2px solid sandybrown;
+        border-radius: 100%;
+
+        color: whitesmoke;
+
+        flex-grow: 0;
+        font-size: 1.5rem;
+
+        height: 64px;
+        width: 64px;
+
+        &:hover {
+            background-color: rgba(245, 245, 245, .25);
+        }
+        &:active {
+            background-color: rgba(245, 245, 245, .5);
+        }
     }
 }
 </style>

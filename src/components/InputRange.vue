@@ -1,5 +1,5 @@
 <script lang="ts">
-import { defineComponent } from "vue"
+import { computed, defineComponent } from "vue"
 
 let inputRangeCount = 0
 
@@ -9,19 +9,19 @@ export default defineComponent({
     props: {
         label: {
             type: String,
+            default: "",
+        },
+        name: {
+            type: String,
             default: () => `input-range-${++inputRangeCount}`,
         },
-        min: {
-            type: Number,
-            default: -1.0,
-        },
-        max: {
-            type: Number,
-            default: 1.0,
+        range: {
+            type: Array,
+            default: () => [0, 1],
         },
         step: {
             type: Number,
-            default: 0.1,
+            default: 0.01,
         },
         modelValue: Number,
     },
@@ -35,22 +35,24 @@ export default defineComponent({
                     emit("update:modelValue", value)
                 }
             },
+            min: computed(() => props.range[0]),
+            max: computed(() => props.range[1]),
         }
     },
 })
 </script>
 
 <template>
-    <div class="spin-box">
-        <input v-if="label"
-            ref="input"
-            type="number"
-            :id="label"
-            :step="step"
-            :min="min"
-            :max="max"
-            :value="modelValue"
-            @input="onInput"
-        >
-    </div>
+    <label v-if="label" for="name">{{label}}</label>
+    <input
+        ref="input"
+        type="range"
+        :name="name"
+        :max="max"
+        :min="min"
+        :step="step"
+        :value="modelValue"
+        @input="onInput"
+    >
+    <span>{{modelValue}}</span>
 </template>

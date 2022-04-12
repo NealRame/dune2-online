@@ -1,55 +1,32 @@
 <script lang="ts">
-import Screen, { ScreenMouseClickEvent, ScreenMouseMotionEvent } from "@/components/Screen.vue"
 
 import * as Engine from "@/engine"
-import { Game } from "@/dune2"
-import { IPaintDevice } from "@/graphics"
-import { Vector } from "@/maths"
+import { Painter } from "@/graphics"
+import { Rect } from "@/maths"
 
 import { isNil } from "lodash"
-import { computed, defineComponent, onUpdated, ref, toRef, unref } from "vue"
-
-interface Data {
-    game: Game|null
-}
+import { defineComponent, onMounted, ref, toRef, unref } from "vue"
 
 export default defineComponent({
-    components: { Screen },
-    props: ["game"],
-    setup(props: Data) {
-        const gameRef = toRef(props, "game")
-        const scaleRef = ref<Engine.ScaleFactor>(2)
-        const screenRef = ref<IPaintDevice | null>(null)
-
-        let miniMap: Engine.IMiniMap|null = null
-        let viewport: Engine.IViewport|null = null
-
-        const width = computed(() => {
-            const game = unref(gameRef)
-            const scale = unref(scaleRef)
-            if (!isNil(game)) {
-                return scale*game.engine.scene.width
-            }
-            return 0
-        })
-
-        const height = computed(() => {
-            const game = unref(gameRef)
-            const scale = unref(scaleRef)
-            if (!isNil(game)) {
-                return scale*game.engine.scene.height
-            }
-            return 0
-        })
+    props: ["engine"],
+    setup(props: { engine: Engine.IEngine }) {
+        const engineRef = toRef(props, "engine")
+        const screenRef = ref<HTMLCanvasElement | null>(null)
+        // let viewport: Engine.IViewport|null = null
 
         const refresh = () => {
-            const game = unref(gameRef)
-            const painter = (unref(screenRef) as IPaintDevice).painter
+            const engine = unref(engineRef)
+            const screen = unref(screenRef)
+            const { width, height } = engine.get(Engine.GameScene).size
 
-            if (isNil(game)) return
-            if (isNil(painter)) return
+            if (isNil(screen)) return
 
-            const image = miniMap?.image
+            screen.width = 2*width
+            screen.height = 2*height
+
+            const miniMap = engine.get(Engine.GameMinimap)
+            const painter = new Painter(screen)
+            const image = miniMap.image
 
             painter.clear("#000")
 
@@ -57,143 +34,43 @@ export default defineComponent({
                 painter.drawImageBitmap(
                     image,
                     { x: 0, y: 0 },
-                    game.engine.scene.rect,
+                    new Rect({ x: 0, y: 0 }, image),
                     painter.size,
                 )
             }
 
-            if (!isNil(viewport)) {
-                const rect = viewport.rect.scale(unref(scaleRef))
-                painter.pen = {
-                    lineWidth: 1,
-                    strokeStyle: "#fff",
-                }
-                painter.drawRect(rect.topLeft(), rect.size)
-            }
+            // if (!isNil(viewport)) {
+            //     const rect = viewport.rect.scale(unref(scaleRef))
+            //     painter.pen = {
+            //         lineWidth: 1,
+            //         strokeStyle: "#fff",
+            //     }
+            //     painter.drawRect(rect.topLeft(), rect.size)
+            // }
         }
 
-        const onZoomInClicked = () => {
-            const game = unref(gameRef)
-            if (!isNil(game)) {
-                game.engine.scene.zoomIn()
-            }
-        }
-
-        const onZoomOutClicked = () => {
-            const game = unref(gameRef)
-            if (!isNil(game)) {
-                game.engine.scene.zoomOut()
-            }
-        }
-
-        const onMouseEvent = ({ button, position }: ScreenMouseClickEvent|ScreenMouseMotionEvent) => {
-            if (!isNil(viewport) && button) {
-                const { x, y } = position
-                const { width, height } = viewport.size
-                viewport.position = (new Vector(x, y)).mul(1/unref(scaleRef)).sub({
-                    x: width/2,
-                    y: height/2,
-                })
-            }
-        }
-
-        onUpdated(() => {
-            const game = unref(gameRef)
-            if (!isNil(game)) {
-                miniMap = game.miniMap
-                miniMap.events.on("changed", refresh)
-
-                viewport = game.engine.scene.viewport
-                if (!isNil(viewport)) {
-                    viewport.events.on("changed", refresh)
-                }
-
-                refresh()
-            }
+        onMounted(() => {
+            refresh()
+            const engine = unref(engineRef)
+            const miniMap = engine.get(Engine.GameMinimap)
+            miniMap.events.on("changed", refresh)
         })
 
         return {
             screen: screenRef,
-            width,
-            height,
-            onMouseEvent,
-            onZoomInClicked,
-            onZoomOutClicked,
         }
     }
 })
 </script>
 
 <template>
-    <div id="minimap-wrapper">
-        <button id="zoom-in">
-            <font-awesome-icon icon="search-plus" @click="onZoomInClicked"/>
-        </button>
-        <button id="zoom-out">
-            <font-awesome-icon icon="search-minus" @click="onZoomOutClicked"/>
-        </button>
-        <screen id="minimap" ref="screen"
-            :width="width"
-            :height="height"
-            @mouseClick="onMouseEvent"
-            @mouseMotion="onMouseEvent"
-        />
-    </div>
+    <canvas id="minimap" ref="screen"/>
 </template>
 
 <style lang="scss" scoped>
-#minimap-wrapper {
-    position: fixed;
-    right: $minimap-position-right;
-    bottom: $minimap-position-bottom;
-    padding: 0;
-
-    canvas#minimap {
-        border:
-            $minimap-color1
-            $minimap-border-thickness
-            $minimap-border-type;
-        border-radius: $minimap-border-radius;
-        box-shadow: 0 0 4px $minimap-shadow-color1;
-
-        transition: all 0.2s ease-in;
-        -webkit-transition: all 0.2s ease-in;
-
-        &:hover {
-            border-color: $minimap-color2;
-            border-radius: $minimap-border-radius;
-            box-shadow: 0 0 16px $minimap-shadow-color2;
-
-            transform: scale($minimap-scale-factor);
-
-            -webkit-transition: all 0.2s ease-out;
-            transition: all 0.2s ease-out;
-        }
-    }
-
-    button {
-        background-color: transparent;
-
-        border: none;
-        color: $minimap-color1;
-        cursor: pointer;
-
-        float: left;
-        clear: both;
-
-        height: $minimap-zoom-button-width;
-        width: $minimap-zoom-button-height;
-
-        -webkit-transition: all 0.2s ease-in;
-        transition: all 0.2s ease-in;
-
-        &:hover {
-            color: $minimap-color2;
-            transform: scale($minimap-zoom-button-scale-factor);
-
-            -webkit-transition: all 0.2s ease-out;
-            transition: all 0.2s ease-out;
-        }
-    }
+#minimap {
+    background-color: rgba($color: black, $alpha: .5);
+    border: 2px solid sandybrown;
+    border-radius: 8px;
 }
 </style>
