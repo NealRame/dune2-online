@@ -48,6 +48,14 @@ export class Painter {
         return new Rect({ x: 0, y: 0 }, this.size)
     }
 
+    get width(): number {
+        return this.canvas_.width
+    }
+
+    get height(): number {
+        return this.canvas_.height
+    }
+
     get pen(): Pen {
         return {
             lineWidth: this.context_.lineWidth,
