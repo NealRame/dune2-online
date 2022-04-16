@@ -8,9 +8,11 @@ import * as Engine from "@/engine"
 
 import Modal from "@/components/Modal.vue"
 import ProgressBar from "@/components/ProgressBar.vue"
+import Screen from "@/components/Screen.vue"
+import { IPaintDevice } from "@/graphics"
 
 export default defineComponent({
-    components: { Modal, ProgressBar },
+    components: { Modal, ProgressBar, Screen },
     setup() {
         const loadingRef = ref<boolean>(true)
         const loadingLabelRef = ref<string>("")
@@ -18,7 +20,7 @@ export default defineComponent({
 
         const screenWidthRef = ref(0)
         const screenHeightRef = ref(0)
-        const screenRef = ref<HTMLCanvasElement | null>(null)
+        const screenRef = ref<IPaintDevice | null>(null)
 
         // handle window resize event
         const resize = () => {
@@ -35,7 +37,7 @@ export default defineComponent({
 
             resize()
 
-            const screen = unref(screenRef) as HTMLCanvasElement
+            const screen = unref(screenRef) as IPaintDevice
             const engine = await Engine.create(Dune.Game, Engine.Mode.Game, screen)
 
             engine.events
@@ -80,7 +82,7 @@ export default defineComponent({
     <modal :show="loading">
         <progress-bar :current="loadingValue" :label="loadingLabel"/>
     </modal>
-    <canvas
+    <screen
         id="screen"
         ref="screen"
         :width="screenWidth"

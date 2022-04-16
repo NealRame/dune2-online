@@ -1,5 +1,22 @@
-import { Rect, IVector2D, ISize2D } from "@/maths"
-import { createObservable, IObservable } from "@/utils"
+import {
+    type IScene,
+} from "./scene"
+
+import {
+    type IPaintDevice,
+} from "@/graphics"
+
+import {
+    Rect,
+    type IVector2D,
+    type ISize2D,
+} from "@/maths"
+
+import {
+    createObservable,
+    type IEmitter,
+    type IObservable,
+} from "@/utils"
 
 import { clamp } from "lodash"
 
@@ -14,40 +31,59 @@ export interface IViewport {
     size: ISize2D
 }
 
-export function createViewport(sceneSize: ISize2D): IViewport {
-    const [emitter, events] = createObservable<IViewportEvent>()
-    const rect = new Rect({ x: 0, y: 0 }, sceneSize)
+export class Viewport implements IViewport {
+    private emitter_: IEmitter<IViewportEvent>
+    private events_: IObservable<IViewportEvent>
+    private rect_: Rect
 
-    const setPosition = ({ x, y }: IVector2D) => {
-        rect.x = clamp(x, 0, sceneSize.width - rect.width)
-        rect.y = clamp(y, 0, sceneSize.height - rect.height)
-        emitter.emit("changed", Rect.fromRect(rect))
+    private setSize_({ width, height }: ISize2D) {
+        this.rect_.width = clamp(width/this.scene_.gridSpacing, 0, this.scene_.width)
+        this.rect_.height = clamp(height/this.scene_.gridSpacing, 0, this.scene_.height)
+        this.emitter_.emit("changed", Rect.fromRect(this.rect_))
     }
 
-    const setSize = (size: ISize2D) => {
-        rect.width = clamp(size.width, 0, sceneSize.width)
-        rect.height = clamp(size.height, 0, sceneSize.height)
-        setPosition(rect.topLeft())
+    private setPosition_({ x, y }: IVector2D) {
+        this.rect_.x = clamp(x, 0, this.scene_.width - this.rect_.width)
+        this.rect_.y = clamp(y, 0, this.scene_.height - this.rect_.height)
+        this.emitter_.emit("changed", Rect.fromRect(this.rect_))
     }
 
-    return {
-        get events(): IObservable<IViewportEvent> {
-            return events
-        },
-        get rect(): Rect {
-            return Rect.fromRect(rect)
-        },
-        get position(): IVector2D {
-            return rect.topLeft()
-        },
-        set position(pos: IVector2D) {
-            setPosition(pos)
-        },
-        get size(): ISize2D {
-            return rect.size
-        },
-        set size(size: ISize2D) {
-            setSize(size)
-        },
+    constructor(
+        private scene_: IScene,
+        private screen_: IPaintDevice,
+    ) {
+        const [emitter, events] = createObservable<IViewportEvent>()
+
+        this.emitter_ = emitter
+        this.events_ = events
+
+        this.rect_ = new Rect({ x: 0, y: 0 }, {
+            width: this.screen_.painter.width/this.scene_.gridSpacing,
+            height: this.screen_.painter.height/this.scene_.gridSpacing,
+        })
+
+        this.screen_.events.on("resized", size => {
+            this.setSize_(size)
+        })
+    }
+
+    get events(): IObservable<IViewportEvent> {
+        return this.events_
+    }
+
+    get rect(): Rect {
+        return this.rect_
+    }
+
+    get position(): IVector2D {
+        return this.rect_.topLeft()
+    }
+
+    set position(pos: IVector2D) {
+        this.setPosition_(pos)
+    }
+
+    get size(): ISize2D {
+        return this.rect_.size
     }
 }

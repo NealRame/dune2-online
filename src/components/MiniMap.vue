@@ -1,17 +1,20 @@
 <script lang="ts">
 
+import Screen from "@/components/Screen.vue"
+
 import * as Engine from "@/engine"
-import { Painter } from "@/graphics"
+import { IPaintDevice } from "@/graphics"
 import { Rect } from "@/maths"
 
 import { isNil } from "lodash"
 import { defineComponent, onMounted, ref, toRef, unref } from "vue"
 
 export default defineComponent({
+    components: { Screen },
     props: ["engine"],
     setup(props: { engine: Engine.IEngine }) {
         const engineRef = toRef(props, "engine")
-        const screenRef = ref<HTMLCanvasElement | null>(null)
+        const screenRef = ref<IPaintDevice | null>(null)
         // let viewport: Engine.IViewport|null = null
 
         const refresh = () => {
@@ -22,18 +25,19 @@ export default defineComponent({
             if (isNil(screen)) return
 
             const miniMap = engine.get(Engine.GameMinimap)
-            const painter = new Painter(screen)
+            const painter = screen.painter
             const image = miniMap.image
+            const origin = {
+                x: painter.width/2 - width + 0.5,
+                y: painter.height/2 - height + 0.5,
+            }
 
             painter.clear("#000")
 
             if (!isNil(image)) {
                 painter.drawImageBitmap(
                     image,
-                    {
-                        x: screen.width/2 - width,
-                        y: screen.height/2 - height,
-                    },
+                    origin,
                     new Rect({ x: 0, y: 0 }, image),
                     {
                         width: 2*width,
@@ -42,21 +46,23 @@ export default defineComponent({
                 )
             }
 
-            // if (!isNil(viewport)) {
-            //     const rect = viewport.rect.scale(unref(scaleRef))
-            //     painter.pen = {
-            //         lineWidth: 1,
-            //         strokeStyle: "#fff",
-            //     }
-            //     painter.drawRect(rect.topLeft(), rect.size)
-            // }
+            const { viewport } = engine.get(Engine.GameScene)
+            const rect = Rect.fromRect(viewport.rect).scale(2)
+
+            painter.pen = {
+                lineWidth: 1,
+                strokeStyle: "#fff",
+            }
+            painter.drawRect(rect.topLeft().add(origin), rect.size)
         }
 
         onMounted(() => {
             refresh()
             const engine = unref(engineRef)
             const miniMap = engine.get(Engine.GameMinimap)
+            const viewport = engine.get(Engine.GameScene).viewport
             miniMap.events.on("changed", refresh)
+            viewport.events.on("changed", refresh)
         })
 
         return {
@@ -67,7 +73,12 @@ export default defineComponent({
 </script>
 
 <template>
-    <canvas id="minimap" ref="screen" width="256" height="256"/>
+    <screen
+        id="minimap"
+        ref="screen"
+        width="256"
+        height="256"
+    />
 </template>
 
 <style lang="scss" scoped>

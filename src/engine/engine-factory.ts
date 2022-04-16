@@ -35,7 +35,9 @@ import {
     type GameMetadata,
 } from "@/engine/types"
 
-import { Painter } from "@/graphics"
+import {
+    type IPaintDevice,
+} from "@/graphics"
 
 import {
     createObservable,
@@ -80,20 +82,20 @@ function getGameLandMetadata(game: any) {
 
 async function initializeScene(
     container: Container,
-    screen: HTMLCanvasElement,
+    screen: IPaintDevice,
 ) {
-    const painter = new Painter(screen)
-    const scene = new Scene(painter)
+    const scene = new Scene(screen)
 
-    screen.addEventListener("mousemove", (ev: MouseEvent) => {
-        const { buttons, ctrlKey, movementX, movementY } = ev
+    container.set(GameScene, scene)
+    screen.events.on("mouseMoved", event => {
+        const { button, ctrlKey, movement } = event
         const { x: offsetX, y: offsetY } = screenToSceneScale(scene, {
-            x: -movementX,
-            y: -movementY,
+            x: -movement.x,
+            y: -movement.y,
         })
 
         // drag scene
-        if (ctrlKey && buttons === 1) {
+        if (ctrlKey && button) {
             if (offsetX !== 0 || offsetY !== 0) {
                 const { x, y, width, height } = scene.viewport.rect
                 scene.viewport.position = {
@@ -103,8 +105,6 @@ async function initializeScene(
             }
         }
     })
-
-    container.set(GameScene, scene)
 }
 
 async function initializeResources(
@@ -158,7 +158,7 @@ async function initializeLand(
 export function create(
     game: any,
     mode: Mode,
-    screen: HTMLCanvasElement,
+    screen: IPaintDevice,
 ): IEngine {
     const container = new Container()
     const state = {

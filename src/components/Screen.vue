@@ -1,9 +1,10 @@
 <script lang="ts">
-import { Rect, IVector2D, ISize2D } from "@/maths"
-import { Painter } from "@/graphics"
+import { IVector2D } from "@/maths"
+import { IPaintDeviceEvents, Painter } from "@/graphics"
 
 import { clamp, isNil } from "lodash"
-import { computed, defineComponent, onMounted, ref, unref } from "vue"
+import { computed, defineComponent, onMounted, ref, toRefs, unref, watch } from "vue"
+import { createObservable } from "@/utils"
 
 export type ScreenMouseMotionEvent = {
     button: boolean,
@@ -23,18 +24,29 @@ export type ScreenMouseClickEvent = {
 }
 
 export default defineComponent({
-    emits: ["mouseMotion", "mouseClick"],
-    props: ["width", "height"],
-    setup(props, { emit }) {
-        const canvasRef = ref<HTMLCanvasElement | null>(null)
+    emits: [
+        "mouseClick",
+        "mouseMotion",
+    ],
+    props: [
+        "height",
+        "width",
+    ],
+    setup(props) {
         let painter: Painter | null
+
+        const canvasRef = ref<HTMLCanvasElement | null>(null)
+        const {
+            height: heightRef,
+            width: widthRef,
+        } = toRefs(props)
+        const [emitter, events] = createObservable<IPaintDeviceEvents>()
 
         // handle mouse move event
         const mouseMove = (e: MouseEvent) => {
             const canvas = unref(canvasRef) as HTMLCanvasElement
             const { left, top } = canvas.getBoundingClientRect()
-
-            emit("mouseMotion", {
+            emitter.emit("mouseMoved", {
                 button: e.buttons > 0,
                 altKey: e.altKey,
                 ctrlKey: e.ctrlKey,
@@ -55,8 +67,7 @@ export default defineComponent({
         const mouseClick = (e: MouseEvent) => {
             const canvas = unref(canvasRef) as HTMLCanvasElement
             const { left, top } = canvas.getBoundingClientRect()
-
-            emit("mouseClick", {
+            emitter.emit("mouseClicked", {
                 button: true,
                 position: {
                     // TODO consider borders thickness
@@ -69,9 +80,15 @@ export default defineComponent({
             })
         }
 
+        watch([widthRef, heightRef], ([width, height]) => {
+            emitter.emit("resized", {
+                height,
+                width,
+            })
+        })
+
         onMounted(() => {
             const canvas = unref(canvasRef) as HTMLCanvasElement
-            // listen to canvas and window events
             canvas.addEventListener("mousemove", mouseMove)
             canvas.addEventListener("click", mouseClick)
             // initialize painter
@@ -80,31 +97,18 @@ export default defineComponent({
 
         return {
             canvas: canvasRef,
+            events,
             painter: computed((): Painter => {
                 if (isNil(painter)) {
                     throw new Error("No painter available yet")
                 }
                 return painter
             }),
-            rect: computed((): Rect => {
-                const canvas = unref(canvasRef)
-                const { x, y } = canvas?.getBoundingClientRect() ?? { x: 0, y: 0 }
-                return new Rect({ x, y }, {
-                    width: props.width,
-                    height: props.height,
-                })
-            }),
-            size: computed((): ISize2D => {
-                return {
-                    width: props.width,
-                    height: props.height,
-                }
-            })
         }
     }
 })
 </script>
 
 <template>
-    <canvas ref="canvas" :width="width" :height="height"></canvas>
+    <canvas ref="canvas" :width="width" :height="height"/>
 </template>
