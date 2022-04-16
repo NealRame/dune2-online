@@ -15,7 +15,6 @@ export default defineComponent({
     setup(props: { engine: Engine.IEngine }) {
         const engineRef = toRef(props, "engine")
         const screenRef = ref<IPaintDevice | null>(null)
-        // let viewport: Engine.IViewport|null = null
 
         const refresh = () => {
             const engine = unref(engineRef)
@@ -32,7 +31,7 @@ export default defineComponent({
                 y: painter.height/2 - height + 0.5,
             }
 
-            painter.clear("#000")
+            painter.clear()
 
             if (!isNil(image)) {
                 painter.drawImageBitmap(
