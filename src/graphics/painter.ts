@@ -98,12 +98,17 @@ export class Painter {
 
     // Drawing routines
 
-    clear(brush: Brush): Painter {
-        const { width, height } = this.size
-        this.context_.save()
-        this.context_.fillStyle = brush
-        this.context_.fillRect(0, 0, width, height)
-        this.context_.restore()
+    clear(): Painter
+    clear(brush: Brush): Painter
+    clear(brush?: Brush): Painter {
+        if (isNil(brush)) {
+            this.context_.clearRect(0, 0, this.width, this.height)
+        } else {
+            this.context_.save()
+            this.context_.fillStyle = brush
+            this.context_.fillRect(0, 0, this.width, this.height)
+            this.context_.restore()
+        }
         return this
     }
 
