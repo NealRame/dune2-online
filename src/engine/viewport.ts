@@ -62,6 +62,9 @@ export class Viewport implements IViewport {
             height: this.screen_.painter.height/this.scene_.gridSpacing,
         })
 
+        this.scene_.events.on("scaledChanged", () => {
+            this.setSize_(this.screen_.painter.size)
+        })
         this.screen_.events.on("resized", size => {
             this.setSize_(size)
         })
