@@ -1,4 +1,4 @@
-import { IScene, ISceneItem } from "./types"
+import { IScene, ISceneEvents, ISceneItem } from "./types"
 
 import { cssHex } from "@/graphics/color"
 import { Brush, Painter } from "@/graphics/painter"
@@ -14,6 +14,7 @@ import { Rect, IVector2D, ISize2D, Vector } from "@/maths"
 
 import { isNil } from "lodash"
 import { IPaintDevice } from "@/graphics"
+import { createObservable, IEmitter, IObservable } from "@/utils"
 
 export function screenToSceneScale(
     scene: IScene,
@@ -80,6 +81,8 @@ export function screenToSceneRect(scene: IScene, rect: Rect)
 }
 
 export class Scene implements IScene {
+    private emitter_: IEmitter<ISceneEvents>
+    private events_: IObservable<ISceneEvents>
     private backgroundColor_: Brush
     private gridUnit_ = 16
     private scale_: ScaleFactor
@@ -91,19 +94,24 @@ export class Scene implements IScene {
 
     visible = true
 
-    private updateViewport_() {
-        // this.viewport_.size = this.painter_.rect.scaled(1/this.gridSpacing).size
-    }
-
     constructor(
         private screen_: IPaintDevice
     ) {
+        const [emitter, events] = createObservable<ISceneEvents>()
+
+        this.emitter_ = emitter
+        this.events_ = events
+
         this.backgroundColor_ = cssHex([0, 0, 0])
         this.width_ = 0
         this.height_ = 0
         this.scale_ = 3
         this.painter_ = this.screen_.painter
         this.viewport_ = new Viewport(this, this.screen_)
+    }
+
+    get events(): IObservable<ISceneEvents> {
+        return this.events_
     }
 
     get entity(): IEntity | null {
@@ -117,7 +125,7 @@ export class Scene implements IScene {
     set scale(f: ScaleFactor) {
         if (this.scale_ !== f) {
             this.scale_ = f
-            this.updateViewport_()
+            this.emitter_.emit("scaledChanged", f)
         }
     }
 
@@ -198,7 +206,6 @@ export class Scene implements IScene {
     }
 
     render(): IScene {
-        // this.updateViewport_()
         if (!isNil(this.painter_)) {
             this.painter_.clear(this.backgroundColor_)
             if (this.visible) {

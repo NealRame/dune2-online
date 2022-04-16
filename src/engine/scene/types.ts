@@ -4,15 +4,21 @@ import { ScaleFactor } from "@/engine/scale"
 
 import { Color, Painter } from "@/graphics"
 import { Rect, ISize2D, Vector } from "@/maths"
+import { IObservable } from "@/utils"
 
 export type Palette = readonly Color.RGBA[]
 
 export type Image = Record<ScaleFactor, ImageBitmap>
 
+export interface ISceneEvents {
+    scaledChanged: ScaleFactor
+}
+
 export interface IScene extends ISceneLayer {
     readonly viewport: IViewport
     readonly gridUnit: number
     readonly gridSpacing: number
+    readonly events: IObservable<ISceneEvents>
     size: ISize2D
     scale: ScaleFactor
     zoomIn(): IScene
