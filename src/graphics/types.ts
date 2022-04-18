@@ -1,8 +1,9 @@
 import { Painter } from "./painter"
 
 import {
-    type IVector2D,
+    type IRect2D,
     type ISize2D,
+    type IVector2D,
 } from "@/maths"
 
 import { IObservable } from "@/utils"
@@ -33,4 +34,8 @@ export interface IPaintDeviceEvents {
 export interface IPaintDevice {
     readonly events: IObservable<IPaintDeviceEvents>
     readonly painter: Painter,
+    readonly width: number,
+    readonly height: number,
+    readonly rect: IRect2D,
+    readonly size: ISize2D,
 }

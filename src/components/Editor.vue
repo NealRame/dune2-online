@@ -9,11 +9,10 @@ import * as Engine from "@/engine"
 import InputRange from "@/components/InputRange.vue"
 import MiniMap from "@/components/MiniMap.vue"
 import Modal from "@/components/Modal.vue"
-import Screen from "@/components/Screen.vue"
+import Screen, { IScreen } from "@/components/Screen.vue"
 import ProgressBar from "@/components/ProgressBar.vue"
 
 import { GameScene } from "@/engine/constants"
-import { IPaintDevice } from "@/graphics"
 
 export default defineComponent({
     components: { InputRange, MiniMap, Modal, ProgressBar, Screen },
@@ -24,9 +23,9 @@ export default defineComponent({
         const loadingLabelRef = ref<string>("")
         const loadingValueRef = ref<number | null>(null)
 
+        const screenRef = ref<IScreen | null>(null)
         const screenWidthRef = ref(0)
         const screenHeightRef = ref(0)
-        const screenRef = ref<IPaintDevice | null>(null)
 
         const showInspector = ref(false)
 
@@ -67,8 +66,9 @@ export default defineComponent({
 
             resize()
 
-            const screen = unref(screenRef) as IPaintDevice
-            const engine = await Engine.create(Dune.Game, Engine.Mode.Editor, screen)
+            const screen = unref(screenRef) as IScreen
+            const paintDevice = screen.getPaintDevice()
+            const engine = await Engine.create(Dune.Game, Engine.Mode.Editor, paintDevice)
 
             watch(landConfig, value => {
                 if (!isNil(engine)) {

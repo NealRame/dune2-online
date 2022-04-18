@@ -1,26 +1,13 @@
 <script lang="ts">
-import { IVector2D } from "@/maths"
-import { IPaintDeviceEvents, Painter } from "@/graphics"
+import { IRect2D, ISize2D } from "@/maths"
+import { IPaintDevice, IPaintDeviceEvents, Painter } from "@/graphics"
 
 import { clamp, isNil } from "lodash"
-import { computed, defineComponent, onMounted, ref, toRefs, unref, watch } from "vue"
-import { createObservable } from "@/utils"
+import { defineComponent, onMounted, ref, toRefs, unref, watch } from "vue"
+import { createObservable, IObservable } from "@/utils"
 
-export type ScreenMouseMotionEvent = {
-    button: boolean,
-    altKey: boolean,
-    ctrlKey: boolean,
-    metaKey: boolean,
-    movement: IVector2D,
-    position: IVector2D,
-}
-
-export type ScreenMouseClickEvent = {
-    button: boolean,
-    altKey: boolean,
-    ctrlKey: boolean,
-    metaKey: boolean,
-    position: IVector2D,
+export interface IScreen {
+    getPaintDevice(): IPaintDevice
 }
 
 export default defineComponent({
@@ -32,9 +19,7 @@ export default defineComponent({
         "height",
         "width",
     ],
-    setup(props) {
-        let painter: Painter | null
-
+    setup(props, { expose }) {
         const canvasRef = ref<HTMLCanvasElement | null>(null)
         const {
             height: heightRef,
@@ -92,18 +77,53 @@ export default defineComponent({
             canvas.addEventListener("mousemove", mouseMove)
             canvas.addEventListener("click", mouseClick)
             // initialize painter
-            painter = new Painter(canvas)
+        })
+
+        let paintDevice: IPaintDevice | null = null
+        let painter: Painter | null = null
+
+        expose({
+            getPaintDevice() {
+                if (isNil(paintDevice)) {
+                    const canvas = unref(canvasRef) as HTMLCanvasElement
+                    paintDevice = {
+                        get painter(): Painter {
+                            if (isNil(painter)) {
+                                painter = new Painter(canvas)
+                            }
+                            return painter
+                        },
+                        get events(): IObservable<IPaintDeviceEvents> {
+                            return events
+                        },
+                        get width(): number {
+                            return canvas.width
+                        },
+                        get height(): number {
+                            return canvas.height
+                        },
+                        get size(): ISize2D {
+                            return {
+                                height: canvas.height,
+                                width: canvas.width,
+                            }
+                        },
+                        get rect(): IRect2D {
+                            return {
+                                x: 0,
+                                y: 0,
+                                width: canvas.width,
+                                height: canvas.height,
+                            }
+                        },
+                    }
+                }
+                return paintDevice
+            },
         })
 
         return {
             canvas: canvasRef,
-            events,
-            painter: computed((): Painter => {
-                if (isNil(painter)) {
-                    throw new Error("No painter available yet")
-                }
-                return painter
-            }),
         }
     }
 })

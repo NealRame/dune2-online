@@ -8,7 +8,7 @@ import * as Engine from "@/engine"
 
 import Modal from "@/components/Modal.vue"
 import ProgressBar from "@/components/ProgressBar.vue"
-import Screen from "@/components/Screen.vue"
+import Screen, { IScreen } from "@/components/Screen.vue"
 import { IPaintDevice } from "@/graphics"
 
 export default defineComponent({
@@ -20,7 +20,7 @@ export default defineComponent({
 
         const screenWidthRef = ref(0)
         const screenHeightRef = ref(0)
-        const screenRef = ref<IPaintDevice | null>(null)
+        const screenRef = ref<IScreen | null>(null)
 
         // handle window resize event
         const resize = () => {
@@ -37,8 +37,8 @@ export default defineComponent({
 
             resize()
 
-            const screen = unref(screenRef) as IPaintDevice
-            const engine = await Engine.create(Dune.Game, Engine.Mode.Game, screen)
+            const screen = unref(screenRef) as IScreen
+            const engine = await Engine.create(Dune.Game, Engine.Mode.Game, screen.getPaintDevice())
 
             engine.events
                 .on("stateChanged", state => {

@@ -1,6 +1,6 @@
 <script lang="ts">
 
-import Screen from "@/components/Screen.vue"
+import Screen, { IScreen } from "@/components/Screen.vue"
 
 import * as Engine from "@/engine"
 import { IPaintDevice, ScreenMouseClickEvent } from "@/graphics"
@@ -15,22 +15,24 @@ export default defineComponent({
     props: ["engine"],
     setup(props: { engine: Engine.IEngine }) {
         const engineRef = toRef(props, "engine")
-        const screenRef = ref<IPaintDevice | null>(null)
+        const screenRef = ref<IScreen | null>(null)
         const zone = Rect.empty()
 
         const refresh = () => {
             const engine = unref(engineRef)
-            const screen = unref(screenRef)
+            const screen = unref(screenRef) as IScreen
+            const paintDevice = screen.getPaintDevice()
+
             const { width, height } = engine.get(Engine.GameScene).size
 
             if (isNil(screen)) return
 
             const miniMap = engine.get(Engine.GameMinimap)
-            const painter = screen.painter
+            const painter = paintDevice.painter
             const image = miniMap.image
 
-            zone.x = painter.width/2 - width
-            zone.y = painter.height/2 - height
+            zone.x = paintDevice.width/2 - width
+            zone.y = paintDevice.height/2 - height
             zone.width = 2*width
             zone.height = 2*height
 
@@ -71,11 +73,12 @@ export default defineComponent({
         onMounted(() => {
             refresh()
             const engine = unref(engineRef)
-            const screen = unref(screenRef) as IPaintDevice
+            const screen = unref(screenRef) as IScreen
+            const paintDevice = screen.getPaintDevice()
             const miniMap = engine.get(Engine.GameMinimap)
             const viewport = engine.get(Engine.GameScene).viewport
 
-            screen.events.on("mouseClicked", onMouseClicked)
+            paintDevice.events.on("mouseClicked", onMouseClicked)
             miniMap.events.on("changed", refresh)
             viewport.events.on("changed", refresh)
         })
