@@ -70,7 +70,7 @@ export type IGameResourceDescriptor<T extends GameResource> = {
     decoder: TConstructor<IGameResourceDecoder<T>>,
 }
 
-export type GameLandDescriptor<T extends ITerrainData> = {
+export type IGameLandDescriptor<T extends ITerrainData> = {
     id: Token<ILand<T>>,
     generator: TConstructor<ILandTerrainGenerator<T>>,
     colorsProvider: TConstructor<ILandTerrainColorProvider<T>>,
@@ -84,5 +84,5 @@ export interface GameMetadata<
     TerrainData extends ITerrainData = ITerrainData,
 > {
     resources?: Array<IGameResourceDescriptor<GameResource>>,
-    land: GameLandDescriptor<TerrainData>,
+    land: IGameLandDescriptor<TerrainData>,
 }
