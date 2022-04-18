@@ -80,7 +80,7 @@ export type IGameLandDescriptor<T extends ITerrainData> = {
 /******************************************************************************
  * Game metadata types
  *****************************************************************************/
-export interface GameMetadata<
+export interface IGameMetadata<
     TerrainData extends ITerrainData = ITerrainData,
 > {
     resources?: Array<IGameResourceDescriptor<GameResource>>,

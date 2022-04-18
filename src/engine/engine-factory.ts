@@ -32,7 +32,7 @@ import {
     Mode,
     GameState,
     type IGameEvents,
-    type GameMetadata,
+    type IGameMetadata,
 } from "@/engine/types"
 
 import {
@@ -60,7 +60,7 @@ export interface IEngine {
 
 function getGameResourcesMetadata(game: any) {
     const rcMeta = Reflect.getMetadata(GameMetadataKeys.resources, game) ?? []
-    return rcMeta as NonNullable<GameMetadata["resources"]>
+    return rcMeta as NonNullable<IGameMetadata["resources"]>
 }
 
 function getGameLandMetadata(game: any) {
@@ -77,7 +77,7 @@ function getGameLandMetadata(game: any) {
     if (isNil(landMeta.tilesProvider)) {
         throw new LandConfigurationError("Land configuration miss tilesProvider property")
     }
-    return landMeta as NonNullable<GameMetadata["land"]>
+    return landMeta as NonNullable<IGameMetadata["land"]>
 }
 
 async function initializeScene(

@@ -1,9 +1,9 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
 import { GameMetadataKeys } from "@/engine/constants"
-import { GameMetadata } from "@/engine/types"
+import { IGameMetadata } from "@/engine/types"
 
-export function Game(metadata: GameMetadata)
+export function Game(metadata: IGameMetadata)
     : ClassDecorator {
     const properties = Object.keys(metadata)
     return target => {
