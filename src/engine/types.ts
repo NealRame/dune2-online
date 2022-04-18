@@ -63,7 +63,7 @@ export interface IGameResourceDecoder<T extends GameResource> {
 export type IGamePaletteDecoder = IGameResourceDecoder<Palette>
 export type IGameImagesDecoder = IGameResourceDecoder<Array<Image>>
 
-export type GameResourceDescriptor<T extends GameResource> = {
+export type IGameResourceDescriptor<T extends GameResource> = {
     id: Token<T>,
     name: string,
     uri: string,
@@ -83,6 +83,6 @@ export type GameLandDescriptor<T extends ITerrainData> = {
 export interface GameMetadata<
     TerrainData extends ITerrainData = ITerrainData,
 > {
-    resources?: Array<GameResourceDescriptor<GameResource>>,
+    resources?: Array<IGameResourceDescriptor<GameResource>>,
     land: GameLandDescriptor<TerrainData>,
 }
