@@ -28,6 +28,13 @@ export class Rect implements IRect2D {
     }
 
     /**
+     * @returns a new Rect at (0, 0) with width and height equal to 0
+     */
+    static empty(): Rect {
+        return new Rect({ x: 0, y: 0 }, { width: 0, height: 0 })
+    }
+
+    /**
      * @returns a new Rect with the same position and size
      */
     static fromRect({ x, y, width, height }: IRect2D): Rect {
