@@ -30,7 +30,7 @@ export enum GameState {
     Stopped,
 }
 
-export interface GameResourceEvent {
+export interface IGameResourceEvent {
     id: Token<GameResource>
     name: string
     current?: number
@@ -38,13 +38,13 @@ export interface GameResourceEvent {
 }
 
 export interface GameEvents {
-    downloadingResourceBegin: GameResourceEvent
-    downloadingResourceProgress: GameResourceEvent
-    downloadingResourceEnd: GameResourceEvent
+    downloadingResourceBegin: IGameResourceEvent
+    downloadingResourceProgress: IGameResourceEvent
+    downloadingResourceEnd: IGameResourceEvent
 
-    decodingResourceBegin: GameResourceEvent
-    decodingResourceProgress: GameResourceEvent
-    decodingResourceEnd: GameResourceEvent
+    decodingResourceBegin: IGameResourceEvent
+    decodingResourceProgress: IGameResourceEvent
+    decodingResourceEnd: IGameResourceEvent
 
     stateChanged: GameState
 }
