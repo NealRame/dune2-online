@@ -3,10 +3,11 @@
 import Screen from "@/components/Screen.vue"
 
 import * as Engine from "@/engine"
-import { IPaintDevice } from "@/graphics"
+import { IPaintDevice, ScreenMouseClickEvent } from "@/graphics"
 import { Rect } from "@/maths"
 
 import { isNil } from "lodash"
+
 import { defineComponent, onMounted, ref, toRef, unref } from "vue"
 
 export default defineComponent({
@@ -15,6 +16,7 @@ export default defineComponent({
     setup(props: { engine: Engine.IEngine }) {
         const engineRef = toRef(props, "engine")
         const screenRef = ref<IPaintDevice | null>(null)
+        const zone = Rect.empty()
 
         const refresh = () => {
             const engine = unref(engineRef)
@@ -26,22 +28,20 @@ export default defineComponent({
             const miniMap = engine.get(Engine.GameMinimap)
             const painter = screen.painter
             const image = miniMap.image
-            const origin = {
-                x: painter.width/2 - width + 0.5,
-                y: painter.height/2 - height + 0.5,
-            }
+
+            zone.x = painter.width/2 - width
+            zone.y = painter.height/2 - height
+            zone.width = 2*width
+            zone.height = 2*height
 
             painter.clear()
 
             if (!isNil(image)) {
                 painter.drawImageBitmap(
                     image,
-                    origin,
+                    zone.topLeft(),
                     new Rect({ x: 0, y: 0 }, image),
-                    {
-                        width: 2*width,
-                        height: 2*height,
-                    }
+                    zone.size,
                 )
             }
 
@@ -52,14 +52,30 @@ export default defineComponent({
                 lineWidth: 1,
                 strokeStyle: "#fff",
             }
-            painter.drawRect(rect.topLeft().add(origin), rect.size)
+            painter.drawRect(rect.topLeft().add(zone.topLeft()), rect.size)
+        }
+
+        const onMouseClicked = (event: ScreenMouseClickEvent) => {
+            if (zone.contains(event.position)) {
+                const engine = unref(engineRef)
+                const { viewport } = engine.get(Engine.GameScene)
+                const vRect = viewport.rect
+
+                viewport.position = {
+                    x: Math.floor((event.position.x - zone.x - vRect.width)/2),
+                    y: Math.floor((event.position.y - zone.y - vRect.height)/2),
+                }
+            }
         }
 
         onMounted(() => {
             refresh()
             const engine = unref(engineRef)
+            const screen = unref(screenRef) as IPaintDevice
             const miniMap = engine.get(Engine.GameMinimap)
             const viewport = engine.get(Engine.GameScene).viewport
+
+            screen.events.on("mouseClicked", onMouseClicked)
             miniMap.events.on("changed", refresh)
             viewport.events.on("changed", refresh)
         })
@@ -72,12 +88,9 @@ export default defineComponent({
 </script>
 
 <template>
-    <screen
-        id="minimap"
-        ref="screen"
-        width="256"
-        height="256"
-    />
+<div id="minimap">
+    <screen ref="screen" width="256" height="256"/>
+</div>
 </template>
 
 <style lang="scss" scoped>
@@ -85,7 +98,6 @@ export default defineComponent({
     background-color: rgba($color: black, $alpha: .5);
     border: 2px solid sandybrown;
     border-radius: 8px;
-
     padding: 1ch;
 }
 </style>
