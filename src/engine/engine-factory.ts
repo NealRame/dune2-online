@@ -31,7 +31,7 @@ import {
 import {
     Mode,
     GameState,
-    type GameEvents,
+    type IGameEvents,
     type GameMetadata,
 } from "@/engine/types"
 
@@ -48,10 +48,10 @@ import {
 
 import { clamp, isNil } from "lodash"
 
-const GameEventsEmitter = new Token<IEmitter<GameEvents>>("game:events:emitter")
+const GameEventsEmitter = new Token<IEmitter<IGameEvents>>("game:events:emitter")
 
 export interface IEngine {
-    readonly events: IObservable<GameEvents>
+    readonly events: IObservable<IGameEvents>
     get<T>(id: Token<T>): T
     initialize(): Promise<IEngine>
     start(): IEngine
@@ -166,14 +166,14 @@ export function create(
         running: false,
     }
 
-    const [emitter, events] = createObservable<GameEvents>()
+    const [emitter, events] = createObservable<IGameEvents>()
 
     container.set(GameEventsEmitter, emitter)
     container.set(GameMode, mode)
 
     return {
         get events()
-            : IObservable<GameEvents> {
+            : IObservable<IGameEvents> {
             return events
         },
         get<T>(id: Token<T>): T {

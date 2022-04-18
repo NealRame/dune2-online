@@ -37,7 +37,7 @@ export interface IGameResourceEvent {
     total?: number
 }
 
-export interface GameEvents {
+export interface IGameEvents {
     downloadingResourceBegin: IGameResourceEvent
     downloadingResourceProgress: IGameResourceEvent
     downloadingResourceEnd: IGameResourceEvent
