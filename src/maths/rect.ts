@@ -28,7 +28,7 @@ export class Rect implements IRect2D {
     }
 
     /**
-     * @returns a copy of the given rectangle
+     * @returns a new Rect with the same position and size
      */
     static fromRect({ x, y, width, height }: IRect2D): Rect {
         return new Rect(
