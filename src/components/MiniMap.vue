@@ -101,6 +101,10 @@ export default defineComponent({
     background-color: rgba($color: black, $alpha: .5);
     border: 2px solid sandybrown;
     border-radius: 8px;
+    margin: 0;
     padding: 1ch;
+    & > canvas {
+        display: block;
+    }
 }
 </style>
