@@ -103,8 +103,5 @@ export default defineComponent({
     border-radius: 8px;
     margin: 0;
     padding: 1ch;
-    & > canvas {
-        display: block;
-    }
 }
 </style>

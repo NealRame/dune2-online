@@ -129,6 +129,14 @@ export default defineComponent({
 })
 </script>
 
+<style lang="scss" scoped>
+canvas {
+    display: block;
+    margin: 0;
+    padding: 0;
+}
+</style>
+
 <template>
     <canvas ref="canvas" :width="width" :height="height"/>
 </template>
