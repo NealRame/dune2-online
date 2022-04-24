@@ -52,6 +52,7 @@ const GameEventsEmitter = new Token<IEmitter<IGameEvents>>("game:events:emitter"
 
 export interface IEngine {
     readonly events: IObservable<IGameEvents>
+    mode: Mode
     get<T>(id: Token<T>): T
     initialize(): Promise<IEngine>
     start(): IEngine
@@ -140,19 +141,12 @@ async function initializeLand(
     container: Container,
     game: any,
 ) {
-    const { id, generator, colorsProvider, tilesProvider } = getGameLandMetadata(game)
+    const { generator, colorsProvider, tilesProvider } = getGameLandMetadata(game)
 
     container.set(GameLandTerrainGenerator, generator)
     container.set(GameLandTilesProvider, tilesProvider)
     container.set(GameLandTerrainColorProvider, colorsProvider)
     container.set(GameMinimap, MiniMap)
-    container.set(id, Land)
-
-    const land = container.get(id)
-
-    land.events.on("reset", size => {
-        container.get(GameScene).size = size
-    })
 }
 
 export function create(
@@ -171,10 +165,69 @@ export function create(
     container.set(GameEventsEmitter, emitter)
     container.set(GameMode, mode)
 
+    const startEngine = () => {
+        if (!state.running) {
+            state.running = true
+
+            const { id: GameLandId } = getGameLandMetadata(game)
+
+            const land = container.get(Land)
+            container.set(GameLandId, land)
+
+            const minimap = container.get(GameMinimap)
+            minimap.land = land
+
+            const scene = container.get(GameScene)
+            scene.addItem(land.view)
+            land.events.on("reset", size => {
+                scene.size = size
+            })
+
+            emitter.emit("stateChanged", GameState.Running)
+
+            const animationLoop = () => {
+                scene.render()
+                state.animationRequestId = requestAnimationFrame(animationLoop)
+            }
+
+            animationLoop()
+        }
+    }
+
+    const stopEngine = () => {
+        if (state.running) {
+            cancelAnimationFrame(state.animationRequestId)
+
+            state.running = false
+            state.animationRequestId = 0
+
+            const { id: GameLandId } = getGameLandMetadata(game)
+
+            const land = container.get(GameLandId)
+            land.events.clear()
+
+            const minimap = container.get(GameMinimap)
+            minimap.land = null
+
+            const scene = container.get(GameScene)
+            scene.removeItem(land.view)
+
+            emitter.emit("stateChanged", GameState.Stopped)
+        }
+    }
+
     return {
         get events()
             : IObservable<IGameEvents> {
             return events
+        },
+        get mode(): Mode {
+            return container.get(GameMode)
+        },
+        set mode(value: Mode) {
+            stopEngine()
+            container.set(GameMode, value)
+            startEngine()
         },
         get<T>(id: Token<T>): T {
             return container.get(id)
@@ -188,29 +241,11 @@ export function create(
             return this
         },
         start(): IEngine {
-            if (!state.running) {
-                state.running = true
-                emitter.emit("stateChanged", GameState.Running)
-
-                const scene = container.get(GameScene)
-                const land = container.get(Land)
-
-                scene.addItem(land.view)
-
-                const animationLoop = () => {
-                    scene.render()
-                    state.animationRequestId = requestAnimationFrame(animationLoop)
-                }
-
-                animationLoop()
-            }
+            startEngine()
             return this as IEngine
         },
         stop(): IEngine {
-            cancelAnimationFrame(state.animationRequestId)
-            state.running = false
-            state.animationRequestId = 0
-            emitter.emit("stateChanged", GameState.Stopped)
+            stopEngine()
             return this as IEngine
         }
     }

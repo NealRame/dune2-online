@@ -49,7 +49,7 @@ import {
 
 import { createObservable, IEmitter, IObservable } from "@/utils"
 
-import { isNil } from "lodash"
+import { constant, isNil } from "lodash"
 
 export class LandConfigurationError extends Error {
     constructor(m: string) {
@@ -75,9 +75,6 @@ export class LandDataSizeError extends Error {
     }
 }
 
-@Service({
-    lifecycle: ServiceLifecycle.Singleton,
-})
 export class Land<
     TerrainDataType extends ITerrainData = ITerrainData,
     LandConfigType extends ILandConfig = ILandConfig,
@@ -100,12 +97,11 @@ export class Land<
     ) {
         super()
 
-        this.size_ = { width: 0, height: 0 }
-        this.indexToPosition_ = createIndexToPositionConverter(this.size_)
-        this.positionToIndex_ = createPositionToIndexConverter(this.size_)
-
         const [emitter, events] = createObservable<ILandEvent<TerrainDataType>>()
 
+        this.indexToPosition_ = constant({ x: 0, y: 0 })
+        this.positionToIndex_ = constant(-1)
+        this.size_ = { width: 0, height: 0 }
         this.emitter_ = emitter
         this.events_ = events
 
