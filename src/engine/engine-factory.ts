@@ -72,11 +72,14 @@ function getGameLandMetadata(game: any) {
     if (isNil(landMeta.id)) {
         throw new LandConfigurationError("Land configuration miss id property")
     }
-    if (isNil(landMeta.generator)) {
-        throw new LandConfigurationError("Land configuration miss generator property")
+    if (isNil(landMeta.Generator)) {
+        throw new LandConfigurationError("Land configuration miss Generator property")
     }
-    if (isNil(landMeta.tilesProvider)) {
-        throw new LandConfigurationError("Land configuration miss tilesProvider property")
+    if (isNil(landMeta.TilesProvider)) {
+        throw new LandConfigurationError("Land configuration miss TilesProvider property")
+    }
+    if (isNil(landMeta.ColorsProvider)) {
+        throw new LandConfigurationError("Land configuration miss ColorsProvider property")
     }
     return landMeta as NonNullable<IGameMetadata["land"]>
 }
@@ -141,11 +144,11 @@ async function initializeLand(
     container: Container,
     game: any,
 ) {
-    const { generator, colorsProvider, tilesProvider } = getGameLandMetadata(game)
+    const { Generator, ColorsProvider, TilesProvider } = getGameLandMetadata(game)
 
-    container.set(GameLandTerrainGenerator, generator)
-    container.set(GameLandTilesProvider, tilesProvider)
-    container.set(GameLandTerrainColorProvider, colorsProvider)
+    container.set(GameLandTerrainColorProvider, ColorsProvider)
+    container.set(GameLandTerrainGenerator, Generator)
+    container.set(GameLandTilesProvider, TilesProvider)
     container.set(GameMinimap, MiniMap)
 }
 

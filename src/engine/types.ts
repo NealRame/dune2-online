@@ -72,9 +72,9 @@ export type IGameResourceDescriptor<T extends GameResource> = {
 
 export type IGameLandDescriptor<T extends ITerrainData> = {
     id: Token<ILand<T>>,
-    generator: TConstructor<ILandTerrainGenerator<T>>,
-    colorsProvider: TConstructor<ILandTerrainColorProvider<T>>,
-    tilesProvider: TConstructor<ILandTerrainTilesProvider<T>>,
+    Generator: TConstructor<ILandTerrainGenerator<T>>,
+    ColorsProvider: TConstructor<ILandTerrainColorProvider<T>>,
+    TilesProvider: TConstructor<ILandTerrainTilesProvider<T>>,
 }
 
 /******************************************************************************

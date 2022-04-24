@@ -27,9 +27,9 @@ import * as Land from "./land"
     }],
     land: {
         id: Land.id,
-        generator: Land.Generator,
-        colorsProvider: Land.ColorsProvider,
-        tilesProvider: Land.TilesProvider,
+        Generator: Land.Generator,
+        ColorsProvider: Land.ColorsProvider,
+        TilesProvider: Land.TilesProvider,
     }
 })
 export class Game {}
