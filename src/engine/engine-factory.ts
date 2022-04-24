@@ -118,7 +118,7 @@ async function initializeResources(
     const emitter = container.get(GameEventsEmitter)
 
     for (const rcDescriptor of getGameResourcesMetadata(game)) {
-        const rcDecoder = container.get(rcDescriptor.decoder)
+        const rcDecoder = container.get(rcDescriptor.Decoder)
         const { id, name } = rcDescriptor
 
         emitter.emit("downloadingResourceBegin", { id, name })

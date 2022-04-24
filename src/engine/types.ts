@@ -67,7 +67,7 @@ export type IGameResourceDescriptor<T extends GameResource> = {
     id: Token<T>,
     name: string,
     uri: string,
-    decoder: TConstructor<IGameResourceDecoder<T>>,
+    Decoder: TConstructor<IGameResourceDecoder<T>>,
 }
 
 export type IGameLandDescriptor<T extends ITerrainData> = {
