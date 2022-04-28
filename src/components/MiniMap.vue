@@ -1,25 +1,26 @@
 <script lang="ts">
+import { EngineKey } from "@/constants"
 
 import Screen, { IScreen } from "@/components/Screen.vue"
 
 import * as Engine from "@/engine"
-import { IPaintDevice, ScreenMouseClickEvent } from "@/graphics"
+import { ScreenMouseClickEvent } from "@/graphics"
 import { Rect } from "@/maths"
 
 import { isNil } from "lodash"
 
-import { defineComponent, onMounted, ref, toRef, unref } from "vue"
+import { defineComponent, inject, onBeforeUnmount, onMounted, onUnmounted, ref, unref } from "vue"
 
 export default defineComponent({
     components: { Screen },
-    props: ["engine"],
-    setup(props: { engine: Engine.IEngine }) {
-        const engineRef = toRef(props, "engine")
+    setup() {
+        const engine = inject(EngineKey)
         const screenRef = ref<IScreen | null>(null)
         const zone = Rect.empty()
 
         const refresh = () => {
-            const engine = unref(engineRef)
+            if (isNil(engine)) return
+
             const screen = unref(screenRef) as IScreen
             const paintDevice = screen.getPaintDevice()
 
@@ -48,39 +49,67 @@ export default defineComponent({
             }
 
             const { viewport } = engine.get(Engine.GameScene)
-            const rect = Rect.fromRect(viewport.rect).scale(2)
+            if (!isNil(viewport)) {
+                const rect = Rect.fromRect(viewport.rect).scale(2)
 
-            painter.pen = {
-                lineWidth: 1,
-                strokeStyle: "#fff",
+                painter.pen = {
+                    lineWidth: 1,
+                    strokeStyle: "#fff",
+                }
+                painter.drawRect(rect.topLeft().add(zone.topLeft()), rect.size)
             }
-            painter.drawRect(rect.topLeft().add(zone.topLeft()), rect.size)
         }
 
         const onMouseClicked = (event: ScreenMouseClickEvent) => {
+            if (isNil(engine)) return
             if (zone.contains(event.position)) {
-                const engine = unref(engineRef)
                 const { viewport } = engine.get(Engine.GameScene)
-                const vRect = viewport.rect
+                if (!isNil(viewport)) {
+                    const vRect = viewport.rect
 
-                viewport.position = {
-                    x: Math.floor((event.position.x - zone.x - vRect.width)/2),
-                    y: Math.floor((event.position.y - zone.y - vRect.height)/2),
+                    viewport.position = {
+                        x: Math.floor((event.position.x - zone.x - vRect.width)/2),
+                        y: Math.floor((event.position.y - zone.y - vRect.height)/2),
+                    }
                 }
             }
         }
 
-        onMounted(() => {
-            refresh()
-            const engine = unref(engineRef)
+        onMounted(async () => {
+            if (isNil(engine)) return
+
+            await engine.initialize()
+
+            const screen = unref(screenRef) as IScreen
+            const paintDevice = screen.getPaintDevice()
+
+            engine.events.on("stateChanged", state => {
+                if (state === Engine.State.Running) {
+                    const miniMap = engine.get(Engine.GameMinimap)
+                    const viewport = engine.get(Engine.GameScene).viewport
+
+                    paintDevice.events.on("mouseClicked", onMouseClicked)
+                    miniMap.events.on("changed", refresh)
+                    viewport.events.on("changed", refresh)
+
+                    refresh()
+                }
+            })
+        })
+
+        onBeforeUnmount(() => {
+            if (isNil(engine)) return
+
+            engine.events.off("stateChanged")
+
             const screen = unref(screenRef) as IScreen
             const paintDevice = screen.getPaintDevice()
             const miniMap = engine.get(Engine.GameMinimap)
             const viewport = engine.get(Engine.GameScene).viewport
 
-            paintDevice.events.on("mouseClicked", onMouseClicked)
-            miniMap.events.on("changed", refresh)
-            viewport.events.on("changed", refresh)
+            paintDevice.events.off("mouseClicked", onMouseClicked)
+            miniMap.events.off("changed", refresh)
+            viewport.events.off("changed", refresh)
         })
 
         return {

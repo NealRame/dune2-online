@@ -1,27 +1,21 @@
 <script lang="ts">
-import { defineComponent, onMounted, reactive, ref, unref, watch } from "vue"
-
-import { debounce, isNil } from "lodash"
-
 import * as Dune from "@/dune"
 import * as Engine from "@/engine"
+import { createEventManager } from "@/utils"
+
+import { EngineKey } from "@/constants"
 
 import InputRange from "@/components/InputRange.vue"
 import MiniMap from "@/components/MiniMap.vue"
-import Modal from "@/components/Modal.vue"
 import Screen, { IScreen } from "@/components/Screen.vue"
-import ProgressBar from "@/components/ProgressBar.vue"
 
-import { GameScene } from "@/engine/constants"
+import { debounce, isNil } from "lodash"
+import { defineComponent, inject, onMounted, onUnmounted, reactive, ref, unref, watch } from "vue"
 
 export default defineComponent({
-    components: { InputRange, MiniMap, Modal, ProgressBar, Screen },
+    components: { InputRange, MiniMap, Screen },
     setup() {
-        const engineRef = ref<Engine.IEngine | null>(null)
-
-        const loadingRef = ref<boolean>(true)
-        const loadingLabelRef = ref<string>("")
-        const loadingValueRef = ref<number | null>(null)
+        const engine = inject(EngineKey)
 
         const screenRef = ref<IScreen | null>(null)
         const screenWidthRef = ref(0)
@@ -38,16 +32,14 @@ export default defineComponent({
 
         // zoom event handler
         const zoomIn = () => {
-            const engine = unref(engineRef)
             if (!isNil(engine)) {
-                engine.get(GameScene).zoomIn()
+                engine.get(Engine.GameScene).zoomIn()
             }
         }
 
         const zoomOut = () => {
-            const engine = unref(engineRef)
             if (!isNil(engine)) {
-                engine.get(GameScene).zoomOut()
+                engine.get(Engine.GameScene).zoomOut()
             }
         }
 
@@ -60,53 +52,45 @@ export default defineComponent({
             screenHeightRef.value = height
         }
 
+        const resizeEventManager = createEventManager(
+            window,
+            "resize",
+            debounce(resize, 100),
+        )
+
+        const contextMenuEventManager = createEventManager(
+            window,
+            "contextmenu",
+            ev => ev.preventDefault(),
+            false,
+        )
+
         onMounted(async () => {
-            window.addEventListener("resize", debounce(resize, 60))
-            window.addEventListener("contextmenu", ev => ev.preventDefault(), false)
+            if (!isNil(engine)) {
+                const screen = unref(screenRef) as IScreen
 
-            resize()
+                contextMenuEventManager.start()
+                resizeEventManager.start()
+                resize()
 
-            const screen = unref(screenRef) as IScreen
-            const paintDevice = screen.getPaintDevice()
-            const engine = await Engine.create(Dune.Game, Engine.Mode.Editor, paintDevice)
+                await engine.initialize()
+                engine
+                    .start(Engine.Mode.Editor, screen.getPaintDevice())
+                    .get(Dune.Land.id).generate(landConfig)
+                watch(landConfig, () => engine.get(Dune.Land.id).generate(landConfig))
+            }
+        })
 
-            watch(landConfig, value => {
-                if (!isNil(engine)) {
-                    engine.get(Dune.Land.id).generate(value)
-                }
-            })
-
-            engine.events
-                .on("stateChanged", state => {
-                    loadingRef.value = state === Engine.GameState.Initializing
-                })
-                .on("downloadingResourceBegin", ({ name }) => {
-                    loadingLabelRef.value = `Downloading ${name}...`
-                    loadingValueRef.value = null
-                })
-                .on("decodingResourceBegin", ({ name }) => {
-                    loadingLabelRef.value = `Decoding ${name}...`
-                    loadingValueRef.value = null
-                })
-                .on("downloadingResourceProgress", ({ current, total }) => {
-                    if (!(isNil(current) || isNil(total))) {
-                        loadingValueRef.value = current/total
-                    }
-                })
-
-            await engine.initialize()
-            engine.start()
-            engine.get(Dune.Land.id).generate({ size: { width: 32, height: 32 } })
-
-            engineRef.value = engine
+        onUnmounted(() => {
+            contextMenuEventManager.stop()
+            resizeEventManager.stop()
+            if (!isNil(engine)) {
+                engine.stop()
+            }
         })
 
         return {
-            engine: engineRef,
             landConfig,
-            loading: loadingRef,
-            loadingLabel: loadingLabelRef,
-            loadingValue: loadingValueRef,
             screen: screenRef,
             screenWidth: screenWidthRef,
             screenHeight: screenHeightRef,
@@ -119,15 +103,12 @@ export default defineComponent({
 </script>
 
 <template>
-    <modal :show="loading">
-        <progress-bar :current="loadingValue" :label="loadingLabel"/>
-    </modal>
     <screen
         ref="screen"
         :width="screenWidth"
         :height="screenHeight"
     />
-    <div id="settings" v-if="engine">
+    <div id="settings">
         <div id="land-inspector" v-show="showInspector">
             <h2>Size</h2>
             <input-range
@@ -193,7 +174,7 @@ export default defineComponent({
                 v-model="landConfig.spiceSaturationThreshold"
             />
         </div>
-        <mini-map :engine="engine" />
+        <mini-map />
         <div id="fabs">
             <button id="open-settings" @click="showInspector=!showInspector">
                 <font-awesome-icon icon="wrench"/>

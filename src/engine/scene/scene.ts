@@ -1,7 +1,7 @@
 import { IScene, ISceneEvents, ISceneItem } from "./types"
 
 import { cssHex } from "@/graphics/color"
-import { Brush, Painter } from "@/graphics/painter"
+import { Brush } from "@/graphics/painter"
 
 import { IEntity } from "@/engine/entity"
 import { scaleDown, ScaleFactor, scaleUp } from "@/engine/scale"
@@ -84,19 +84,18 @@ export class Scene implements IScene {
     private emitter_: IEmitter<ISceneEvents>
     private events_: IObservable<ISceneEvents>
     private backgroundColor_: Brush
-    private gridUnit_ = 16
     private scale_: ScaleFactor
     private width_: number
     private height_: number
-    private viewport_: Viewport
-    private painter_: Painter
+
+    private gridUnit_ = 16
     private items_: Array<ISceneItem> = []
+    private screen_: IPaintDevice | null = null
+    private viewport_: Viewport
 
     visible = true
 
-    constructor(
-        private screen_: IPaintDevice
-    ) {
+    constructor() {
         const [emitter, events] = createObservable<ISceneEvents>()
 
         this.emitter_ = emitter
@@ -106,8 +105,8 @@ export class Scene implements IScene {
         this.width_ = 0
         this.height_ = 0
         this.scale_ = 3
-        this.painter_ = this.screen_.painter
-        this.viewport_ = new Viewport(this, this.screen_)
+
+        this.viewport_ = new Viewport(this)
     }
 
     get events(): IObservable<ISceneEvents> {
@@ -167,18 +166,28 @@ export class Scene implements IScene {
     set size(size: ISize2D) {
         this.width_ = size.width
         this.height_ = size.height
+        this.emitter_.emit("sizeChanged", size)
     }
 
     get rect(): Rect {
         return new Rect({ x: 0, y: 0 }, this.size)
     }
 
-    get viewport(): IViewport {
-        return this.viewport_
-    }
-
     get scene(): this {
         return this
+    }
+
+    get screen(): IPaintDevice | null {
+        return this.screen_
+    }
+
+    set screen(screen: IPaintDevice | null) {
+        this.screen_ = screen
+        this.emitter_.emit("screenChanged", screen)
+    }
+
+    get viewport(): IViewport {
+        return this.viewport_
     }
 
     addItem(item: ISceneItem): this {
@@ -202,17 +211,19 @@ export class Scene implements IScene {
 
     clear(): this {
         this.items_ = []
+        this.size = { width: 0, height: 0 }
         return this
     }
 
     render(): IScene {
-        if (!isNil(this.painter_)) {
-            this.painter_.clear(this.backgroundColor_)
+        if (!isNil(this.screen_) && !isNil(this.viewport_)) {
+            const painter = this.screen_.painter
+            painter.clear(this.backgroundColor_)
             if (this.visible) {
                 // draw items
                 for (const item of this.items_) {
                     if (item.visible) {
-                        item.render(this.painter_, this.viewport_.rect)
+                        item.render(painter, this.viewport_.rect)
                     }
                 }
             }

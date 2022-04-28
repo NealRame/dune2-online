@@ -32,38 +32,38 @@ export default defineComponent({
         }
 
         onMounted(async () => {
-            window.addEventListener("resize", debounce(resize, 60))
-            window.addEventListener("contextmenu", ev => ev.preventDefault(), false)
+            // window.addEventListener("resize", debounce(resize, 60))
+            // window.addEventListener("contextmenu", ev => ev.preventDefault(), false)
 
-            resize()
+            // resize()
 
-            const screen = unref(screenRef) as IScreen
-            const engine = await Engine.create(Dune.Game, Engine.Mode.Game, screen.getPaintDevice())
+            // const screen = unref(screenRef) as IScreen
+            // const engine = await Engine.create(Dune.Game, Engine.Mode.Game, screen.getPaintDevice())
 
-            engine.events
-                .on("stateChanged", state => {
-                    loadingRef.value = state === Engine.GameState.Initializing
-                })
-                .on("downloadingResourceBegin", ({ name }) => {
-                    loadingLabelRef.value = `Downloading ${name}...`
-                    loadingValueRef.value = null
-                })
-                .on("decodingResourceBegin", ({ name }) => {
-                    loadingLabelRef.value = `Decoding ${name}...`
-                    loadingValueRef.value = null
-                })
-                .on("downloadingResourceProgress", ({ current, total }) => {
-                    if (!(isNil(current) || isNil(total))) {
-                        loadingValueRef.value = current/total
-                    }
-                })
+            // engine.events
+            //     .on("stateChanged", state => {
+            //         loadingRef.value = state === Engine.GameState.Initializing
+            //     })
+            //     .on("downloadingResourceBegin", ({ name }) => {
+            //         loadingLabelRef.value = `Downloading ${name}...`
+            //         loadingValueRef.value = null
+            //     })
+            //     .on("decodingResourceBegin", ({ name }) => {
+            //         loadingLabelRef.value = `Decoding ${name}...`
+            //         loadingValueRef.value = null
+            //     })
+            //     .on("downloadingResourceProgress", ({ current, total }) => {
+            //         if (!(isNil(current) || isNil(total))) {
+            //             loadingValueRef.value = current/total
+            //         }
+            //     })
 
-            await engine.initialize()
-            engine.start()
+            // await engine.initialize()
+            // engine.start()
 
-            const land = engine.get(Dune.Land.id)
-            land.generate({ size: { width: 32, height: 32 } })
-            land.reveal(land.position, land.size)
+            // const land = engine.get(Dune.Land.id)
+            // land.generate({ size: { width: 32, height: 32 } })
+            // land.reveal(land.position, land.size)
         })
 
         return {

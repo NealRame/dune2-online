@@ -18,7 +18,7 @@ import {
     type IObservable,
 } from "@/utils"
 
-import { clamp } from "lodash"
+import { clamp, isNil } from "lodash"
 
 export interface IViewportEvent {
     changed: Rect
@@ -31,43 +31,57 @@ export interface IViewport {
     size: ISize2D
 }
 
+type ResizeEventHandler = (size: ISize2D) => void
+type PositionEventHandler = (position: IVector2D) => void
+
 export class Viewport implements IViewport {
     private emitter_: IEmitter<IViewportEvent>
     private events_: IObservable<IViewportEvent>
     private rect_: Rect
+    private screen_: IPaintDevice | null = null
 
-    private setSize_({ width, height }: ISize2D) {
-        this.rect_.width = clamp(width/this.scene_.gridSpacing, 0, this.scene_.width)
-        this.rect_.height = clamp(height/this.scene_.gridSpacing, 0, this.scene_.height)
-        this.emitter_.emit("changed", Rect.fromRect(this.rect_))
-    }
-
-    private setPosition_({ x, y }: IVector2D) {
-        this.rect_.x = clamp(x, 0, this.scene_.width - this.rect_.width)
-        this.rect_.y = clamp(y, 0, this.scene_.height - this.rect_.height)
-        this.emitter_.emit("changed", Rect.fromRect(this.rect_))
-    }
+    private updateSize_: ResizeEventHandler
+    private updatePosition_: PositionEventHandler
 
     constructor(
         private scene_: IScene,
-        private screen_: IPaintDevice,
     ) {
         const [emitter, events] = createObservable<IViewportEvent>()
 
         this.emitter_ = emitter
         this.events_ = events
+        this.rect_ = Rect.empty()
 
-        this.rect_ = new Rect({ x: 0, y: 0 }, {
-            width: this.screen_.width/this.scene_.gridSpacing,
-            height: this.screen_.height/this.scene_.gridSpacing,
-        })
+        this.updateSize_ = ({ width, height }) => {
+            const { gridSpacing, width: sceneW, height: sceneH } = this.scene_
+            this.rect_.width = clamp(width/gridSpacing, 0, sceneW)
+            this.rect_.height = clamp(height/gridSpacing, 0, sceneH)
+            this.emitter_.emit("changed", Rect.fromRect(this.rect_))
+        }
 
-        this.scene_.events.on("scaledChanged", () => {
-            this.setSize_(this.screen_.size)
-        })
-        this.screen_.events.on("resized", size => {
-            this.setSize_(size)
-        })
+        this.updatePosition_ = ({ x, y }) => {
+            this.rect_.x = clamp(x, 0, this.scene_.width - this.rect_.width)
+            this.rect_.y = clamp(y, 0, this.scene_.height - this.rect_.height)
+            this.emitter_.emit("changed", Rect.fromRect(this.rect_))
+        }
+
+        this.scene_.events
+            .on("scaledChanged", () => {
+                this.updateSize_(this.screen_?.size ?? { width: 0, height: 0 })
+            })
+            .on("sizeChanged", () => {
+                this.updateSize_(this.screen_?.size ?? { width: 0, height: 0 })
+            })
+            .on("screenChanged", (screen: IPaintDevice | null) => {
+                if (!isNil(this.screen_)) {
+                    this.screen_.events.off("resized", this.updateSize_)
+                }
+                if (!isNil(screen)) {
+                    this.screen_ = screen
+                    this.updateSize_(this.screen_.size)
+                    this.screen_.events.on("resized", this.updateSize_)
+                }
+            })
     }
 
     get events(): IObservable<IViewportEvent> {
@@ -83,7 +97,7 @@ export class Viewport implements IViewport {
     }
 
     set position(pos: IVector2D) {
-        this.setPosition_(pos)
+        this.updatePosition_(pos)
     }
 
     get size(): ISize2D {

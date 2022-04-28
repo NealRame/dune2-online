@@ -23,11 +23,11 @@ export enum Mode {
     Game,
 }
 
-export enum GameState {
-    Initializing,
+export enum State {
+    Initializing = 0,
+    Ready,
     Running,
     Paused,
-    Stopped,
 }
 
 export interface IGameResourceEvent {
@@ -46,7 +46,7 @@ export interface IGameEvents {
     decodingResourceProgress: IGameResourceEvent
     decodingResourceEnd: IGameResourceEvent
 
-    stateChanged: GameState
+    stateChanged: State
 }
 
 /******************************************************************************

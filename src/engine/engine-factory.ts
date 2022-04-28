@@ -30,12 +30,13 @@ import {
 
 import {
     Mode,
-    GameState,
+    State,
     type IGameEvents,
     type IGameMetadata,
 } from "@/engine/types"
 
 import {
+    ScreenMouseMotionEvent,
     type IPaintDevice,
 } from "@/graphics"
 
@@ -47,15 +48,22 @@ import {
 } from "@/utils"
 
 import { clamp, isNil } from "lodash"
+import { GameState } from "."
 
 const GameEventsEmitter = new Token<IEmitter<IGameEvents>>("game:events:emitter")
 
+export class EngineNotReadyError extends Error {
+    constructor() {
+        super("Engine not ready. You should call Engine#initialize() method and wait for it to be ready")
+        Object.setPrototypeOf(this, EngineNotReadyError.prototype)
+    }
+}
+
 export interface IEngine {
     readonly events: IObservable<IGameEvents>
-    mode: Mode
     get<T>(id: Token<T>): T
     initialize(): Promise<IEngine>
-    start(): IEngine
+    start(mode: Mode, screen: IPaintDevice): IEngine
     stop(): IEngine
 }
 
@@ -86,12 +94,17 @@ function getGameLandMetadata(game: any) {
 
 async function initializeScene(
     container: Container,
-    screen: IPaintDevice,
 ) {
-    const scene = new Scene(screen)
-
+    const scene = new Scene()
     container.set(GameScene, scene)
-    screen.events.on("mouseMoved", event => {
+}
+
+function dragHandler(scene: Scene) {
+    return (event: ScreenMouseMotionEvent) => {
+        const viewport = scene.viewport
+
+        if (isNil(viewport)) return
+
         const { button, ctrlKey, movement } = event
         const { x: offsetX, y: offsetY } = screenToSceneScale(scene, {
             x: -movement.x,
@@ -101,14 +114,14 @@ async function initializeScene(
         // drag scene
         if (ctrlKey && button) {
             if (offsetX !== 0 || offsetY !== 0) {
-                const { x, y, width, height } = scene.viewport.rect
-                scene.viewport.position = {
+                const { x, y, width, height } = viewport.rect
+                viewport.position = {
                     x: clamp(x + offsetX, 0, scene.width - width),
                     y: clamp(y + offsetY, 0, scene.height - height),
                 }
             }
         }
-    })
+    }
 }
 
 async function initializeResources(
@@ -154,43 +167,69 @@ async function initializeLand(
 
 export function create(
     game: any,
-    mode: Mode,
-    screen: IPaintDevice,
 ): IEngine {
+    const [emitter, events] = createObservable<IGameEvents>()
     const container = new Container()
-    const state = {
-        animationRequestId: 0,
-        running: false,
+
+    const updateEngineState = (state: State) => {
+        container.set(GameState, state)
+        emitter.emit("stateChanged", state)
     }
 
-    const [emitter, events] = createObservable<IGameEvents>()
+    const waitForReady = (): Promise<void> => {
+        return new Promise(resolve => {
+            events.once("stateChanged", state => {
+                if (state === State.Ready) {
+                    resolve()
+                }
+            })
+        })
+    }
 
-    container.set(GameEventsEmitter, emitter)
-    container.set(GameMode, mode)
+    const initializeEngine = async () => {
+        if (!container.has(GameState)) {
+            updateEngineState(State.Initializing)
+            await initializeScene(container)
+            await initializeResources(container, game)
+            await initializeLand(container, game)
+            updateEngineState(State.Ready)
+        } else if (container.get(GameState) === State.Initializing) {
+            await waitForReady()
+        }
+    }
 
-    const startEngine = () => {
-        if (!state.running) {
-            state.running = true
+    let animationRequestId = 0
 
-            const { id: GameLandId } = getGameLandMetadata(game)
+    const startEngine = (mode: Mode, screen: IPaintDevice) => {
+        if (!container.has(GameState)) {
+            throw new EngineNotReadyError()
+        }
+        if (container.get(GameState) === State.Ready) {
+            const { id: GameLand } = getGameLandMetadata(game)
+
+            container.set(GameMode, mode)
 
             const land = container.get(Land)
-            container.set(GameLandId, land)
+            container.set(GameLand, land)
 
             const minimap = container.get(GameMinimap)
             minimap.land = land
 
             const scene = container.get(GameScene)
-            scene.addItem(land.view)
+
             land.events.on("reset", size => {
                 scene.size = size
             })
 
-            emitter.emit("stateChanged", GameState.Running)
+            scene.screen = screen
+            scene.addItem(land.view)
+            screen.events.on("mouseMoved", dragHandler(scene))
+
+            updateEngineState(State.Running)
 
             const animationLoop = () => {
                 scene.render()
-                state.animationRequestId = requestAnimationFrame(animationLoop)
+                animationRequestId = requestAnimationFrame(animationLoop)
             }
 
             animationLoop()
@@ -198,56 +237,48 @@ export function create(
     }
 
     const stopEngine = () => {
-        if (state.running) {
-            cancelAnimationFrame(state.animationRequestId)
+        if (container.has(GameState)
+            && container.get(GameState) === State.Running) {
+            cancelAnimationFrame(animationRequestId)
 
-            state.running = false
-            state.animationRequestId = 0
+            const { id: GameLand } = getGameLandMetadata(game)
 
-            const { id: GameLandId } = getGameLandMetadata(game)
-
-            const land = container.get(GameLandId)
+            const land = container.get(GameLand)
             land.events.clear()
+
+            container.remove(GameLand)
 
             const minimap = container.get(GameMinimap)
             minimap.land = null
+            minimap.events.clear()
 
             const scene = container.get(GameScene)
-            scene.removeItem(land.view)
+            scene.clear()
+            scene.screen = null
 
-            emitter.emit("stateChanged", GameState.Stopped)
+            updateEngineState(State.Ready)
         }
     }
+
+    container.set(GameEventsEmitter, emitter)
 
     return {
         get events()
             : IObservable<IGameEvents> {
             return events
         },
-        get mode(): Mode {
-            return container.get(GameMode)
-        },
-        set mode(value: Mode) {
-            stopEngine()
-            container.set(GameMode, value)
-            startEngine()
-        },
         get<T>(id: Token<T>): T {
             return container.get(id)
         },
         async initialize() {
-            emitter.emit("stateChanged", GameState.Initializing)
-            await initializeScene(container, screen)
-            await initializeResources(container, game)
-            await initializeLand(container, game)
-            emitter.emit("stateChanged", GameState.Stopped)
+            await initializeEngine()
             return this
         },
-        start(): IEngine {
-            startEngine()
+        start(mode: Mode, screen: IPaintDevice) {
+            startEngine(mode, screen)
             return this as IEngine
         },
-        stop(): IEngine {
+        stop() {
             stopEngine()
             return this as IEngine
         }
