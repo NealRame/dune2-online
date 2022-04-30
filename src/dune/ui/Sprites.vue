@@ -1,6 +1,6 @@
 
 <script lang="ts">
-import Screen from "@/components/Screen.vue"
+import Screen from "@/dune/ui/Screen.vue"
 
 import { ScaleFactor, IScene, Scene, Grid, AnimationSprite, Tile, Sprite } from "@/engine"
 

@@ -3,8 +3,8 @@ import "@/styles/global.scss"
 
 import { EngineKey } from "./constants"
 
-import Modal from "@/components/Modal.vue"
-import ProgressBar from "@/components/ProgressBar.vue"
+import Modal from "@/dune/ui/Modal.vue"
+import ProgressBar from "@/dune/ui/ProgressBar.vue"
 
 import * as Engine from "@/engine"
 

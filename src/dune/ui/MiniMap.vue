@@ -1,7 +1,7 @@
 <script lang="ts">
 import { EngineKey } from "@/constants"
 
-import Screen, { IScreen } from "@/components/Screen.vue"
+import Screen, { IScreen } from "@/dune/ui/Screen.vue"
 
 import * as Engine from "@/engine"
 import { ScreenMouseClickEvent } from "@/graphics"

@@ -9,7 +9,7 @@ import { createEventManager } from "@/utils"
 
 import { EngineKey } from "@/constants"
 
-import Screen, { IScreen } from "@/components/Screen.vue"
+import Screen, { IScreen } from "@/dune/ui/Screen.vue"
 
 export default defineComponent({
     components: { Screen },

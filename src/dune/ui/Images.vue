@@ -1,6 +1,6 @@
 <script lang="ts">
-import Screen, { ScreenMouseClickEvent } from "@/components/Screen.vue"
-import ImagePalette from "@/components/ImagePalette.vue"
+import Screen, { ScreenMouseClickEvent } from "./Screen.vue"
+import ImagePalette from "./ImagePalette.vue"
 
 import { ImageLib, ImageSet } from "@/dune2/types"
 import { Data } from "@/dune2"

@@ -1,6 +1,6 @@
-import Game from "@/components/Game.vue"
-import Editor from "@/components/Editor.vue"
-import Home from "@/components/Home.vue"
+import Game from "@/dune/ui/Game.vue"
+import Editor from "@/dune/ui/Editor.vue"
+import Home from "@/dune/ui/Home.vue"
 
 import { createRouter, createWebHistory, RouteRecordRaw } from "vue-router"
 

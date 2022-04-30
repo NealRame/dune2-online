@@ -3,8 +3,8 @@ import { defineComponent, onMounted, ref, unref } from "vue"
 
 import { debounce } from "lodash"
 
-import Screen, { ScreenMouseClickEvent } from "@/components/Screen.vue"
-import TilePalette from "@/components/TilePalette.vue"
+import Screen, { ScreenMouseClickEvent } from "@/dune/ui/Screen.vue"
+import TilePalette from "@/dune/ui/TilePalette.vue"
 
 import { IPaintDevice } from "@/graphics"
 import { Data } from "@/dune2"

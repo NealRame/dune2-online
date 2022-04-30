@@ -5,10 +5,10 @@ import { createEventManager } from "@/utils"
 
 import { EngineKey } from "@/constants"
 
-import Icon from "@/components/Icon.vue"
-import InputRange from "@/components/InputRange.vue"
-import MiniMap from "@/components/MiniMap.vue"
-import Screen, { IScreen } from "@/components/Screen.vue"
+import Icon from "./Icon.vue"
+import InputRange from "./InputRange.vue"
+import MiniMap from "./MiniMap.vue"
+import Screen, { IScreen } from "./Screen.vue"
 
 import { debounce, isNil } from "lodash"
 import { defineComponent, inject, onMounted, onUnmounted, reactive, ref, unref, watch } from "vue"
