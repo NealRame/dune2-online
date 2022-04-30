@@ -5,6 +5,7 @@ import { createEventManager } from "@/utils"
 
 import { EngineKey } from "@/constants"
 
+import Icon from "@/components/Icon.vue"
 import InputRange from "@/components/InputRange.vue"
 import MiniMap from "@/components/MiniMap.vue"
 import Screen, { IScreen } from "@/components/Screen.vue"
@@ -13,7 +14,7 @@ import { debounce, isNil } from "lodash"
 import { defineComponent, inject, onMounted, onUnmounted, reactive, ref, unref, watch } from "vue"
 
 export default defineComponent({
-    components: { InputRange, MiniMap, Screen },
+    components: { Icon, InputRange, MiniMap, Screen },
     setup() {
         const engine = inject(EngineKey)
 
@@ -175,16 +176,16 @@ export default defineComponent({
         <mini-map />
         <div id="fabs">
             <button id="open-settings" @click="showInspector=!showInspector">
-                <font-awesome-icon icon="wrench"/>
+                <icon type="settings" />
             </button>
             <button id="seed" @click="landConfig.seed = Date.now()">
-                <font-awesome-icon icon="sync-alt"/>
+                <icon type="refresh" />
             </button>
-            <button id="zoom-in">
-                <font-awesome-icon icon="search-plus" @click="zoomIn"/>
+            <button id="zoom-in" @click="zoomIn">
+                <icon type="zoom-in" />
             </button>
-            <button id="zoom-out">
-                <font-awesome-icon icon="search-minus" @click="zoomOut"/>
+            <button id="zoom-out" @click="zoomOut">
+                <icon type="zoom-out" />
             </button>
         </div>
     </div>
