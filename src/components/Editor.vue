@@ -123,7 +123,6 @@ export default defineComponent({
                 :range="[16, 128]"
                 :step="1"
             />
-
             <h2>Terrain</h2>
             <input-range
                 label="Scale"
@@ -149,7 +148,6 @@ export default defineComponent({
                 label="Mountain"
                 v-model="landConfig.terrainMountainsThreshold"
             />
-
             <h2>Spice</h2>
             <input-range
                 label="Scale"
@@ -190,7 +188,6 @@ export default defineComponent({
             </button>
         </div>
     </div>
-
 </template>
 
 <style lang="scss" scoped>
