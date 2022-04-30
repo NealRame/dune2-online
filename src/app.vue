@@ -6,7 +6,6 @@ import { EngineKey } from "./constants"
 import Modal from "@/components/Modal.vue"
 import ProgressBar from "@/components/ProgressBar.vue"
 
-import * as Dune from "@/dune"
 import * as Engine from "@/engine"
 
 import { isNil } from "lodash"
