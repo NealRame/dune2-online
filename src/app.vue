@@ -10,7 +10,7 @@ import * as Dune from "@/dune"
 import * as Engine from "@/engine"
 
 import { isNil } from "lodash"
-import { defineComponent, onMounted, provide, ref } from "vue"
+import { defineComponent, inject, onMounted, ref } from "vue"
 
 export default defineComponent({
     name: "App",
@@ -23,28 +23,28 @@ export default defineComponent({
         const loadingLabelRef = ref<string>("")
         const loadingValueRef = ref<number | null>(null)
 
-        const engine = Engine.create(Dune.Game)
-
-        provide(EngineKey, engine)
         onMounted(async () => {
-            engine.events
-                .on("stateChanged", state => {
-                    loadingRef.value = state === Engine.State.Initializing
-                })
-                .on("downloadingResourceBegin", ({ name }) => {
-                    loadingLabelRef.value = `Downloading ${name}...`
-                    loadingValueRef.value = null
-                })
-                .on("decodingResourceBegin", ({ name }) => {
-                    loadingLabelRef.value = `Decoding ${name}...`
-                    loadingValueRef.value = null
-                })
-                .on("downloadingResourceProgress", ({ current, total }) => {
-                    if (!(isNil(current) || isNil(total))) {
-                        loadingValueRef.value = current/total
-                    }
-                })
-            await engine.initialize()
+            const engine = inject(EngineKey)
+            if (!isNil(engine)) {
+                engine.events
+                    .on("stateChanged", state => {
+                        loadingRef.value = state === Engine.State.Initializing
+                    })
+                    .on("downloadingResourceBegin", ({ name }) => {
+                        loadingLabelRef.value = `Downloading ${name}...`
+                        loadingValueRef.value = null
+                    })
+                    .on("decodingResourceBegin", ({ name }) => {
+                        loadingLabelRef.value = `Decoding ${name}...`
+                        loadingValueRef.value = null
+                    })
+                    .on("downloadingResourceProgress", ({ current, total }) => {
+                        if (!(isNil(current) || isNil(total))) {
+                            loadingValueRef.value = current/total
+                        }
+                    })
+                await engine.initialize()
+            }
         })
 
         return {
