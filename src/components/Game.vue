@@ -1,26 +1,31 @@
 <script lang="ts">
-import { defineComponent, onMounted, ref, unref } from "vue"
+import { defineComponent, inject, onMounted, onUnmounted, ref, unref } from "vue"
 
 import { debounce, isNil } from "lodash"
 
 import * as Dune from "@/dune"
 import * as Engine from "@/engine"
+import { createEventManager } from "@/utils"
 
-import Modal from "@/components/Modal.vue"
-import ProgressBar from "@/components/ProgressBar.vue"
+import { EngineKey } from "@/constants"
+
 import Screen, { IScreen } from "@/components/Screen.vue"
-import { IPaintDevice } from "@/graphics"
 
 export default defineComponent({
-    components: { Modal, ProgressBar, Screen },
+    components: { Screen },
     setup() {
-        const loadingRef = ref<boolean>(true)
-        const loadingLabelRef = ref<string>("")
-        const loadingValueRef = ref<number | null>(null)
+        const engine = inject(EngineKey)
 
         const screenWidthRef = ref(0)
         const screenHeightRef = ref(0)
         const screenRef = ref<IScreen | null>(null)
+
+        const landConfig = Dune.Land.ensureConfig({
+            size: {
+                width: 32,
+                height: 32,
+            },
+        })
 
         // handle window resize event
         const resize = () => {
@@ -31,45 +36,43 @@ export default defineComponent({
             screenHeightRef.value = height
         }
 
+        const resizeEventManager = createEventManager(
+            window,
+            "resize",
+            debounce(resize, 100),
+        )
+
+        const contextMenuEventManager = createEventManager(
+            window,
+            "contextmenu",
+            ev => ev.preventDefault(),
+            false,
+        )
+
         onMounted(async () => {
-            // window.addEventListener("resize", debounce(resize, 60))
-            // window.addEventListener("contextmenu", ev => ev.preventDefault(), false)
+            if (!isNil(engine)) {
+                const screen = unref(screenRef) as IScreen
 
-            // resize()
+                contextMenuEventManager.start()
+                resizeEventManager.start()
+                resize()
 
-            // const screen = unref(screenRef) as IScreen
-            // const engine = await Engine.create(Dune.Game, Engine.Mode.Game, screen.getPaintDevice())
+                await engine.initialize()
+                engine
+                    .start(Engine.Mode.Game, screen.getPaintDevice())
+                    .get(Dune.Land.id).generate(landConfig)
+            }
+        })
 
-            // engine.events
-            //     .on("stateChanged", state => {
-            //         loadingRef.value = state === Engine.GameState.Initializing
-            //     })
-            //     .on("downloadingResourceBegin", ({ name }) => {
-            //         loadingLabelRef.value = `Downloading ${name}...`
-            //         loadingValueRef.value = null
-            //     })
-            //     .on("decodingResourceBegin", ({ name }) => {
-            //         loadingLabelRef.value = `Decoding ${name}...`
-            //         loadingValueRef.value = null
-            //     })
-            //     .on("downloadingResourceProgress", ({ current, total }) => {
-            //         if (!(isNil(current) || isNil(total))) {
-            //             loadingValueRef.value = current/total
-            //         }
-            //     })
-
-            // await engine.initialize()
-            // engine.start()
-
-            // const land = engine.get(Dune.Land.id)
-            // land.generate({ size: { width: 32, height: 32 } })
-            // land.reveal(land.position, land.size)
+        onUnmounted(() => {
+            contextMenuEventManager.stop()
+            resizeEventManager.stop()
+            if (!isNil(engine)) {
+                engine.stop()
+            }
         })
 
         return {
-            loading: loadingRef,
-            loadingLabel: loadingLabelRef,
-            loadingValue: loadingValueRef,
             screen: screenRef,
             screenWidth: screenWidthRef,
             screenHeight: screenHeightRef,
@@ -79,9 +82,6 @@ export default defineComponent({
 </script>
 
 <template>
-    <modal :show="loading">
-        <progress-bar :current="loadingValue" :label="loadingLabel"/>
-    </modal>
     <screen
         id="screen"
         ref="screen"
