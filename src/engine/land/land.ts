@@ -24,8 +24,6 @@ import { LandEditorView } from "./view/editor-view"
 import { Entity } from "@/engine/entity"
 import {
     Inject,
-    Service,
-    ServiceLifecycle,
 } from "@/engine/injector"
 import {
     GameLandTerrainGenerator,
