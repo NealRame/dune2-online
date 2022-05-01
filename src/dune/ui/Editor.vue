@@ -6,15 +6,15 @@ import { createEventManager } from "@/utils"
 import { EngineKey } from "@/constants"
 
 import Icon from "./Icon.vue"
-import InputRange from "./InputRange.vue"
+import LandConfigPanel from "./LandConfigPanel.vue"
 import MiniMap from "./MiniMap.vue"
 import Screen, { IScreen } from "./Screen.vue"
 
 import { debounce, isNil } from "lodash"
-import { defineComponent, inject, onMounted, onUnmounted, reactive, ref, unref, watch } from "vue"
+import { defineComponent, inject, onMounted, onUnmounted, ref, unref, watch } from "vue"
 
 export default defineComponent({
-    components: { Icon, InputRange, MiniMap, Screen },
+    components: { Icon, LandConfigPanel, MiniMap, Screen },
     setup() {
         const engine = inject(EngineKey)
 
@@ -24,7 +24,7 @@ export default defineComponent({
 
         const showInspector = ref(false)
 
-        const landConfig = reactive(Dune.Land.ensureConfig({
+        const landConfig = ref(Dune.Land.ensureConfig({
             size: {
                 width: 32,
                 height: 32,
@@ -77,8 +77,8 @@ export default defineComponent({
                 await engine.initialize()
                 engine
                     .start(Engine.Mode.Editor, screen.getPaintDevice())
-                    .get(Dune.Land.id).generate(landConfig)
-                watch(landConfig, () => engine.get(Dune.Land.id).generate(landConfig))
+                    .get(Dune.Land.id).generate(unref(landConfig))
+                watch(landConfig, value => engine.get(Dune.Land.id).generate(value))
             }
         })
 
@@ -109,72 +109,9 @@ export default defineComponent({
         :width="screenWidth"
         :height="screenHeight"
     />
-    <div id="settings">
-        <div id="land-inspector" v-show="showInspector">
-            <h2>Size</h2>
-            <input-range
-                label="Width"
-                v-model="landConfig.size.width"
-                :range="[16, 128]"
-                :step="1"
-            />
-            <input-range
-                label="Height"
-                v-model="landConfig.size.height"
-                :range="[16, 128]"
-                :step="1"
-            />
-            <h2>Terrain</h2>
-            <input-range
-                label="Scale"
-                v-model="landConfig.terrainScale"
-                :range="[16, 64]"
-                :step="1"
-            />
-            <input-range
-                label="Details"
-                v-model="landConfig.terrainDetails"
-                :range="[1, 6]"
-                :step="1"
-            />
-            <input-range
-                label="Sand"
-                v-model="landConfig.terrainSandThreshold"
-            />
-            <input-range
-                label="Rock"
-                v-model="landConfig.terrainRockThreshold"
-            />
-            <input-range
-                label="Mountain"
-                v-model="landConfig.terrainMountainsThreshold"
-            />
-            <h2>Spice</h2>
-            <input-range
-                label="Scale"
-                v-model="landConfig.spiceScale"
-                :range="[16, 64]"
-                :step="1"
-            />
-            <input-range
-                label="Details"
-                v-model="landConfig.spiceDetails"
-                :range="[1, 6]"
-                :step="1"
-            />
-            <input-range
-                label="Threshold"
-                :step="0.001"
-                v-model="landConfig.spiceThreshold"
-            />
-            <input-range
-                label="Saturation"
-                :step="0.001"
-                v-model="landConfig.spiceSaturationThreshold"
-            />
-        </div>
+    <div id="right-panel">
         <mini-map />
-        <div id="fabs">
+        <div id="land-actions">
             <button id="open-settings" @click="showInspector=!showInspector">
                 <icon type="settings" />
             </button>
@@ -188,47 +125,12 @@ export default defineComponent({
                 <icon type="zoom-out" />
             </button>
         </div>
+        <land-config-panel v-model="landConfig" v-show="showInspector"/>
     </div>
 </template>
 
 <style lang="scss" scoped>
-#settings {
-    display: flex;
-
-    align-items: stretch;
-
-    flex-direction: column;
-
-    gap: .5rem;
-
-    position: fixed;
-    bottom: 16px;
-    right: 16px;
-}
-#land-inspector {
-    background-color: rgba($color: black, $alpha: .5);
-    border: 2px solid sandybrown;
-    border-radius: 8px;
-
-    font-size: .75rem;
-
-    display: grid;
-    grid-template-columns: auto 100fr min(6ch);
-
-    justify-items: stretch;
-    align-items: center;
-
-    padding: 1ch;
-
-    & > h2 {
-        background-color: rgba($color: black, $alpha: .25);
-        font-size: 1rem;
-        grid-column: 1 / span 3;
-        margin: .25rem 0;
-        width: 100%;
-    }
-}
-#fabs {
+#land-actions {
     display: flex;
 
     flex-direction: row;
