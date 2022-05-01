@@ -13,6 +13,16 @@ import { defineComponent, inject, onBeforeUnmount, onMounted, ref, unref } from 
 
 export default defineComponent({
     components: { Screen },
+    props: {
+        width: {
+            type: Number,
+            default: 256,
+        },
+        height: {
+            type: Number,
+            default: 256,
+        },
+    },
     setup() {
         const engine = inject(EngineKey)
         const screenRef = ref<IScreen | null>(null)
@@ -121,7 +131,7 @@ export default defineComponent({
 
 <template>
 <div id="minimap">
-    <screen ref="screen" width="256" height="256"/>
+    <screen ref="screen" :width="width" :height="height"/>
 </div>
 </template>
 
