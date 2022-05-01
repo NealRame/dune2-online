@@ -9,10 +9,11 @@ import { createEventManager } from "@/utils"
 
 import { EngineKey } from "@/constants"
 
+import MiniMap from "@/dune/ui/MiniMap.vue"
 import Screen, { IScreen } from "@/dune/ui/Screen.vue"
 
 export default defineComponent({
-    components: { Screen },
+    components: { Screen, MiniMap },
     setup() {
         const engine = inject(EngineKey)
 
@@ -20,12 +21,12 @@ export default defineComponent({
         const screenHeightRef = ref(0)
         const screenRef = ref<IScreen | null>(null)
 
-        const landConfig = Dune.Land.ensureConfig({
+        const landConfig = ref(Dune.Land.ensureConfig({
             size: {
                 width: 32,
                 height: 32,
             },
-        })
+        }))
 
         // handle window resize event
         const resize = () => {
@@ -60,7 +61,7 @@ export default defineComponent({
                 await engine.initialize()
                 engine
                     .start(Engine.Mode.Game, screen.getPaintDevice())
-                    .get(Dune.Land.id).generate(landConfig)
+                    .get(Dune.Land.id).generate(unref(landConfig))
             }
         })
 
@@ -73,6 +74,7 @@ export default defineComponent({
         })
 
         return {
+            landConfig,
             screen: screenRef,
             screenWidth: screenWidthRef,
             screenHeight: screenHeightRef,
@@ -83,9 +85,14 @@ export default defineComponent({
 
 <template>
     <screen
-        id="screen"
         ref="screen"
         :width="screenWidth"
         :height="screenHeight"
     />
+    <div id="right-panel">
+        <mini-map
+            :width="2*landConfig.size.width"
+            :height="2*landConfig.size.height"
+        />
+    </div>
 </template>
