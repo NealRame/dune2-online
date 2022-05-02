@@ -62,6 +62,11 @@ export default defineComponent({
             if (!isNil(viewport)) {
                 const rect = Rect.fromRect(viewport.rect).scale(2)
 
+                rect.x += 0.5
+                rect.y += 0.5
+                rect.width = Math.floor(rect.width)
+                rect.height = Math.floor(rect.height)
+
                 painter.pen = {
                     lineWidth: 1,
                     strokeStyle: "#fff",
