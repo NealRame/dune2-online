@@ -32,6 +32,7 @@ import {
     Mode,
     State,
     type IGameEvents,
+    type IGameEngine,
     type IGameMetadata,
 } from "@/engine/types"
 
@@ -48,23 +49,16 @@ import {
 } from "@/utils"
 
 import { clamp, isNil } from "lodash"
-import { GameState } from "."
+import { GameState, IGameModule, TConstructor } from "."
 
 const GameEventsEmitter = new Token<IEmitter<IGameEvents>>("game:events:emitter")
+const Game = new Token<IGameModule>("game:module")
 
 export class EngineNotReadyError extends Error {
     constructor() {
         super("Engine not ready. You should call Engine#initialize() method and wait for it to be ready")
         Object.setPrototypeOf(this, EngineNotReadyError.prototype)
     }
-}
-
-export interface IEngine {
-    readonly events: IObservable<IGameEvents>
-    get<T>(id: Token<T>): T
-    initialize(): Promise<IEngine>
-    start(mode: Mode, screen: IPaintDevice): IEngine
-    stop(): IEngine
 }
 
 function getGameResourcesMetadata(game: any) {
@@ -166,8 +160,8 @@ async function initializeLand(
 }
 
 export function create(
-    game: any,
-): IEngine {
+    GameModule: TConstructor<IGameModule>,
+): IGameEngine {
     const [emitter, events] = createObservable<IGameEvents>()
     const container = new Container()
 
@@ -190,8 +184,8 @@ export function create(
         if (!container.has(GameState)) {
             updateEngineState(State.Initializing)
             await initializeScene(container)
-            await initializeResources(container, game)
-            await initializeLand(container, game)
+            await initializeResources(container, GameModule)
+            await initializeLand(container, GameModule)
             updateEngineState(State.Ready)
         } else if (container.get(GameState) === State.Initializing) {
             await waitForReady()
@@ -205,7 +199,7 @@ export function create(
             throw new EngineNotReadyError()
         }
         if (container.get(GameState) === State.Ready) {
-            const { id: GameLand } = getGameLandMetadata(game)
+            const { id: GameLand } = getGameLandMetadata(GameModule)
 
             container.set(GameMode, mode)
 
@@ -241,7 +235,7 @@ export function create(
             && container.get(GameState) === State.Running) {
             cancelAnimationFrame(animationRequestId)
 
-            const { id: GameLand } = getGameLandMetadata(game)
+            const { id: GameLand } = getGameLandMetadata(GameModule)
 
             const land = container.get(GameLand)
             land.events.clear()
@@ -261,6 +255,7 @@ export function create(
     }
 
     container.set(GameEventsEmitter, emitter)
+    container.set(Game, new GameModule())
 
     return {
         get events()
@@ -276,11 +271,13 @@ export function create(
         },
         start(mode: Mode, screen: IPaintDevice) {
             startEngine(mode, screen)
-            return this as IEngine
+            container.get(Game).onStart(this)
+            return this as IGameEngine
         },
         stop() {
             stopEngine()
-            return this as IEngine
+            container.get(Game).onStop(this)
+            return this as IGameEngine
         }
     }
 }

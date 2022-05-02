@@ -32,7 +32,15 @@ import * as Land from "./land"
         TilesProvider: Land.TilesProvider,
     }
 })
-export class Game {}
+export class Game extends Engine.GameModule {
+    onStart(engine: Engine.IGameEngine): void {
+        console.log("onStart", engine)
+    }
+
+    onStop(engine: Engine.IGameEngine): void {
+        console.log("onStop", engine)
+    }
+}
 
 export * as Resources from "./resources"
 export * as Land from "./land"

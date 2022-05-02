@@ -1,6 +1,15 @@
 import { Image, Palette } from "@/engine/scene"
 
 import { Token } from "@/engine/injector"
+
+import {
+    type IPaintDevice
+} from "@/graphics"
+
+import {
+    type IObservable,
+} from "@/utils"
+
 import {
     ILand,
     ILandTerrainGenerator,
@@ -80,6 +89,20 @@ export type IGameLandDescriptor<T extends ITerrainData> = {
 /******************************************************************************
  * Game metadata types
  *****************************************************************************/
+
+export interface IGameEngine {
+    readonly events: IObservable<IGameEvents>
+    get<T>(id: Token<T>): T
+    initialize(): Promise<IGameEngine>
+    start(mode: Mode, screen: IPaintDevice): IGameEngine
+    stop(): IGameEngine
+}
+
+export interface IGameModule {
+    onStart(engine: IGameEngine): void
+    onStop(engine: IGameEngine): void
+}
+
 export interface IGameMetadata<
     TerrainData extends ITerrainData = ITerrainData,
 > {

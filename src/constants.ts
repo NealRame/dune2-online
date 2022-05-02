@@ -1,4 +1,4 @@
 import { InjectionKey } from "vue"
-import { type IEngine } from "./engine"
+import { type IGameEngine } from "./engine"
 
-export const EngineKey: InjectionKey<IEngine> = Symbol("Engine")
+export const EngineKey: InjectionKey<IGameEngine> = Symbol("Engine")
