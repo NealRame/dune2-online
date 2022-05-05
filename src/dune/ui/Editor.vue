@@ -31,6 +31,16 @@ export default defineComponent({
             },
         }))
 
+        // refresh land
+        const updateSeed = () => {
+            if (!isNil(engine)) {
+                landConfig.value = {
+                    ...landConfig.value,
+                    seed: Date.now(),
+                }
+            }
+        }
+
         // zoom event handler
         const zoomIn = () => {
             if (!isNil(engine)) {
@@ -96,6 +106,7 @@ export default defineComponent({
             screenWidth: screenWidthRef,
             screenHeight: screenHeightRef,
             showInspector,
+            updateSeed,
             zoomIn,
             zoomOut,
         }
@@ -115,7 +126,7 @@ export default defineComponent({
             <button id="open-settings" @click="showInspector=!showInspector">
                 <icon type="settings" />
             </button>
-            <button id="seed" @click="landConfig.seed = Date.now()">
+            <button id="seed" @click="updateSeed">
                 <icon type="refresh" />
             </button>
             <button id="zoom-in" @click="zoomIn">
