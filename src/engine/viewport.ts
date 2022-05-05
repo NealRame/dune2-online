@@ -29,6 +29,7 @@ export interface IViewport {
     readonly rect: Rect
     position: IVector2D
     size: ISize2D
+    centerOn(position: IVector2D): IViewport
 }
 
 type ResizeEventHandler = (size: ISize2D) => void
@@ -102,5 +103,14 @@ export class Viewport implements IViewport {
 
     get size(): ISize2D {
         return this.rect_.size
+    }
+
+    centerOn(position: IVector2D)
+        : IViewport {
+        this.position = {
+            x: clamp(position.x - this.rect_.width/2, 0, this.scene_.width - this.rect_.width),
+            y: clamp(position.y - this.rect_.height/2, 0, this.scene_.height - this.rect_.height),
+        }
+        return this
     }
 }
