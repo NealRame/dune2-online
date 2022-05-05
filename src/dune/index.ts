@@ -34,7 +34,26 @@ import * as Land from "./land"
 })
 export class Game extends Engine.GameModule {
     onStart(engine: Engine.IGameEngine): void {
-        console.log("onStart", engine)
+        const size = {
+            width: 32,
+            height: 32,
+        }
+
+        engine
+            .get(Land.id)
+            .generate(Land.ensureConfig({ size }))
+            .reveal({ x: size.width/2 - 2, y: size.height/2 - 1 }, {
+                width: 5,
+                height: 3,
+            })
+            .reveal({ x: size.width/2 - 1, y: size.height/2 - 2 }, {
+                width: 3,
+                height: 5,
+            })
+
+        engine
+            .get(Engine.GameScene).viewport
+            .centerOn({ x: size.width/2, y: size.height/2 })
     }
 
     onStop(engine: Engine.IGameEngine): void {
