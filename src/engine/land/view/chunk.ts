@@ -16,6 +16,7 @@ import { isNil } from "lodash"
 
 export class Chunk extends SceneItem {
     private rect_: Rect
+    private dirty_ = false
     private image_: Partial<Image> = {}
     private refresh_: Record<number, [IVector2D, Array<Image>]> = {}
 
@@ -49,6 +50,7 @@ export class Chunk extends SceneItem {
     refresh(position: IVector2D, images: Array<Image>): void {
         const index = this.positionToIndex_(position)
         this.refresh_[index] = [position, images]
+        this.dirty_ = true
     }
 
     render(
@@ -67,17 +69,20 @@ export class Chunk extends SceneItem {
     }
 
     update(): Chunk {
-        const tiles = Object.values(this.refresh_)
-        this.refresh_ = {}
-        if (tiles.length > 0) {
-            renderImage({
-                size: this.size,
-                gridUnit: this.scene.gridUnit,
-                image: this.image_,
-                tiles,
-            }).then(image => {
-                this.image_ = image
-            })
+        if (this.dirty_) {
+            const tiles = Object.values(this.refresh_)
+            if (tiles.length > 0) {
+                renderImage({
+                    size: this.size,
+                    gridUnit: this.scene.gridUnit,
+                    image: this.image_,
+                    tiles,
+                }).then(image => {
+                    this.image_ = image
+                })
+            }
+            this.dirty_ = false
+            this.refresh_ = {}
         }
         return this
     }
