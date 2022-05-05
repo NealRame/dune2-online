@@ -85,9 +85,8 @@ export default defineComponent({
                 resize()
 
                 await engine.initialize()
-                engine
-                    .start(Engine.Mode.Editor, screen.getPaintDevice())
-                    .get(Dune.Land.id).generate(unref(landConfig))
+                engine.start(Engine.Mode.Editor, screen.getPaintDevice())
+
                 watch(landConfig, value => engine.get(Dune.Land.id).generate(value))
             }
         })
