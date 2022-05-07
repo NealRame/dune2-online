@@ -1,6 +1,9 @@
 import { Image, Palette } from "@/engine/scene"
 
-import { Token } from "@/engine/injector"
+import {
+    type TConstructor,
+    Token
+} from "@/engine/injector"
 
 import {
     type IPaintDevice
@@ -11,17 +14,12 @@ import {
 } from "@/utils"
 
 import {
-    ILand,
-    ILandTerrainGenerator,
-    ILandTerrainColorProvider,
-    ILandTerrainTilesProvider,
-    ITerrainData
+    type ILand,
+    type ILandTerrainGenerator,
+    type ILandTerrainColorProvider,
+    type ILandTerrainTilesProvider,
+    type ITerrainData
 } from "./land"
-
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export interface TConstructor<T = any> {
-    new(...args: Array<never>): T
-}
 
 /******************************************************************************
  * Game state
