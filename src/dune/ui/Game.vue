@@ -12,10 +12,24 @@ import { EngineKey } from "@/constants"
 import MiniMap from "@/dune/ui/MiniMap.vue"
 import Screen, { IScreen } from "@/dune/ui/Screen.vue"
 
+declare global {
+    interface Window {
+        Dune: {
+            engine?: Engine.IGameEngine
+            Land: typeof Dune.Land.id
+        }
+    }
+}
+
 export default defineComponent({
     components: { Screen, MiniMap },
     setup() {
         const engine = inject(EngineKey)
+
+        window.Dune = {
+            engine,
+            Land: Dune.Land.id,
+        }
 
         const screenWidthRef = ref(0)
         const screenHeightRef = ref(0)
