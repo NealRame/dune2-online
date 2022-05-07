@@ -9,6 +9,7 @@ import {
     GameMinimap,
     GameMode,
     GameScene,
+    GameState,
 } from "@/engine/constants"
 
 import {
@@ -35,6 +36,7 @@ import {
     type IGameEvents,
     type IGameEngine,
     type IGameMetadata,
+    type IGameModule,
 } from "@/engine/types"
 
 import {
@@ -50,7 +52,6 @@ import {
 } from "@/utils"
 
 import { clamp, isNil } from "lodash"
-import { GameState, IGameModule, TConstructor } from "."
 
 const GameEventsEmitter = new Token<IEmitter<IGameEvents>>("game:events:emitter")
 const Game = new Token<IGameModule>("game:module")
