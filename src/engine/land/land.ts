@@ -21,7 +21,6 @@ import {
 import { LandChunkView } from "./view/chunk-view"
 import { LandEditorView } from "./view/editor-view"
 
-import { Entity } from "@/engine/entity"
 import {
     Inject,
 } from "@/engine/injector"
@@ -76,7 +75,7 @@ export class LandDataSizeError extends Error {
 export class Land<
     TerrainDataType extends ITerrainData = ITerrainData,
     LandConfigType extends ILandConfig = ILandConfig,
-> extends Entity implements ILand<TerrainDataType, LandConfigType> {
+> implements ILand<TerrainDataType, LandConfigType> {
     private size_: ISize2D
     private indexToPosition_: IndexToPositionConverter
     private positionToIndex_: PositionToIndexConverter
@@ -93,8 +92,6 @@ export class Land<
         @Inject(GameMode) gameMode: Mode,
         @Inject(GameScene) scene: IScene,
     ) {
-        super()
-
         const [emitter, events] = createObservable<ILandEvent<TerrainDataType>>()
 
         this.indexToPosition_ = constant({ x: 0, y: 0 })

@@ -3,7 +3,6 @@ import { IScene, ISceneEvents, ISceneItem } from "./types"
 import { cssHex } from "@/graphics/color"
 import { Brush } from "@/graphics/painter"
 
-import { IEntity } from "@/engine/entity"
 import { scaleDown, ScaleFactor, scaleUp } from "@/engine/scale"
 import {
     type IViewport,
@@ -111,10 +110,6 @@ export class Scene implements IScene {
 
     get events(): IObservable<ISceneEvents> {
         return this.events_
-    }
-
-    get entity(): IEntity | null {
-        return null
     }
 
     get scale(): ScaleFactor {

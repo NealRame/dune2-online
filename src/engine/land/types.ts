@@ -1,4 +1,3 @@
-import { IEntity } from "@/engine/entity"
 import { Image } from "@/engine/scene"
 
 import { Color } from "@/graphics"
@@ -56,7 +55,7 @@ export interface ILandTerrainColorProvider<Data extends ITerrainData = ITerrainD
 export interface ILand<
     TerrainDataType extends ITerrainData = ITerrainData,
     LandConfigType extends ILandConfig = ILandConfig,
-> extends IEntity {
+> {
     readonly width: number
     readonly height: number
     readonly size: ISize2D
