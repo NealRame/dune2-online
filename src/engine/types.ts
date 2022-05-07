@@ -22,9 +22,47 @@ import {
 } from "./land"
 
 /******************************************************************************
- * Game state
+ * Game engine metadata
  *****************************************************************************/
 
+/* Game resources metadata ***************************************************/
+export type GameResourceIdentifier = string | symbol
+
+export type GameResource = Palette | Array<Image>
+
+export interface IGameResourceDecoder<T extends GameResource> {
+    decode(data: Uint8Array, identifier: Token<T>): Promise<T>
+}
+
+export type IGamePaletteDecoder = IGameResourceDecoder<Palette>
+export type IGameImagesDecoder = IGameResourceDecoder<Array<Image>>
+
+export type IGameResourceDescriptor<T extends GameResource> = {
+    id: Token<T>,
+    name: string,
+    uri: string,
+    Decoder: TConstructor<IGameResourceDecoder<T>>,
+}
+
+/* Game land metadata ********************************************************/
+export type IGameLandDescriptor<T extends ITerrainData> = {
+    id: Token<ILand<T>>,
+    Generator: TConstructor<ILandTerrainGenerator<T>>,
+    ColorsProvider: TConstructor<ILandTerrainColorProvider<T>>,
+    TilesProvider: TConstructor<ILandTerrainTilesProvider<T>>,
+}
+
+/* Game metadata *************************************************************/
+export interface IGameMetadata<
+    TerrainData extends ITerrainData = ITerrainData,
+> {
+    resources?: Array<IGameResourceDescriptor<GameResource>>,
+    land: IGameLandDescriptor<TerrainData>,
+}
+
+/******************************************************************************
+ * Game engine
+ *****************************************************************************/
 export enum Mode {
     Editor,
     Game,
@@ -56,38 +94,6 @@ export interface IGameEvents {
     stateChanged: State
 }
 
-/******************************************************************************
- * Game resources
- *****************************************************************************/
-export type GameResourceIdentifier = string | symbol
-
-export type GameResource = Palette | Array<Image>
-
-export interface IGameResourceDecoder<T extends GameResource> {
-    decode(data: Uint8Array, identifier: Token<T>): Promise<T>
-}
-
-export type IGamePaletteDecoder = IGameResourceDecoder<Palette>
-export type IGameImagesDecoder = IGameResourceDecoder<Array<Image>>
-
-export type IGameResourceDescriptor<T extends GameResource> = {
-    id: Token<T>,
-    name: string,
-    uri: string,
-    Decoder: TConstructor<IGameResourceDecoder<T>>,
-}
-
-export type IGameLandDescriptor<T extends ITerrainData> = {
-    id: Token<ILand<T>>,
-    Generator: TConstructor<ILandTerrainGenerator<T>>,
-    ColorsProvider: TConstructor<ILandTerrainColorProvider<T>>,
-    TilesProvider: TConstructor<ILandTerrainTilesProvider<T>>,
-}
-
-/******************************************************************************
- * Game metadata types
- *****************************************************************************/
-
 export interface IGameEngine {
     readonly events: IObservable<IGameEvents>
     get<T>(id: Token<T>): T
@@ -96,14 +102,10 @@ export interface IGameEngine {
     stop(): IGameEngine
 }
 
+/******************************************************************************
+ * Game module
+ *****************************************************************************/
 export interface IGameModule {
     onStart(engine: IGameEngine): void
     onStop(engine: IGameEngine): void
-}
-
-export interface IGameMetadata<
-    TerrainData extends ITerrainData = ITerrainData,
-> {
-    resources?: Array<IGameResourceDescriptor<GameResource>>,
-    land: IGameLandDescriptor<TerrainData>,
 }
