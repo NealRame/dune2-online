@@ -15,7 +15,8 @@ export abstract class Entity<
 
     private id_: number
     private name_: string | undefined
-    private scene_: IScene
+
+    protected scene_: IScene
 
     constructor(data: Data, scene: IScene) {
         super(data)
