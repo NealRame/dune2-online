@@ -1,22 +1,24 @@
 import {
     type IScene,
-    type ISceneItem
 } from "./scene"
 import { type IEntity } from "./types"
 
 import { EventMap, Model } from "@/utils"
 
-export abstract class Entity<
+export class Entity<
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     Data extends Record<string, any>,
-    Events extends EventMap = Record<string, never>
+    Events extends EventMap = Record<string, any>
 > extends Model<Data, Events> implements IEntity {
     private static nextId_ = 0
 
-    private id_: number
-    private name_: string | undefined
-
     protected scene_: IScene
+
+    protected id_: number
+    protected name_: string | undefined
+
+    protected x_ = 0
+    protected y_ = 0
 
     constructor(data: Data, scene: IScene) {
         super(data)
@@ -36,5 +38,11 @@ export abstract class Entity<
         this.name_ = name
     }
 
-    abstract get view(): ISceneItem
+    get x(): number {
+        return this.x_
+    }
+
+    get y(): number {
+        return this.y_
+    }
 }

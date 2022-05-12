@@ -124,12 +124,12 @@ export interface IGameModule {
  *****************************************************************************/
 export interface IEntity {
     readonly id: number
-    readonly name: string
-    readonly view: ISceneItem
-}
+    name: string
 
-export interface IPositionableData {
-    position: IVector2D
+    readonly x: number
+    readonly y: number
+
+    readonly view?: ISceneItem
 }
 
 export interface IDestructibleData {
