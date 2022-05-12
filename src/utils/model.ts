@@ -11,8 +11,9 @@ export class Model<
     Events extends EventMap = Record<string, any>
 > {
     private data_: Data
-    private emitter_: IEmitter<PropertyEventMap<Data> & Events>
     private events_: IObservable<PropertyEventMap<Data> & Events>
+
+    protected emitter_: IEmitter<PropertyEventMap<Data> & Events>
 
     constructor(data: Data) {
         const [emitter, events] = createObservable<PropertyEventMap<Data> & Events>()
