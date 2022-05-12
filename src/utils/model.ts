@@ -42,15 +42,4 @@ export class Model<
         )
         return this
     }
-
-    update(data: Partial<Data>)
-        : Model<Data, Events> {
-        for (const key of Object.keys(data) as (keyof Data)[]) {
-            this.set(
-                key as string & keyof Data,
-                (data as Data)[key as string & keyof Data]
-            )
-        }
-        return this
-    }
 }
