@@ -7,7 +7,8 @@ export type PropertyEventMap<Type> = {
 export class Model<
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     Data extends Record<string, any>,
-    Events extends EventMap = Record<string, never>
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    Events extends EventMap = Record<string, any>
 > {
     private data_: Data
     private emitter_: IEmitter<PropertyEventMap<Data> & Events>
