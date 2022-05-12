@@ -8,6 +8,7 @@ import { EventMap, Model } from "@/utils"
 export class Entity<
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     Data extends Record<string, any>,
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     Events extends EventMap = Record<string, any>
 > extends Model<Data, Events> implements IEntity {
     private static nextId_ = 0
