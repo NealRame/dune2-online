@@ -30,10 +30,11 @@ import * as Land from "./land"
         Generator: Land.Generator,
         ColorsProvider: Land.ColorsProvider,
         TilesProvider: Land.TilesProvider,
-    }
+    },
 })
 export class Game extends Engine.GameModule {
     onStart(engine: Engine.IGameEngine): void {
+        const viewport = engine.get(Engine.GameScene).viewport
         const size = {
             width: 32,
             height: 32,
@@ -51,9 +52,7 @@ export class Game extends Engine.GameModule {
                 height: 5,
             })
 
-        engine
-            .get(Engine.GameScene).viewport
-            .centerOn({ x: size.width/2, y: size.height/2 })
+        viewport.centerOn({ x: size.width/2, y: size.height/2 })
     }
 
     onStop(engine: Engine.IGameEngine): void {
