@@ -1,7 +1,10 @@
 import {
     type IScene,
 } from "./scene"
-import { type IEntity } from "./types"
+
+import {
+    type IEntity
+} from "./types"
 
 import {
     createObservable,
@@ -10,15 +13,25 @@ import {
     type EventMap,
 } from "@/utils/event"
 
-export type PropertyEventMap<Type> = {
-    [Property in keyof Type as `${string & Property}Changed`]: Type[Property]
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export type IEntityData = Record<string, any>
+
+export type IEntityDataEvents<Data extends IEntityData> = {
+    [K in keyof Data as `${string & K}Changed`]: Data[K]
+}
+
+type EntityEvents<
+    Data extends IEntityData,
+    ExtraEvents extends EventMap,
+> = IEntityDataEvents<Data> & ExtraEvents
+
+type IEntityInternalEvents = {
+    update: undefined
 }
 
 export class Entity<
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    Data extends Record<string, any>,
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    Events extends EventMap = Record<string, any>
+    Data extends IEntityData,
+    ExtraEvents extends EventMap = Record<string, never>
 > implements IEntity {
     private static nextId_ = 0
 
@@ -32,11 +45,11 @@ export class Entity<
     protected x_ = 0
     protected y_ = 0
 
-    protected events_: IObservable<PropertyEventMap<Data> & Events>
-    protected emitter_: IEmitter<PropertyEventMap<Data> & Events>
+    protected events_: IObservable<EntityEvents<Data, ExtraEvents> & IEntityInternalEvents>
+    protected emitter_:   IEmitter<EntityEvents<Data, ExtraEvents> & IEntityInternalEvents>
 
     constructor(data: Data, scene: IScene) {
-        const [emitter, events] = createObservable<PropertyEventMap<Data> & Events>()
+        const [emitter, events] = createObservable<EntityEvents<Data, ExtraEvents> & IEntityInternalEvents>()
 
         this.data_ = data
         this.emitter_ = emitter
@@ -47,7 +60,7 @@ export class Entity<
     }
 
     get events()
-        : IObservable<PropertyEventMap<Data> & Events> {
+        : IObservable<EntityEvents<Data, ExtraEvents>> {
         return this.events_
     }
 
@@ -81,7 +94,7 @@ export class Entity<
         this.data_[prop] = value
         this.emitter_.emit(
             `${prop}Changed`,
-            value as unknown as (PropertyEventMap<Data> & Events)[`${K}Changed`]
+            value as unknown as (EntityEvents<Data, ExtraEvents> & IEntityInternalEvents)[`${K}Changed`]
         )
         return this
     }
