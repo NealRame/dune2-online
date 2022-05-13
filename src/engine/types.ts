@@ -1,7 +1,6 @@
 import {
     type Image,
     type Palette,
-    type ISceneItem
 } from "@/engine/scene"
 
 import {
@@ -12,11 +11,6 @@ import {
 import {
     type IPaintDevice
 } from "@/graphics"
-
-import {
-    type IVector2D,
-    Direction
-} from "@/maths"
 
 import {
     type IObservable,
@@ -117,25 +111,4 @@ export interface IGameEngine {
 export interface IGameModule {
     onStart(engine: IGameEngine): void
     onStop(engine: IGameEngine): void
-}
-
-/******************************************************************************
- * Game entity
- *****************************************************************************/
-export interface IEntity {
-    readonly id: number
-    name: string
-
-    readonly x: number
-    readonly y: number
-
-    readonly view?: ISceneItem
-}
-
-export interface IDestructibleData {
-    health: number
-}
-
-export interface IMovable {
-    move(direction: Direction): void
 }

@@ -1,10 +1,6 @@
 import {
     type IScene,
-} from "./scene"
-
-import {
-    type IEntity
-} from "./types"
+} from "@/engine/scene"
 
 import {
     createObservable,
@@ -12,6 +8,10 @@ import {
     type IObservable,
     type EventMap,
 } from "@/utils/event"
+
+import {
+    type IEntity
+} from "./types"
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export type IEntityData = Record<string, any>
@@ -23,9 +23,7 @@ export type IEntityDataEvents<Data extends IEntityData> = {
 type EntityEvents<
     Data extends IEntityData,
     ExtraEvents extends EventMap,
-> = IEntityDataEvents<Data> & ExtraEvents
-
-type IEntityInternalEvents = {
+> = IEntityDataEvents<Data> & ExtraEvents & {
     update: undefined
 }
 
@@ -45,11 +43,11 @@ export class Entity<
     protected x_ = 0
     protected y_ = 0
 
-    protected events_: IObservable<EntityEvents<Data, ExtraEvents> & IEntityInternalEvents>
-    protected emitter_:   IEmitter<EntityEvents<Data, ExtraEvents> & IEntityInternalEvents>
+    protected events_: IObservable<EntityEvents<Data, ExtraEvents>>
+    protected emitter_:   IEmitter<EntityEvents<Data, ExtraEvents>>
 
     constructor(data: Data, scene: IScene) {
-        const [emitter, events] = createObservable<EntityEvents<Data, ExtraEvents> & IEntityInternalEvents>()
+        const [emitter, events] = createObservable<EntityEvents<Data, ExtraEvents>>()
 
         this.data_ = data
         this.emitter_ = emitter
@@ -94,7 +92,7 @@ export class Entity<
         this.data_[prop] = value
         this.emitter_.emit(
             `${prop}Changed`,
-            value as unknown as (EntityEvents<Data, ExtraEvents> & IEntityInternalEvents)[`${K}Changed`]
+            value as unknown as EntityEvents<Data, ExtraEvents>[`${K}Changed`]
         )
         return this
     }
