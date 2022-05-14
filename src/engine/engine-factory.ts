@@ -162,7 +162,7 @@ async function initializeLand(
 }
 
 export function create(
-    GameModule: TConstructor<IGameController>,
+    GameController: TConstructor<IGameController>,
 ): IGameEngine {
     const [emitter, events] = createObservable<IGameEvents>()
     const container = new Container()
@@ -186,8 +186,8 @@ export function create(
         if (!container.has(GameState)) {
             updateEngineState(State.Initializing)
             await initializeScene(container)
-            await initializeResources(container, GameModule)
-            await initializeLand(container, GameModule)
+            await initializeResources(container, GameController)
+            await initializeLand(container, GameController)
             updateEngineState(State.Ready)
         } else if (container.get(GameState) === State.Initializing) {
             await waitForReady()
@@ -201,7 +201,7 @@ export function create(
             throw new EngineNotReadyError()
         }
         if (container.get(GameState) === State.Ready) {
-            const { id: GameLand } = getGameLandMetadata(GameModule)
+            const { id: GameLand } = getGameLandMetadata(GameController)
 
             container.set(GameMode, mode)
 
@@ -237,7 +237,7 @@ export function create(
             && container.get(GameState) === State.Running) {
             cancelAnimationFrame(animationRequestId)
 
-            const { id: GameLand } = getGameLandMetadata(GameModule)
+            const { id: GameLand } = getGameLandMetadata(GameController)
 
             const land = container.get(GameLand)
             land.events.clear()
@@ -257,7 +257,7 @@ export function create(
     }
 
     container.set(GameEventsEmitter, emitter)
-    container.set(Game, new GameModule())
+    container.set(Game, new GameController())
 
     return {
         get events()
