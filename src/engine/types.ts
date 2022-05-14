@@ -108,7 +108,7 @@ export interface IGameEngine {
 /******************************************************************************
  * Game module
  *****************************************************************************/
-export interface IGameModule {
+export interface IGameController {
     onStart(engine: IGameEngine): void
     onStop(engine: IGameEngine): void
 }

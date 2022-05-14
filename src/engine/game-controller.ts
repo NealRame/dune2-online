@@ -2,10 +2,10 @@
 /* eslint-disable @typescript-eslint/no-empty-function */
 import {
     type IGameEngine,
-    type IGameModule,
+    type IGameController,
 } from "@/engine/types"
 
-export class GameModule implements IGameModule {
+export class GameController implements IGameController {
     onStart(engine: IGameEngine): void {
     }
 

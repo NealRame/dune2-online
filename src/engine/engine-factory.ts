@@ -36,7 +36,7 @@ import {
     type IGameEvents,
     type IGameEngine,
     type IGameMetadata,
-    type IGameModule,
+    type IGameController,
 } from "@/engine/types"
 
 import {
@@ -54,7 +54,7 @@ import {
 import { clamp, isNil } from "lodash"
 
 const GameEventsEmitter = new Token<IEmitter<IGameEvents>>("game:events:emitter")
-const Game = new Token<IGameModule>("game:module")
+const Game = new Token<IGameController>("game:module")
 
 export class EngineNotReadyError extends Error {
     constructor() {
@@ -162,7 +162,7 @@ async function initializeLand(
 }
 
 export function create(
-    GameModule: TConstructor<IGameModule>,
+    GameModule: TConstructor<IGameController>,
 ): IGameEngine {
     const [emitter, events] = createObservable<IGameEvents>()
     const container = new Container()

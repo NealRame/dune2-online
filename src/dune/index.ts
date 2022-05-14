@@ -32,7 +32,7 @@ import * as Land from "./land"
         TilesProvider: Land.TilesProvider,
     },
 })
-export class Game extends Engine.GameModule {
+export class Game extends Engine.GameController {
     onStart(engine: Engine.IGameEngine): void {
         const viewport = engine.get(Engine.GameScene).viewport
         const size = {
