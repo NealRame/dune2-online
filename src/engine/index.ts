@@ -1,7 +1,6 @@
 export * from "./animation"
 export * from "./constants"
 export * from "./engine-factory"
-export * from "./game-controller"
 export * from "./grid"
 export * from "./land"
 export * from "./mini-map"
