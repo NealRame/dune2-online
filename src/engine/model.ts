@@ -13,7 +13,8 @@ export type IModelEventMap<Type> = {
     [Property in keyof Type as `${string & Property}Changed`]: Type[Property]
 }
 
-export interface IModel<Data extends IModelData> extends IObservable<IModelEventMap<Data>> {
+export interface IModel<Data extends IModelData> {
+    readonly events: IObservable<IModelDataEvents<Data>>
     get<K extends string & keyof Data>(prop: K): Data[K]
     set<K extends string & keyof Data>(prop: K, value: Data[K]): IModel<Data>
 }
@@ -22,7 +23,9 @@ export function createModel<Data extends IModelData>(data: Data)
     : IModel<Data> {
     const [emitter, events] = createObservable<IModelDataEvents<Data>>()
     return {
-        ...events,
+        get events() {
+            return events
+        },
         get<K extends string & keyof Data>(prop: K)
             : Data[K] {
             return data[prop]

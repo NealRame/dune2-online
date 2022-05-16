@@ -1,41 +1,23 @@
 import {
-    type IScene,
+    type ISceneItem,
 } from "@/engine/scene"
 
 import {
-    createObservable,
-    type IEmitter,
-    type IObservable,
-    type EventMap,
-} from "@/utils/event"
+    type IModel,
+    type IModelData,
+} from "@/engine/model"
 
 import {
-    type IEntity
+    type IEntity,
+    type IEntityEvents,
+    type IEntityController,
 } from "./types"
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export type IEntityData = Record<string, any>
-
-export type IEntityDataEvents<Data extends IEntityData> = {
-    [K in keyof Data as `${string & K}Changed`]: Data[K]
-}
-
-type EntityEvents<
-    Data extends IEntityData,
-    ExtraEvents extends EventMap,
-> = IEntityDataEvents<Data> & ExtraEvents & {
-    update: undefined
-}
-
 export class Entity<
-    Data extends IEntityData,
-    ExtraEvents extends EventMap = Record<string, never>
-> implements IEntity {
+    Data extends IModelData,
+    Events extends IEntityEvents,
+> implements IEntity<Data, Events> {
     private static nextId_ = 0
-
-    protected scene_: IScene
-
-    protected data_: Data
 
     protected id_: number
     protected name_: string | undefined
@@ -43,23 +25,13 @@ export class Entity<
     protected x_ = 0
     protected y_ = 0
 
-    protected events_: IObservable<EntityEvents<Data, ExtraEvents>>
-    protected emitter_:   IEmitter<EntityEvents<Data, ExtraEvents>>
-
-    constructor(data: Data, scene: IScene) {
-        const [emitter, events] = createObservable<EntityEvents<Data, ExtraEvents>>()
-
-        this.data_ = data
-        this.emitter_ = emitter
-        this.events_ = events
-
+    constructor(
+        protected controller_: IEntityController<Data, Events>,
+        protected model_: IModel<Data>,
+        protected view_: ISceneItem,
+    ) {
         this.id_ = Entity.nextId_++
-        this.scene_ = scene
-    }
-
-    get events()
-        : IObservable<EntityEvents<Data, ExtraEvents>> {
-        return this.events_
+        this.controller_.initialize(this)
     }
 
     get id(): number {
@@ -82,18 +54,15 @@ export class Entity<
         return this.y_
     }
 
-    get<K extends string & keyof Data>(prop: K)
-        : Data[K] {
-        return this.data_[prop]
+    get controller(): IEntityController<Data, Events> {
+        return this.controller_
     }
 
-    set<K extends string & keyof Data>(prop: K, value: Data[K])
-        : this {
-        this.data_[prop] = value
-        this.emitter_.emit(
-            `${prop}Changed`,
-            value as unknown as EntityEvents<Data, ExtraEvents>[`${K}Changed`]
-        )
-        return this
+    get model(): IModel<Data> {
+        return this.model_
+    }
+
+    get view(): ISceneItem {
+        return this.view_
     }
 }

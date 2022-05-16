@@ -1,12 +1,9 @@
 import {
-    type IPositionableData,
     type IDestructibleData,
-} from "@/engine/types"
+    type IDestructibleEvents,
+    type IMovableData,
+} from "@/engine/entity"
 
-export interface IUnitData extends
-    IPositionableData,
-    IDestructibleData {}
+export type IUnitData = IDestructibleData & IMovableData
 
-export interface IUnitEvents {
-    "destroyed": void,
-}
+export type IUnitEvents = IDestructibleEvents

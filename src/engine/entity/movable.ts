@@ -22,10 +22,8 @@ import {
 } from "@/maths"
 
 import {
-    type IEmitter
-} from "@/utils"
-
-import {
+    type IEntityData,
+    type IEntityEvents,
     type IMovable,
     type IMovableData,
     type IMovableEvents,
@@ -41,8 +39,8 @@ function directionRotationSequence(from: Direction, to: Direction) {
 }
 
 export function Movable<
-    Data extends IMovableData = IMovableData,
-    Events extends IMovableEvents = IMovableEvents,
+    Data extends IEntityData & IMovableData,
+    Events extends IEntityEvents & IMovableEvents,
 >(Base: TConstructor<Entity<Data, Events>>)
     : TConstructor<Entity<Data, Events> & IMovable> {
     return class extends Base implements IMovable {
@@ -52,9 +50,10 @@ export function Movable<
             : void {
             if (!isNil(this.animation_)) return
 
-            const directions = directionRotationSequence(this.get("direction"), d)
+            const directions = directionRotationSequence(this.model.get("direction"), d)
             const direction = Vector.FromDirection(d)
-            const speed = this.get("speed")
+
+            const speed = this.model.get("speed")
             const { x, y } = this
 
             const update = () => {
@@ -63,7 +62,8 @@ export function Movable<
                 }
             }
 
-            this.events.on("update", update)
+            this.controller.events.on("update", update)
+
             this.animation_ = createSequenceAnimation({
                 animations: [
                     createTransitionAnimation({
@@ -72,8 +72,9 @@ export function Movable<
                         set: t => {
                             const step = Math.floor(t*directions.length)
                             const direction = directions[clamp(step, 0, directions.length - 1)]
-                            if (this.get("direction") !== direction) {
-                                this.set("direction", direction)
+
+                            if (this.model.get("direction") !== direction) {
+                                this.model.set("direction", direction)
                             }
                         }
                     }),
@@ -87,12 +88,8 @@ export function Movable<
                     })
                 ],
                 done: () => {
-                    const emitter = this.emitter_ as IEmitter<IMovableEvents>
-                    emitter.emit("destinationReached", {
-                        x: this.x,
-                        y: this.y,
-                    })
-                    this.events.off("update", update)
+                    this.controller.events.off("update", update)
+                    this.controller.emitter.emit("destinationReached", this)
                 }
             })
         }
