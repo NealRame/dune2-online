@@ -38,9 +38,9 @@ export class Entity<
     protected position_ = Vector.Zero
 
     constructor(
-        protected hooks_: IEntityLifecycleHooks<Data, Events>,
+        private hooks_: IEntityLifecycleHooks<Data, Events>,
+        private view_: ISceneItem,
         protected model_: IModel<Data>,
-        protected view_: ISceneItem,
     ) {
         const [emitter, events] = createObservable<Events>()
 
