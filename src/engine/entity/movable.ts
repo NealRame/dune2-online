@@ -72,7 +72,6 @@ export function Movable<
                         set: t => {
                             const step = Math.floor(t*directions.length)
                             const direction = directions[clamp(step, 0, directions.length - 1)]
-
                             if (this.model.get("direction") !== direction) {
                                 this.model.set("direction", direction)
                             }
