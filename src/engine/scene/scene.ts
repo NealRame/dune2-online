@@ -132,7 +132,7 @@ export class Scene implements IScene {
     }
 
     get position(): Vector {
-        return Vector.Null
+        return Vector.Zero
     }
 
     get x(): number {

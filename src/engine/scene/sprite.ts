@@ -27,7 +27,7 @@ export class SpriteBase extends SceneItem {
         if (this.frameIndex_ < this.frames_.length) {
             this.frames_[this.frameIndex_].render(
                 painter,
-                new Rect(Vector.Null, this.size)
+                new Rect(Vector.Zero, this.size)
             )
         }
 
