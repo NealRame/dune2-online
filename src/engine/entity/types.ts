@@ -21,13 +21,12 @@ export interface IEntityEvents {
     ready: undefined
 }
 
-export interface IEntityController<
+export interface IEntityLifecycleHooks<
     Data extends IEntityData,
     Events extends IEntityEvents = IEntityEvents,
 > {
-    readonly events: IObservable<Events>
-    readonly emitter: IEmitter<Events>
-    initialize(entity: IEntity<Data, Events>): void
+    onDestroyed?(model: IModel<Data>, emitter: IEmitter<Events>, events: IObservable<Events>): void
+    onInitialized?(model: IModel<Data>, emitter: IEmitter<Events>, events: IObservable<Events>): void
 }
 
 export interface IEntity<
@@ -35,9 +34,10 @@ export interface IEntity<
     Events extends IEntityEvents,
 > extends Readonly<IVector2D> {
     readonly id: number
+
     name: string
 
-    readonly controller: IEntityController<ModelData, Events>
+    readonly events: IObservable<Events>
     readonly model: IModel<ModelData>
     readonly view: ISceneItem
 }

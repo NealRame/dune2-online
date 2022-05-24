@@ -1,6 +1,4 @@
-import {
-    type ISceneItem,
-} from "@/engine/scene"
+import { isNil } from "lodash"
 
 import {
     type IModel,
@@ -8,30 +6,51 @@ import {
 } from "@/engine/model"
 
 import {
+    type ISceneItem,
+} from "@/engine/scene"
+
+import { Vector } from "@/maths"
+
+import {
+    createObservable,
+    type IEmitter,
+    type IObservable,
+} from "@/utils"
+
+import {
     type IEntity,
     type IEntityEvents,
-    type IEntityController,
+    type IEntityLifecycleHooks,
 } from "./types"
+
+let EntityNextID = 0
 
 export class Entity<
     Data extends IModelData,
     Events extends IEntityEvents,
 > implements IEntity<Data, Events> {
-    private static nextId_ = 0
-
     protected id_: number
-    protected name_: string | undefined
 
-    protected x_ = 0
-    protected y_ = 0
+    protected events_: IObservable<Events>
+    protected emitter_: IEmitter<Events>
+
+    protected name_: string | undefined
+    protected position_ = Vector.Zero
 
     constructor(
-        protected controller_: IEntityController<Data, Events>,
+        protected hooks_: IEntityLifecycleHooks<Data, Events>,
         protected model_: IModel<Data>,
         protected view_: ISceneItem,
     ) {
-        this.id_ = Entity.nextId_++
-        this.controller_.initialize(this)
+        const [emitter, events] = createObservable<Events>()
+
+        this.emitter_ = emitter
+        this.events_ = events
+        this.id_ = EntityNextID++
+
+        if (!isNil(this.hooks_.onInitialized)) {
+            this.hooks_.onInitialized(this.model_, this.emitter_, this.events_)
+        }
     }
 
     get id(): number {
@@ -47,15 +66,15 @@ export class Entity<
     }
 
     get x(): number {
-        return this.x_
+        return this.position_.x
     }
 
     get y(): number {
-        return this.y_
+        return this.position_.y
     }
 
-    get controller(): IEntityController<Data, Events> {
-        return this.controller_
+    get events(): IObservable<Events> {
+        return this.events_
     }
 
     get model(): IModel<Data> {

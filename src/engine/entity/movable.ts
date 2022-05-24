@@ -54,7 +54,7 @@ export function Movable<
             const direction = Vector.FromDirection(d)
 
             const speed = this.model.get("speed")
-            const { x, y } = this
+            const { x, y } = this.position_
 
             const update = () => {
                 if (!isNil(this.animation_)) {
@@ -62,7 +62,7 @@ export function Movable<
                 }
             }
 
-            this.controller.events.on("update", update)
+            this.events.on("update", update)
 
             this.animation_ = createSequenceAnimation({
                 animations: [
@@ -82,14 +82,14 @@ export function Movable<
                         frames: Math.floor(60/speed),
                         easing: Easing.Cubic.easeInOut,
                         set: t => {
-                            this.x_ = x + t*direction.x
-                            this.y_ = y + t*direction.y
+                            this.position_.x = x + t*direction.x
+                            this.position_.y = y + t*direction.y
                         }
                     })
                 ],
                 done: () => {
-                    this.controller.events.off("update", update)
-                    this.controller.emitter.emit("destinationReached", this)
+                    this.events_.off("update", update)
+                    this.emitter_.emit("destinationReached", this)
                 }
             })
         }
