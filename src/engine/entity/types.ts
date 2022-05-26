@@ -1,4 +1,8 @@
 import {
+    type TConstructor,
+} from "@/engine/injector"
+
+import {
     type IModel,
     type IModelData,
 } from "@/engine/model"
@@ -11,7 +15,11 @@ import {
     Direction,
     type IVector2D,
 } from "@/maths"
-import { IEmitter, IObservable } from "@/utils"
+
+import {
+    type IEmitter,
+    type IObservable
+} from "@/utils"
 
 export type IEntityData = IModelData
 
@@ -19,14 +27,6 @@ export interface IEntityEvents {
     destroyed: undefined
     update: undefined
     ready: undefined
-}
-
-export interface IEntityLifecycleHooks<
-    Data extends IEntityData,
-    Events extends IEntityEvents = IEntityEvents,
-> {
-    onDestroyed?(model: IModel<Data>, emitter: IEmitter<Events>, events: IObservable<Events>): void
-    onInitialized?(model: IModel<Data>, emitter: IEmitter<Events>, events: IObservable<Events>): void
 }
 
 export interface IEntity<
@@ -41,6 +41,32 @@ export interface IEntity<
     readonly model: IModel<ModelData>
     readonly view: ISceneItem
 }
+
+export interface IEntityLifecycleHooks<
+    Data extends IEntityData,
+    Events extends IEntityEvents = IEntityEvents,
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    IMixins extends Array<Record<string, unknown>> = [],
+> {
+    onDestroyed?(model: IModel<Data>, emitter: IEmitter<Events>, events: IObservable<Events>): void
+    onInitialized?(model: IModel<Data>, emitter: IEmitter<Events>, events: IObservable<Events>): void
+}
+
+export type IEntityMixin<
+    Data extends IEntityData,
+    Events extends IEntityEvents,
+    IMixin extends Record<string, unknown>,
+> = (base: TConstructor<IEntity<Data, Events>>) => TConstructor<IEntity<Data, Events> & IMixin>
+
+export type MapToIEntityMixins<
+    Data extends IEntityData,
+    Events extends IEntityEvents,
+    IMixins extends Array<Record<string, unknown>>,
+> = {
+    [K in keyof IMixins]: K extends number
+        ? IEntityMixin<Data, Events, IMixins[K]>
+        : never
+} & { length: IMixins["length"] }
 
 export interface IDestructibleData {
     health: number
