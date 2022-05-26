@@ -8,6 +8,7 @@ import {
 } from "@/engine/model"
 
 import {
+    type Image,
     type ISceneItem,
 } from "@/engine/scene"
 
@@ -27,6 +28,13 @@ export interface IEntityEvents {
     destroyed: undefined
     update: undefined
     ready: undefined
+}
+
+export interface IEntityTileProvider<
+    Data extends IEntityData = IEntityData,
+    Events extends IEntityEvents = IEntityEvents,
+> {
+    getTile(entity: IEntity<Data, Events>): Image | null
 }
 
 export interface IEntity<
