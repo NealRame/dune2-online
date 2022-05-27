@@ -5,6 +5,7 @@ import { Mode, State } from "./types"
 
 export const GameMetadataKeys = {
     resources: Symbol("game:metadata:resources"),
+    entity: Symbol("entity:metadata"),
     land: Symbol("game:metadata:land"),
 }
 

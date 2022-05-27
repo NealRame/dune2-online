@@ -23,7 +23,7 @@ export interface IEntityMetadata<
     IMixins extends Array<Record<string, unknown>> = [],
 > {
     Mixins: MapToIEntityMixins<Data, Events, IMixins>
-    TileProvider: TConstructor<IEntityTileProvider<Data, Events>>
+    TileProvider: TConstructor<IEntityTileProvider<Data>>
 }
 
 export function Entity(metadata: IEntityMetadata)
