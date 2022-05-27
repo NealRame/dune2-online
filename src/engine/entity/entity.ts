@@ -1,15 +1,19 @@
 import { isNil } from "lodash"
 
 import {
+    createModel,
     type IModel,
     type IModelData,
 } from "@/engine/model"
 
 import {
+    type IScene,
     type ISceneItem,
 } from "@/engine/scene"
 
-import { Vector } from "@/maths"
+import {
+    Vector,
+} from "@/maths"
 
 import {
     createObservable,
@@ -21,7 +25,12 @@ import {
     type IEntity,
     type IEntityEvents,
     type IEntityLifecycleHooks,
+    type IEntityTileProvider,
 } from "./types"
+
+import {
+    EntityView,
+} from "./view"
 
 let EntityNextID = 0
 
@@ -37,16 +46,26 @@ export class Entity<
     protected name_: string | undefined
     protected position_ = Vector.Zero
 
+    protected hooks_: IEntityLifecycleHooks<Data, Events>
+    protected model_: IModel<Data>
+    protected view_: ISceneItem
+
     constructor(
-        protected model_: IModel<Data>,
-        private view_: ISceneItem,
-        private hooks_: IEntityLifecycleHooks<Data, Events>,
+        data: Data,
+        hooks: IEntityLifecycleHooks<Data, Events>,
+        tileProvider: IEntityTileProvider<Data>,
+        scene: IScene,
     ) {
+        this.id_ = EntityNextID++
+
         const [emitter, events] = createObservable<Events>()
 
         this.emitter_ = emitter
         this.events_ = events
-        this.id_ = EntityNextID++
+
+        this.hooks_ = hooks
+        this.model_ = createModel(data)
+        this.view_ = new EntityView(this, tileProvider, scene)
 
         if (!isNil(this.hooks_.onInitialized)) {
             this.hooks_.onInitialized(this.model_, this.emitter_, this.events_)
