@@ -22,6 +22,7 @@ export interface IEntityMetadata<
     Events extends IEntityEvents = IEntityEvents,
     IMixins extends Array<Record<string, unknown>> = [],
 > {
+    data: Data
     Mixins: MapToIEntityMixins<Data, Events, IMixins>
     TileProvider: TConstructor<IEntityTileProvider<Data>>
 }
