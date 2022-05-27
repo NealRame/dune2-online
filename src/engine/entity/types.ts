@@ -37,8 +37,8 @@ export interface IEntityTileProvider<
 }
 
 export interface IEntity<
-    ModelData extends IModelData,
-    Events extends IEntityEvents,
+    ModelData extends IModelData = Record<string, never>,
+    Events extends IEntityEvents = IEntityEvents,
 > extends Readonly<IVector2D> {
     readonly id: number
 
