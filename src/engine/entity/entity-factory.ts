@@ -46,6 +46,7 @@ export class EntityFactory {
 
         const Mixed = Mixins.reduce(
             (Mixed, Mixin) => Mixin(Mixed),
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
             Entity as any,
         )
 
