@@ -32,9 +32,8 @@ export interface IEntityEvents {
 
 export interface IEntityTileProvider<
     Data extends IEntityData = IEntityData,
-    Events extends IEntityEvents = IEntityEvents,
 > {
-    getTile(entity: IEntity<Data, Events>): Image | null
+    getTile(model: IModel<Data>): Image | null
 }
 
 export interface IEntity<
