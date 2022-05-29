@@ -51,9 +51,9 @@ export interface IEntity<
 
 export interface IEntityLifecycleHooks<
     Data extends IEntityData,
-    Events extends IEntityEvents = IEntityEvents,
+    Events extends IEntityEvents,
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    IMixins extends Array<Record<string, unknown>> = [],
+    IMixins extends Array<unknown>,
 > {
     onDestroyed?(model: IModel<Data>, emitter: IEmitter<Events>, events: IObservable<Events>): void
     onInitialized?(model: IModel<Data>, emitter: IEmitter<Events>, events: IObservable<Events>): void
@@ -62,13 +62,13 @@ export interface IEntityLifecycleHooks<
 export type IEntityMixin<
     Data extends IEntityData,
     Events extends IEntityEvents,
-    IMixin extends Record<string, unknown>,
+    IMixin extends unknown,
 > = (base: TConstructor<IEntity<Data, Events>>) => TConstructor<IEntity<Data, Events> & IMixin>
 
 export type MapToIEntityMixins<
     Data extends IEntityData,
     Events extends IEntityEvents,
-    IMixins extends Array<Record<string, unknown>>,
+    IMixins extends Array<unknown>,
 > = {
     [K in keyof IMixins]: K extends number
         ? IEntityMixin<Data, Events, IMixins[K]>

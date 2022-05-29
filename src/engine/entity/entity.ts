@@ -37,6 +37,7 @@ let EntityNextID = 0
 export class Entity<
     Data extends IModelData,
     Events extends IEntityEvents,
+    IMixins extends Array<unknown>,
 > implements IEntity<Data, Events> {
     protected id_: number
 
@@ -46,13 +47,13 @@ export class Entity<
     protected name_: string | undefined
     protected position_ = Vector.Zero
 
-    protected hooks_: IEntityLifecycleHooks<Data, Events>
+    protected hooks_: IEntityLifecycleHooks<Data, Events, IMixins>
     protected model_: IModel<Data>
     protected view_: ISceneItem
 
     constructor(
         data: Data,
-        hooks: IEntityLifecycleHooks<Data, Events>,
+        hooks: IEntityLifecycleHooks<Data, Events, IMixins>,
         tileProvider: IEntityTileProvider<Data>,
         scene: IScene,
     ) {

@@ -1,4 +1,4 @@
 export * from "./entity"
-export * from "./entity-factory"
+export * from "./entity-manager"
 export * from "./movable"
 export * from "./types"

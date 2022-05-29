@@ -14,6 +14,7 @@ import {
 
 import {
     Entity,
+    type IEntity,
     type IEntityData,
     type IEntityEvents,
     type IEntityLifecycleHooks,
@@ -26,22 +27,30 @@ import {
 function getEntityMetadata<
     Data extends IEntityData = IEntityData,
     Events extends IEntityEvents = IEntityEvents,
-    IMixins extends Array<Record<string, unknown>> = [],
+    IMixins extends Array<unknown> = [],
 >(target: TConstructor<IEntityLifecycleHooks<Data, Events, IMixins>>)
     : IEntityMetadata<Data, Events, IMixins> {
     return Reflect.getMetadata(GameMetadataKeys.entity, target)
 }
 
-export class EntityFactory {
+export interface IEntityManager {
+    create<
+        Data extends IEntityData,
+        Events extends IEntityEvents,
+        IMixins extends Array<unknown>
+    >(EntityHooks: TConstructor<IEntityLifecycleHooks<Data, Events, IMixins>>): IEntity<Data, Events> & TupleToIntersection<IMixins>
+    reset(): IEntityManager
+}
+
+export class EntityManager implements IEntityManager {
     constructor(protected container_: Container) {}
 
     create<
         Data extends IEntityData,
         Events extends IEntityEvents,
-        IMixins extends Array<Record<string, unknown>>,
-    >(
-        EntityHooks: TConstructor<IEntityLifecycleHooks<Data, Events, IMixins>>,
-    ): Entity<Data, Events> & TupleToIntersection<IMixins> {
+        IMixins extends Array<unknown>,
+    >(EntityHooks: TConstructor<IEntityLifecycleHooks<Data, Events, IMixins>>)
+        : IEntity<Data, Events> & TupleToIntersection<IMixins> {
         const { data, Mixins, TileProvider } = getEntityMetadata(EntityHooks)
 
         const Mixed = Mixins.reduce(
@@ -54,6 +63,13 @@ export class EntityFactory {
         const scene = this.container_.get(GameScene)
         const tileProvider = new TileProvider()
 
-        return new Mixed(data, tileProvider, hooks, scene)
+        const entity = new Mixed(data, tileProvider, hooks, scene)
+
+        return entity
+    }
+
+    reset()
+        : this {
+        return this
     }
 }

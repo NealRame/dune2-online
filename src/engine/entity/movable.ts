@@ -41,8 +41,9 @@ function directionRotationSequence(from: Direction, to: Direction) {
 export function Movable<
     Data extends IEntityData & IMovableData,
     Events extends IEntityEvents & IMovableEvents,
->(Base: TConstructor<Entity<Data, Events>>)
-    : TConstructor<Entity<Data, Events> & IMovable> {
+    IMixins extends Array<unknown>,
+>(Base: TConstructor<Entity<Data, Events, IMixins>>)
+    : TConstructor<Entity<Data, Events, IMixins> & IMovable> {
     return class extends Base implements IMovable {
         private animation_: Animation|null = null
 

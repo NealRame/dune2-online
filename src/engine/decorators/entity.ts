@@ -20,7 +20,7 @@ import {
 export interface IEntityMetadata<
     Data extends IEntityData = IEntityData,
     Events extends IEntityEvents = IEntityEvents,
-    IMixins extends Array<Record<string, unknown>> = [],
+    IMixins extends Array<unknown> = [],
 > {
     data: Data
     Mixins: MapToIEntityMixins<Data, Events, IMixins>

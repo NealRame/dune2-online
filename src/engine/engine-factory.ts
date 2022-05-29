@@ -1,7 +1,10 @@
 /* eslint-disable @typescript-eslint/explicit-module-boundary-types */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
+import { clamp, isNil } from "lodash"
+
 import {
+    GameEntityManager,
     GameMetadataKeys,
     GameLandTerrainGenerator,
     GameLandTerrainColorProvider,
@@ -11,6 +14,10 @@ import {
     GameScene,
     GameState,
 } from "@/engine/constants"
+
+import {
+    EntityManager,
+} from "@/engine/entity"
 
 import {
     Container,
@@ -50,8 +57,6 @@ import {
     IEmitter,
     type IObservable,
 } from "@/utils"
-
-import { clamp, isNil } from "lodash"
 
 const GameEventsEmitter = new Token<IEmitter<IGameEvents>>("game:events:emitter")
 const Game = new Token<IGameController>("game:module")
@@ -161,6 +166,13 @@ async function initializeLand(
     container.set(GameMinimap, MiniMap)
 }
 
+async function initializeEntityManager(
+    container: Container,
+    game: any,
+) {
+    container.set(GameEntityManager, new EntityManager(container))
+}
+
 export function create(
     GameController: TConstructor<IGameController>,
 ): IGameEngine {
@@ -188,6 +200,7 @@ export function create(
             await initializeScene(container)
             await initializeResources(container, GameController)
             await initializeLand(container, GameController)
+            await initializeEntityManager(container, GameController)
             updateEngineState(State.Ready)
         } else if (container.get(GameState) === State.Initializing) {
             await waitForReady()
