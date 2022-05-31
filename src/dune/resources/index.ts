@@ -13,7 +13,7 @@ import {
 import {
     type IGameImagesDecoder,
     type IGamePaletteDecoder,
-} from "@/engine/resource"
+} from "@/engine/resources"
 
 import PromiseWorker from "promise-worker"
 

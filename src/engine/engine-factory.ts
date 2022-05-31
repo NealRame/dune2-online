@@ -27,7 +27,7 @@ import {
 
 import { MiniMap } from "@/engine/mini-map"
 
-import * as Resource from "@/engine/resource"
+import * as Resource from "@/engine/resources"
 
 import {
     Scene,
@@ -36,7 +36,7 @@ import {
 
 import {
     type IGameResourceList,
-} from "@/engine/resource"
+} from "@/engine/resources"
 
 import {
     Mode,

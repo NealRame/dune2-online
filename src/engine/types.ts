@@ -1,7 +1,7 @@
 import {
     type GameResource,
     type IGameResourceList,
-} from "@/engine/resource"
+} from "@/engine/resources"
 
 import {
     type TConstructor,
