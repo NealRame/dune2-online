@@ -4,7 +4,6 @@
 import { clamp, isNil } from "lodash"
 
 import {
-    GameEntityManager,
     GameMetadataKeys,
     GameLandTerrainGenerator,
     GameLandTerrainColorProvider,
@@ -14,10 +13,6 @@ import {
     GameScene,
     GameState,
 } from "@/engine/constants"
-
-import {
-    EntityManager,
-} from "@/engine/entity"
 
 import {
     Container,
@@ -169,9 +164,7 @@ async function initializeLand(
 async function initializeEntityManager(
     container: Container,
     game: any,
-) {
-    container.set(GameEntityManager, new EntityManager(container))
-}
+) { console.log("Initializing entity manager") }
 
 export function create(
     GameController: TConstructor<IGameController>,

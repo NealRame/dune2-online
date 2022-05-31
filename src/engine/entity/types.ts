@@ -39,12 +39,14 @@ export interface IEntityTileProvider<
 export interface IEntity<
     ModelData extends IModelData = Record<string, never>,
     Events extends IEntityEvents = IEntityEvents,
-> extends Readonly<IVector2D> {
+> extends IVector2D {
     readonly id: number
 
     name: string
 
+    readonly emitter: IEmitter<Events>
     readonly events: IObservable<Events>
+
     readonly model: IModel<ModelData>
     readonly view: ISceneItem
 }
@@ -52,8 +54,6 @@ export interface IEntity<
 export interface IEntityLifecycleHooks<
     Data extends IEntityData,
     Events extends IEntityEvents,
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    IMixins extends Array<unknown>,
 > {
     onDestroyed?(model: IModel<Data>, emitter: IEmitter<Events>, events: IObservable<Events>): void
     onInitialized?(model: IModel<Data>, emitter: IEmitter<Events>, events: IObservable<Events>): void

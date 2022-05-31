@@ -7,7 +7,7 @@ import {
 } from "@/engine/animation"
 
 import {
-    Entity,
+    type IEntity,
 } from "@/engine/entity"
 
 import {
@@ -40,10 +40,9 @@ function directionRotationSequence(from: Direction, to: Direction) {
 
 export function Movable<
     Data extends IEntityData & IMovableData,
-    Events extends IEntityEvents & IMovableEvents,
-    IMixins extends Array<unknown>,
->(Base: TConstructor<Entity<Data, Events, IMixins>>)
-    : TConstructor<Entity<Data, Events, IMixins> & IMovable> {
+    Events extends IEntityEvents & IMovableEvents
+>(Base: TConstructor<IEntity<Data, Events>>)
+    : TConstructor<IEntity<Data, Events> & IMovable> {
     return class extends Base implements IMovable {
         private animation_: Animation|null = null
 
@@ -54,8 +53,9 @@ export function Movable<
             const directions = directionRotationSequence(this.model.get("direction"), d)
             const direction = Vector.FromDirection(d)
 
+            const x = this.x
+            const y = this.y
             const speed = this.model.get("speed")
-            const { x, y } = this.position_
 
             const update = () => {
                 if (!isNil(this.animation_)) {
@@ -82,14 +82,14 @@ export function Movable<
                         frames: Math.floor(60/speed),
                         easing: Easing.Cubic.easeInOut,
                         set: t => {
-                            this.position_.x = x + t*direction.x
-                            this.position_.y = y + t*direction.y
+                            this.x = x + t*direction.x
+                            this.y = y + t*direction.y
                         }
                     })
                 ],
                 done: () => {
-                    this.events_.off("update", update)
-                    this.emitter_.emit("destinationReached", this)
+                    this.events.off("update", update)
+                    this.emitter.emit("destinationReached", this)
                 }
             })
         }
