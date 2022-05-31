@@ -35,13 +35,16 @@ import {
 } from "@/engine/scene"
 
 import {
+    type IGameResourceList,
+} from "@/engine/resource"
+
+import {
     Mode,
     State,
     type IGameController,
     type IGameEvents,
     type IGameEngine,
     type IGameMetadata,
-    type IGameResourceList,
 } from "@/engine/types"
 
 import {

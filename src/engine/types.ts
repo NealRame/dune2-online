@@ -1,11 +1,11 @@
 import {
-    type Image,
-    type Palette,
-} from "@/engine/scene"
+    type GameResource,
+    type IGameResourceList,
+} from "@/engine/resource"
 
 import {
     type TConstructor,
-    Token
+    type Token,
 } from "@/engine/injector"
 
 import {
@@ -28,22 +28,6 @@ import {
  * Game engine metadata
  *****************************************************************************/
 
-/* Game resources metadata ***************************************************/
-export type GameResource = Palette | Array<Image>
-
-export interface IGameResourceDecoder<T extends GameResource> {
-    decode(data: Uint8Array, identifier: Token<T>, set: string): Promise<T>
-}
-
-export type IGamePaletteDecoder = IGameResourceDecoder<Palette>
-export type IGameImagesDecoder = IGameResourceDecoder<Array<Image>>
-
-export type IGameResourceDescriptor<T extends GameResource> = {
-    name: string,
-    uri: string,
-    Decoder: TConstructor<IGameResourceDecoder<T>>,
-}
-
 /* Game land metadata ********************************************************/
 export type IGameLandDescriptor<T extends ITerrainData> = {
     id: Token<ILand<T>>,
@@ -51,8 +35,6 @@ export type IGameLandDescriptor<T extends ITerrainData> = {
     ColorsProvider: TConstructor<ILandTerrainColorProvider<T>>,
     TilesProvider: TConstructor<ILandTerrainTilesProvider<T>>,
 }
-
-export type IGameResourceList = Array<Token<GameResource>>
 
 /* Game metadata *************************************************************/
 export interface IGameMetadata<

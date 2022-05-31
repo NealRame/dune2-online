@@ -2,7 +2,7 @@ import { isNil } from "lodash"
 
 import {
     type Token,
-} from "./injector"
+} from "@/engine/injector"
 
 import {
     type GameResource,
