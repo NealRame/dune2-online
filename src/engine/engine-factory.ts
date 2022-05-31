@@ -55,7 +55,7 @@ import {
 import {
     createObservable,
     fetchData,
-    IEmitter,
+    type IEmitter,
     type IObservable,
 } from "@/utils"
 
