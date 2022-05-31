@@ -4,27 +4,11 @@ import * as Resources from "./resources"
 import * as Land from "./land"
 
 @Engine.Decorators.Game({
-    resources: [{
-        id: Resources.Palette,
-        name: "palette",
-        uri: "/assets/palette.json.gz",
-        Decoder: Resources.PaletteDecoder,
-    }, {
-        id: Resources.MiscImages,
-        name: "misc",
-        uri: "/assets/images.misc.json.gz",
-        Decoder: Resources.ImagesDecoder,
-    }, {
-        id: Resources.TerrainImages,
-        name: "terrain",
-        uri: "/assets/images.terrain.json.gz",
-        Decoder: Resources.ImagesDecoder,
-    }, {
-        id: Resources.UnitsImages,
-        name: "units",
-        uri: "/assets/images.units.json.gz",
-        Decoder: Resources.ImagesDecoder,
-    }],
+    resources: [
+        Resources.Palette,
+        Resources.MiscImages,
+        Resources.TerrainImages,
+    ],
     land: {
         id: Land.id,
         Generator: Land.Generator,

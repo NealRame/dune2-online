@@ -29,8 +29,6 @@ import {
  *****************************************************************************/
 
 /* Game resources metadata ***************************************************/
-export type GameResourceIdentifier = string | symbol
-
 export type GameResource = Palette | Array<Image>
 
 export interface IGameResourceDecoder<T extends GameResource> {
@@ -41,7 +39,6 @@ export type IGamePaletteDecoder = IGameResourceDecoder<Palette>
 export type IGameImagesDecoder = IGameResourceDecoder<Array<Image>>
 
 export type IGameResourceDescriptor<T extends GameResource> = {
-    id: Token<T>,
     name: string,
     uri: string,
     Decoder: TConstructor<IGameResourceDecoder<T>>,
@@ -55,11 +52,13 @@ export type IGameLandDescriptor<T extends ITerrainData> = {
     TilesProvider: TConstructor<ILandTerrainTilesProvider<T>>,
 }
 
+export type IGameResourceList = Array<Token<GameResource>>
+
 /* Game metadata *************************************************************/
 export interface IGameMetadata<
     TerrainData extends ITerrainData = ITerrainData,
 > {
-    resources?: Array<IGameResourceDescriptor<GameResource>>,
+    resources?: IGameResourceList,
     land: IGameLandDescriptor<TerrainData>,
 }
 

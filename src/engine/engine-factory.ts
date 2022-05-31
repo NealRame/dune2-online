@@ -27,6 +27,8 @@ import {
 
 import { MiniMap } from "@/engine/mini-map"
 
+import * as Resource from "@/engine/resource"
+
 import {
     Scene,
     screenToSceneScale,
@@ -35,10 +37,11 @@ import {
 import {
     Mode,
     State,
+    type IGameController,
     type IGameEvents,
     type IGameEngine,
     type IGameMetadata,
-    type IGameController,
+    type IGameResourceList,
 } from "@/engine/types"
 
 import {
@@ -63,9 +66,8 @@ export class EngineNotReadyError extends Error {
     }
 }
 
-function getGameResourcesMetadata(game: any) {
-    const rcMeta = Reflect.getMetadata(GameMetadataKeys.resources, game) ?? []
-    return rcMeta as NonNullable<IGameMetadata["resources"]>
+function getGameResources(game: any) {
+    return (Reflect.getMetadata(GameMetadataKeys.resources, game) ?? []) as IGameResourceList
 }
 
 function getGameLandMetadata(game: any) {
@@ -126,12 +128,14 @@ async function initializeResources(
 ): Promise<void> {
     const emitter = container.get(GameEventsEmitter)
 
-    for (const rcDescriptor of getGameResourcesMetadata(game)) {
-        const rcDecoder = container.get(rcDescriptor.Decoder)
-        const { id, name } = rcDescriptor
+    for (const id of getGameResources(game)) {
+        const rcMetadata = Resource.getMetadata(id)
+        const rcDecoder = container.get(rcMetadata.Decoder)
+
+        const name = rcMetadata.name
 
         emitter.emit("downloadingResourceBegin", { id, name })
-        const rcData = await fetchData(rcDescriptor.uri, (current, total) => {
+        const rcData = await fetchData(rcMetadata.uri, (current, total) => {
             emitter.emit("downloadingResourceProgress", {
                 id,
                 name,
@@ -142,10 +146,10 @@ async function initializeResources(
         emitter.emit("downloadingResourceEnd", { id, name })
 
         emitter.emit("decodingResourceBegin", { id, name })
-        const rc = await rcDecoder.decode(rcData, rcDescriptor.id, name)
+        const rc = await rcDecoder.decode(rcData, id, name)
         emitter.emit("decodingResourceEnd", { id, name })
 
-        container.set(rcDescriptor.id, rc)
+        container.set(id, rc)
     }
 }
 
