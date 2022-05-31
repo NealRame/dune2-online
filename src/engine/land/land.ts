@@ -1,39 +1,21 @@
-import {
-    Terrain
-} from "./terrain"
-import {
-    type ILand,
-    type ILandConfig,
-    type ILandEvent,
-    type ILandTerrainGenerator,
-    type ILandTerrainTilesProvider,
-    type ITerrainData,
-    type ITerrain,
-    type Neighborhood,
-} from "./types"
-import {
-    createPositionToIndexConverter,
-    createIndexToPositionConverter,
-    IndexToPositionConverter,
-    PositionToIndexConverter,
-} from "./utils"
-
-import { LandChunkView } from "./view/chunk-view"
-import { LandEditorView } from "./view/editor-view"
+import { constant, isNil } from "lodash"
 
 import {
     Inject,
 } from "@/engine/injector"
+
 import {
     GameLandTerrainGenerator,
     GameLandTilesProvider,
     GameMode,
     GameScene,
 } from "@/engine/constants"
+
 import {
     type IScene,
     type ISceneItem
 } from "@/engine/scene"
+
 import {
     Mode,
 } from "@/engine/types"
@@ -44,33 +26,40 @@ import {
     type IVector2D,
 } from "@/maths"
 
-import { createObservable, IEmitter, IObservable } from "@/utils"
+import {
+    createObservable,
+    type IEmitter,
+    type IObservable
+} from "@/utils"
 
-import { constant, isNil } from "lodash"
+import {
+    LandDataSizeError,
+} from "./errors"
 
-export class LandConfigurationError extends Error {
-    constructor(m: string) {
-        super(m)
-        Object.setPrototypeOf(this, LandConfigurationError.prototype)
-    }
-}
+import {
+    Terrain
+} from "./terrain"
 
-export class LandDataError extends Error {
-    constructor(m: string) {
-        super(m)
-        Object.setPrototypeOf(this, LandDataError.prototype)
-    }
-}
+import {
+    type ILand,
+    type ILandConfig,
+    type ILandEvent,
+    type ILandTerrainGenerator,
+    type ILandTerrainTilesProvider,
+    type ITerrainData,
+    type ITerrain,
+    type Neighborhood,
+} from "./types"
 
-export class LandDataSizeError extends Error {
-    constructor(
-        public current: number,
-        public expected: number
-    ) {
-        super("Land data size error")
-        Object.setPrototypeOf(this, LandDataSizeError.prototype)
-    }
-}
+import {
+    createPositionToIndexConverter,
+    createIndexToPositionConverter,
+    IndexToPositionConverter,
+    PositionToIndexConverter,
+} from "./utils"
+
+import { LandChunkView } from "./view/chunk-view"
+import { LandEditorView } from "./view/editor-view"
 
 export class Land<
     TerrainDataType extends ITerrainData = ITerrainData,
