@@ -57,25 +57,25 @@ class ImagesDecoder implements IGameImagesDecoder {
     }
 }
 
-Engine.Resource.define(Palette, {
+Engine.Resources.define(Palette, {
     name: "palette",
     uri: "/assets/palette.json.gz",
     Decoder: PaletteDecoder,
 })
 
-Engine.Resource.define(MiscImages, {
+Engine.Resources.define(MiscImages, {
     name: "misc",
     uri: "/assets/images.misc.json.gz",
     Decoder: ImagesDecoder,
 })
 
-Engine.Resource.define(TerrainImages, {
+Engine.Resources.define(TerrainImages, {
     name: "terrain",
     uri: "/assets/images.terrain.json.gz",
     Decoder: ImagesDecoder,
 })
 
-Engine.Resource.define(UnitsImages, {
+Engine.Resources.define(UnitsImages, {
     name: "units",
     uri: "/assets/images.units.json.gz",
     Decoder: ImagesDecoder,

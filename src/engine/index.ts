@@ -13,4 +13,4 @@ export * from "./types"
 export * from "./viewport"
 
 export * as Decorators from "./decorators"
-export * as Resource from "./resources"
+export * as Resources from "./resources"
