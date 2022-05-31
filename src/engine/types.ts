@@ -34,7 +34,7 @@ export type GameResourceIdentifier = string | symbol
 export type GameResource = Palette | Array<Image>
 
 export interface IGameResourceDecoder<T extends GameResource> {
-    decode(data: Uint8Array, identifier: Token<T>): Promise<T>
+    decode(data: Uint8Array, identifier: Token<T>, set: string): Promise<T>
 }
 
 export type IGamePaletteDecoder = IGameResourceDecoder<Palette>

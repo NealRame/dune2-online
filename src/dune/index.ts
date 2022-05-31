@@ -11,17 +11,17 @@ import * as Land from "./land"
         Decoder: Resources.PaletteDecoder,
     }, {
         id: Resources.MiscImages,
-        name: "misc images",
+        name: "misc",
         uri: "/assets/images.misc.json.gz",
         Decoder: Resources.ImagesDecoder,
     }, {
         id: Resources.TerrainImages,
-        name: "terrain images",
+        name: "terrain",
         uri: "/assets/images.terrain.json.gz",
         Decoder: Resources.ImagesDecoder,
     }, {
         id: Resources.UnitsImages,
-        name: "units images",
+        name: "units",
         uri: "/assets/images.units.json.gz",
         Decoder: Resources.ImagesDecoder,
     }],

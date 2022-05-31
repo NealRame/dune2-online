@@ -12,7 +12,7 @@ import {
 
 import PromiseWorker from "promise-worker"
 
-export const Palette = new Token<Engine.Palette>("palette")
+export const Palette: Token<Engine.Palette> = Symbol("palette")
 
 @Service({
     lifecycle: ServiceLifecycle.Singleton
@@ -30,9 +30,9 @@ export class PaletteDecoder implements IGamePaletteDecoder {
     }
 }
 
-export const MiscImages = new Token<Array<Engine.Image>>("misc")
-export const TerrainImages = new Token<Array<Engine.Image>>("terrain")
-export const UnitsImages = new Token<Array<Engine.Image>>("units")
+export const MiscImages: Token<Array<Engine.Image>> = Symbol("misc")
+export const TerrainImages: Token<Array<Engine.Image>> = Symbol("terrain")
+export const UnitsImages: Token<Array<Engine.Image>> = Symbol("units")
 
 @Service({
     lifecycle: ServiceLifecycle.Singleton
@@ -46,11 +46,11 @@ export class ImagesDecoder implements IGameImagesDecoder {
         this.worker_ = new PromiseWorker(new DecodeImagesWorker())
     }
 
-    decode(data: Uint8Array, identifier: Token)
+    decode(data: Uint8Array, identifier: Token, set: string)
         : Promise<Engine.Image[]> {
         return this.worker_.postMessage({
             data,
-            set: identifier.name,
+            set,
             palette: this.palette_
         })
     }

@@ -23,10 +23,10 @@ export const GameResourcesMetadataKeys = {
  * Identifiers
  *****************************************************************************/
 
-export const GameMode = new Token<Mode>("game:mode")
-export const GameState = new Token<State>("game:state")
-export const GameScene = new Token<Scene>("game:scene")
-export const GameMinimap = new Token<IMiniMap>("game:minimap")
+export const GameMode: Token<Mode> = Symbol("game:mode")
+export const GameState: Token<State> = Symbol("game:state")
+export const GameScene: Token<Scene> = Symbol("game:scene")
+export const GameMinimap: Token<IMiniMap> = Symbol("game:minimap")
 // export const GameEntityManager = new Token<IEntityManager>("game:entity:manager")
 
 export const GameLandTerrainGenerator = Symbol("game:land:terrainGenerator")

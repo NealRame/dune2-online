@@ -53,8 +53,8 @@ import {
     type IObservable,
 } from "@/utils"
 
-const GameEventsEmitter = new Token<IEmitter<IGameEvents>>("game:events:emitter")
-const Game = new Token<IGameController>("game:module")
+const GameEventsEmitter: Token<IEmitter<IGameEvents>> = Symbol("game:events:emitter")
+const Game: Token<IGameController> = Symbol("game:module")
 
 export class EngineNotReadyError extends Error {
     constructor() {
@@ -142,7 +142,7 @@ async function initializeResources(
         emitter.emit("downloadingResourceEnd", { id, name })
 
         emitter.emit("decodingResourceBegin", { id, name })
-        const rc = await rcDecoder.decode(rcData, rcDescriptor.id)
+        const rc = await rcDecoder.decode(rcData, rcDescriptor.id, name)
         emitter.emit("decodingResourceEnd", { id, name })
 
         container.set(rcDescriptor.id, rc)
