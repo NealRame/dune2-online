@@ -13,13 +13,13 @@ import { Inject } from "@/engine/injector"
 
 import { RGBA } from "@/graphics/color"
 
-export class ColorsProvider implements Engine.ILandTerrainColorProvider<ITerrainData> {
+export class ColorsProvider implements Engine.Land.ILandTerrainColorProvider<ITerrainData> {
     constructor(
         @Inject(GameMode) private mode_: Engine.Mode,
         @Inject(Palette) private palette_: Engine.Palette,
     ) { }
 
-    getTerrainColor(terrain: Engine.ITerrain<ITerrainData>): RGBA {
+    getTerrainColor(terrain: Engine.Land.ITerrain<ITerrainData>): RGBA {
         const { revealed, type } = terrain.data
         if (revealed || this.mode_ === Engine.Mode.Editor) {
             switch (type) {

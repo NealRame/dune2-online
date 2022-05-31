@@ -10,14 +10,14 @@ export enum TerrainType {
     Mountain,
 }
 
-export interface ITerrainData extends Engine.ITerrainData {
+export interface ITerrainData extends Engine.Land.ITerrainData {
     spice: number
     type: TerrainType
 }
 
-export type ITerrain = Engine.ITerrain<ITerrainData>
+export type ITerrain = Engine.Land.ITerrain<ITerrainData>
 
-export interface Config extends Engine.ILandConfig {
+export interface Config extends Engine.Land.ILandConfig {
     // Land size
     size: ISize2D
     // Generation seed

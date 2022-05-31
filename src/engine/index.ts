@@ -3,7 +3,6 @@ export * from "./constants"
 export * from "./engine-factory"
 export * from "./entity"
 export * from "./grid"
-export * from "./land"
 export * from "./mini-map"
 export * from "./model"
 
@@ -13,4 +12,5 @@ export * from "./types"
 export * from "./viewport"
 
 export * as Decorators from "./decorators"
+export * as Land from "./land"
 export * as Resources from "./resources"

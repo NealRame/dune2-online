@@ -20,13 +20,9 @@ import {
     type Token,
 } from "@/engine/injector"
 
-import {
-    Land,
-    LandConfigurationError,
-} from "@/engine/land"
-
 import { MiniMap } from "@/engine/mini-map"
 
+import * as Land from "@/engine/land"
 import * as Resource from "@/engine/resources"
 
 import {
@@ -73,24 +69,8 @@ function getGameResources(game: any) {
     return (Reflect.getMetadata(GameMetadataKeys.resources, game) ?? []) as IGameResourceList
 }
 
-function getGameLandMetadata(game: any) {
-    const landMeta = Reflect.getMetadata(GameMetadataKeys.land, game)
-    if (isNil(landMeta)) {
-        throw new LandConfigurationError("Missing land configuration")
-    }
-    if (isNil(landMeta.id)) {
-        throw new LandConfigurationError("Land configuration miss id property")
-    }
-    if (isNil(landMeta.Generator)) {
-        throw new LandConfigurationError("Land configuration miss Generator property")
-    }
-    if (isNil(landMeta.TilesProvider)) {
-        throw new LandConfigurationError("Land configuration miss TilesProvider property")
-    }
-    if (isNil(landMeta.ColorsProvider)) {
-        throw new LandConfigurationError("Land configuration miss ColorsProvider property")
-    }
-    return landMeta as NonNullable<IGameMetadata["land"]>
+function getGameLandId(game: any) {
+    return Reflect.getMetadata(GameMetadataKeys.land, game) as Token<Land.ILand>
 }
 
 async function initializeScene(
@@ -160,7 +140,7 @@ async function initializeLand(
     container: Container,
     game: any,
 ) {
-    const { Generator, ColorsProvider, TilesProvider } = getGameLandMetadata(game)
+    const { Generator, ColorsProvider, TilesProvider } = Land.getMetadata()
 
     container.set(GameLandTerrainColorProvider, ColorsProvider)
     container.set(GameLandTerrainGenerator, Generator)
@@ -214,12 +194,12 @@ export function create(
             throw new EngineNotReadyError()
         }
         if (container.get(GameState) === State.Ready) {
-            const { id: GameLand } = getGameLandMetadata(GameController)
+            const landId = getGameLandId(GameController)
 
             container.set(GameMode, mode)
 
-            const land = container.get(Land)
-            container.set(GameLand, land)
+            const land = container.get(Land.Land)
+            container.set(landId, land)
 
             const minimap = container.get(GameMinimap)
             minimap.land = land
@@ -250,12 +230,12 @@ export function create(
             && container.get(GameState) === State.Running) {
             cancelAnimationFrame(animationRequestId)
 
-            const { id: GameLand } = getGameLandMetadata(GameController)
+            const landId = getGameLandId(GameController)
 
-            const land = container.get(GameLand)
+            const land = container.get(landId)
             land.events.clear()
 
-            container.remove(GameLand)
+            container.remove(landId)
 
             const minimap = container.get(GameMinimap)
             minimap.land = null

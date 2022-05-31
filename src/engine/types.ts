@@ -30,7 +30,6 @@ import {
 
 /* Game land metadata ********************************************************/
 export type IGameLandDescriptor<T extends ITerrainData> = {
-    id: Token<ILand<T>>,
     Generator: TConstructor<ILandTerrainGenerator<T>>,
     ColorsProvider: TConstructor<ILandTerrainColorProvider<T>>,
     TilesProvider: TConstructor<ILandTerrainTilesProvider<T>>,
@@ -40,8 +39,8 @@ export type IGameLandDescriptor<T extends ITerrainData> = {
 export interface IGameMetadata<
     TerrainData extends ITerrainData = ITerrainData,
 > {
+    land: Token<ILand<TerrainData>>,
     resources?: IGameResourceList,
-    land: IGameLandDescriptor<TerrainData>,
 }
 
 /******************************************************************************

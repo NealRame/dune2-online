@@ -1,15 +1,17 @@
 import { constant, isNil } from "lodash"
 
 import {
-    Inject,
-} from "@/engine/injector"
-
-import {
     GameLandTerrainGenerator,
+    GameLandTerrainColorProvider,
     GameLandTilesProvider,
     GameMode,
     GameScene,
 } from "@/engine/constants"
+
+import {
+    Inject,
+    type Token,
+} from "@/engine/injector"
 
 import {
     type IScene,
@@ -18,6 +20,7 @@ import {
 
 import {
     Mode,
+    type IGameLandDescriptor,
 } from "@/engine/types"
 
 import {
@@ -33,6 +36,7 @@ import {
 } from "@/utils"
 
 import {
+    LandConfigurationError,
     LandDataSizeError,
 } from "./errors"
 
@@ -176,4 +180,43 @@ export class Land<
             yield * this.terrains_
         }
     }
+}
+
+export function define<
+    TerrainDataType extends ITerrainData = ITerrainData
+>(metadata: IGameLandDescriptor<TerrainDataType>): void {
+    Reflect.defineProperty(window, GameLandTerrainColorProvider, {
+        value: metadata.ColorsProvider,
+    })
+    Reflect.defineProperty(window, GameLandTerrainGenerator, {
+        value: metadata.Generator,
+    })
+    Reflect.defineProperty(window, GameLandTilesProvider, {
+        value: metadata.TilesProvider
+    })
+}
+
+export function getMetadata<
+    TerrainDataType extends ITerrainData = ITerrainData
+>(): IGameLandDescriptor<TerrainDataType> {
+    const Generator = Reflect.get(window, GameLandTerrainGenerator)
+    if (isNil(Generator)) {
+        throw new LandConfigurationError("Land configuration miss Generator property")
+    }
+
+    const ColorsProvider = Reflect.get(window, GameLandTerrainColorProvider)
+    if (isNil(ColorsProvider)) {
+        throw new LandConfigurationError("Land configuration miss ColorsProvider property")
+    }
+
+    const TilesProvider = Reflect.get(window, GameLandTilesProvider)
+    if (isNil(TilesProvider)) {
+        throw new LandConfigurationError("Land configuration miss TilesProvider property")
+    }
+
+    return {
+        Generator,
+        ColorsProvider,
+        TilesProvider,
+    } as IGameLandDescriptor<TerrainDataType>
 }

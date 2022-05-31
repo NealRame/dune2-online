@@ -9,12 +9,7 @@ import * as Land from "./land"
         Resources.MiscImages,
         Resources.TerrainImages,
     ],
-    land: {
-        id: Land.id,
-        Generator: Land.Generator,
-        ColorsProvider: Land.ColorsProvider,
-        TilesProvider: Land.TilesProvider,
-    },
+    land: Land.id,
 })
 export class Game implements Engine.IGameController {
     onStart(engine: Engine.IGameEngine): void {

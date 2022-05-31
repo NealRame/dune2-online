@@ -19,7 +19,7 @@ function isSpicy(type: TerrainType): boolean {
 
 function terrainTopoMask(
     terrain: ITerrain,
-    neighbors: Engine.Neighborhood<ITerrainData>,
+    neighbors: Engine.Land.Neighborhood<ITerrainData>,
 ): number {
     const terrainType = terrain.data.type
     return reduceRight(
@@ -43,7 +43,7 @@ function terrainTopoMask(
 
 function terrainRevealMask(
     terrain: ITerrain,
-    neighbors: Engine.Neighborhood<ITerrainData>,
+    neighbors: Engine.Land.Neighborhood<ITerrainData>,
 ): number {
     if (terrain.data.revealed) return 0
     return reduceRight(
@@ -55,7 +55,7 @@ function terrainRevealMask(
 
 function terrainTileIndex(
     terrain: ITerrain,
-    neighbors: Engine.Neighborhood<ITerrainData>,
+    neighbors: Engine.Land.Neighborhood<ITerrainData>,
 ): number {
     const topoImageOffset = terrainTopoMask(terrain, neighbors)
 
@@ -82,20 +82,20 @@ function terrainTileIndex(
 
 function fogTileIndex(
     terrain: ITerrain,
-    neighbors: Engine.Neighborhood<ITerrainData>
+    neighbors: Engine.Land.Neighborhood<ITerrainData>
 ): number {
     const revealMaskImageOffset = terrainRevealMask(terrain, neighbors)
     return revealMaskImageOffset > 0 ? 123 - revealMaskImageOffset : -1
 }
 
-export class TilesProvider implements Engine.ILandTerrainTilesProvider<ITerrainData> {
+export class TilesProvider implements Engine.Land.ILandTerrainTilesProvider<ITerrainData> {
     constructor(
         @Inject(TerrainImages) private tiles_: Array<Engine.Image>,
     ) { }
 
     getFogTile(
         terrain: ITerrain,
-        neighbors: Engine.Neighborhood<ITerrainData>,
+        neighbors: Engine.Land.Neighborhood<ITerrainData>,
     ): Engine.Image | null {
         const index = fogTileIndex(terrain, neighbors)
         return index < 0 ? null : this.tiles_[index]
@@ -103,7 +103,7 @@ export class TilesProvider implements Engine.ILandTerrainTilesProvider<ITerrainD
 
     getTerrainTile(
         terrain: ITerrain,
-        neighbors: Engine.Neighborhood<ITerrainData>,
+        neighbors: Engine.Land.Neighborhood<ITerrainData>,
     ): Engine.Image {
         return this.tiles_[terrainTileIndex(terrain, neighbors)]
     }
