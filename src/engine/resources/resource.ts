@@ -9,11 +9,11 @@ import {
 } from "./errors"
 
 import {
-    type GameResource,
+    type IGameResource,
     type IGameResourceDescriptor,
 } from "./types"
 
-export function define<T extends GameResource>(
+export function define<T extends IGameResource>(
     id: Token<T>,
     rcDescriptor: IGameResourceDescriptor<T>): void {
     Reflect.defineProperty(window, id as symbol, {
@@ -21,11 +21,11 @@ export function define<T extends GameResource>(
     })
 }
 
-export function getMetadata(id: Token<GameResource>)
-    : IGameResourceDescriptor<GameResource> {
+export function getMetadata(id: Token<IGameResource>)
+    : IGameResourceDescriptor<IGameResource> {
     const rcDescriptor = Reflect.get(window, id as symbol)
     if (isNil(rcDescriptor)) {
         throw new ResourceDefinitionError("No resource found! You must define resource first by calling Resource.define() function.")
     }
-    return rcDescriptor as unknown as IGameResourceDescriptor<GameResource>
+    return rcDescriptor as unknown as IGameResourceDescriptor<IGameResource>
 }

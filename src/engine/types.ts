@@ -1,5 +1,5 @@
 import {
-    type GameResource,
+    type IGameResource,
     type IGameResourceList,
 } from "@/engine/resources"
 
@@ -60,7 +60,7 @@ export enum State {
 }
 
 export interface IGameResourceEvent {
-    id: Token<GameResource>
+    id: Token<IGameResource>
     name: string
     current?: number
     total?: number
