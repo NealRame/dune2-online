@@ -16,8 +16,8 @@ import {
 
 import {
     Container,
-    Token,
     type TConstructor,
+    type Token,
 } from "@/engine/injector"
 
 import {
