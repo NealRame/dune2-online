@@ -5,7 +5,6 @@ export * from "./entity"
 export * from "./grid"
 export * from "./mini-map"
 export * from "./model"
-
 export * from "./scale"
 export * from "./scene"
 export * from "./types"
