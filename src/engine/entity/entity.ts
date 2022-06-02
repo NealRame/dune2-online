@@ -1,6 +1,10 @@
 import { isNil } from "lodash"
 
 import {
+    type Token
+} from "@/engine/injector"
+
+import {
     createModel,
     type IModel,
     type IModelData,
@@ -23,14 +27,17 @@ import {
 
 import {
     type IEntity,
+    type IEntityData,
     type IEntityEvents,
     type IEntityLifecycleHooks,
+    type IEntityMetadata,
     type IEntityTileProvider,
 } from "./types"
 
 import {
     EntityView,
 } from "./view"
+import { EntityDefinitionError } from "./errors"
 
 let EntityNextID = 0
 
@@ -107,4 +114,28 @@ export class Entity<
     get view(): ISceneItem {
         return this.view_
     }
+}
+
+export function define<
+    Data extends IEntityData,
+    Events extends IEntityEvents,
+    IMixins extends Array<unknown>,
+>(
+    id: Token<[Data, Events, IMixins]>,
+    metadata: IEntityMetadata<Data, Events, IMixins>
+): void {
+    Reflect.defineMetadata(window, id, metadata)
+}
+
+export function getMetadata<
+    Data extends IEntityData,
+    Events extends IEntityEvents,
+    IMixins extends Array<unknown>,
+>(id: Token<[Data, Events, IMixins]>)
+    : IEntityMetadata<Data, Events, IMixins> {
+    const metadata = Reflect.get(window, id as symbol)
+    if (isNil(metadata)) {
+        throw new EntityDefinitionError(id)
+    }
+    return metadata as unknown as IEntityMetadata<Data, Events, IMixins>
 }

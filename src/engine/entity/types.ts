@@ -75,6 +75,16 @@ export type MapToIEntityMixins<
         : never
 } & { length: IMixins["length"] }
 
+export interface IEntityMetadata<
+    Data extends IEntityData = IEntityData,
+    Events extends IEntityEvents = IEntityEvents,
+    IMixins extends Array<unknown> = [],
+> {
+    data: Data
+    Mixins: MapToIEntityMixins<Data, Events, IMixins>
+    TileProvider: TConstructor<IEntityTileProvider<Data>>
+}
+
 export interface IDestructibleData {
     health: number
 }
