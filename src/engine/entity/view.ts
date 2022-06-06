@@ -14,6 +14,7 @@ import {
     type IEntityData,
     type IEntityTileProvider,
 } from "./types"
+import { Rect, Vector } from "@/maths"
 
 export class EntityView<Data extends IEntityData> extends SceneItem {
     constructor(
@@ -22,17 +23,41 @@ export class EntityView<Data extends IEntityData> extends SceneItem {
         scene: IScene,
     ) { super(scene) }
 
-    render(painter: Painter)
-        : this {
-        const gridSpacing = this.scene.gridSpacing
-        const image = this.tilesProvider_.getTile(this.entity_.model)
+    get rect(): Rect {
+        const tiles = this.tilesProvider_.getTiles(this.entity_.model)
 
-        if (!isNil(image)) {
-            painter.drawImageBitmap(image[this.scene.scale], {
-                x: this.entity_.x*gridSpacing,
-                y: this.entity_.x*gridSpacing,
-            })
+        if (tiles.length === 0) {
+            return Rect.empty()
         }
+
+        let rect: Rect
+
+        if (tiles.length === 1) {
+            rect = tiles[0].rect
+        } else {
+            rect = Rect.bounding(tiles.map(tile => tile.rect)).translate(this.entity_)
+        }
+
+        return rect.translate(this.entity_)
+    }
+
+    render(painter: Painter, viewport: Rect)
+        : this {
+        const rect = Rect.intersection(viewport, this.rect)
+        const tiles = this.tilesProvider_.getTiles(this.entity_.model)
+
+        if (!isNil(rect)) {
+            const gridSpacing = this.scene.gridSpacing
+            const origin = (new Vector(this.entity_.x, this.entity_.y)).sub(viewport.topLeft())
+
+            for (const tile of tiles) {
+                painter.save()
+                painter.translate(tile.position.add(origin).mul(gridSpacing))
+                tile.render(painter, tile.rect)
+                painter.restore()
+            }
+        }
+
         return this
     }
 }

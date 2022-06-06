@@ -49,20 +49,28 @@ export class Rect implements IRect2D {
      * @param r1
      * @returns Rect
      */
-    static bounding(r1: Rect, ...rects: Array<Rect>): Rect {
-        const u = Rect.fromRect(r1)
-        for (const r of rects) {
-            const leftX = Math.min(u.leftX, r.leftX)
-            const rightX = Math.max(u.rightX, r.rightX)
-            const topY = Math.min(u.topY, r.topY)
-            const bottomY = Math.max(u.bottomY, r.bottomY)
-
-            u.x = leftX
-            u.y = topY
-            u.width = rightX - leftX
-            u.height = bottomY - topY
+    static bounding(rects: Array<Rect>): Rect {
+        if (rects.length === 0) {
+            return Rect.empty()
         }
-        return u
+
+        let u: Rect | null = null
+        for (const r of rects) {
+            if (u === null) {
+                u = r
+            } else {
+                const leftX = Math.min(u.leftX, r.leftX)
+                const rightX = Math.max(u.rightX, r.rightX)
+                const topY = Math.min(u.topY, r.topY)
+                const bottomY = Math.max(u.bottomY, r.bottomY)
+
+                u.x = leftX
+                u.y = topY
+                u.width = rightX - leftX
+                u.height = bottomY - topY
+            }
+        }
+        return u as Rect
     }
 
     /**

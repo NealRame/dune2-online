@@ -8,7 +8,7 @@ import {
 } from "@/engine/model"
 
 import {
-    type Image,
+    Tile,
     type ISceneItem,
 } from "@/engine/scene"
 
@@ -33,7 +33,7 @@ export interface IEntityEvents {
 export interface IEntityTileProvider<
     Data extends IEntityData = IEntityData,
 > {
-    getTile(model: IModel<Data>): Image | null
+    getTiles(model: IModel<Data>): Array<Tile>
 }
 
 export interface IEntity<
@@ -81,8 +81,9 @@ export interface IEntityMetadata<
     IMixins extends Array<unknown> = [],
 > {
     data: Data
-    Mixins: MapToIEntityMixins<Data, Events, IMixins>
+    Hooks: TConstructor<IEntityLifecycleHooks<Data, Events>>
     TileProvider: TConstructor<IEntityTileProvider<Data>>
+    Mixins: Array<CallableFunction>
 }
 
 export interface IDestructibleData {
