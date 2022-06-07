@@ -78,6 +78,7 @@ export type MapToIEntityMixins<
 export interface IEntityMetadata<
     Data extends IEntityData = IEntityData,
     Events extends IEntityEvents = IEntityEvents,
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     IMixins extends Array<unknown> = [],
 > {
     data: Data
