@@ -16,7 +16,11 @@ declare global {
     interface Window {
         Dune: {
             engine?: Engine.IGameEngine
-            Land: typeof Dune.Land.id
+            Land: typeof Dune.Land.id,
+            UnitsManager: typeof Engine.GameUnitsManager,
+            Units: {
+                Harvester: typeof Dune.Units.Harvester,
+            },
         }
     }
 }
@@ -29,6 +33,10 @@ export default defineComponent({
         window.Dune = {
             engine,
             Land: Dune.Land.id,
+            UnitsManager: Engine.GameUnitsManager as symbol,
+            Units: {
+                Harvester: Dune.Units.Harvester,
+            }
         }
 
         const screenWidthRef = ref(0)

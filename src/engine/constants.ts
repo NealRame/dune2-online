@@ -1,3 +1,4 @@
+import { IEntityManager } from "./entity"
 import { Token } from "./injector"
 import { IMiniMap } from "./mini-map"
 import { Scene } from "./scene"
@@ -27,8 +28,9 @@ export const GameMode: Token<Mode> = Symbol("game:mode")
 export const GameState: Token<State> = Symbol("game:state")
 export const GameScene: Token<Scene> = Symbol("game:scene")
 export const GameMinimap: Token<IMiniMap> = Symbol("game:minimap")
-// export const GameEntityManager = new Token<IEntityManager>("game:entity:manager")
 
 export const GameLandTerrainGenerator = Symbol("game:land:terrainGenerator")
 export const GameLandTilesProvider = Symbol("game:land:terrainTilesProvider")
 export const GameLandTerrainColorProvider = Symbol("game:land:terrainColorProvider")
+
+export const GameUnitsManager: Token<IEntityManager> = Symbol("game:units:manager")

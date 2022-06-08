@@ -8,6 +8,7 @@ import * as Land from "./land"
         Resources.Palette,
         Resources.MiscImages,
         Resources.TerrainImages,
+        Resources.UnitsImages,
     ],
     land: Land.id,
 })
@@ -41,3 +42,4 @@ export class Game implements Engine.IGameController {
 
 export * as Resources from "./resources"
 export * as Land from "./land"
+export * as Units from "./units"

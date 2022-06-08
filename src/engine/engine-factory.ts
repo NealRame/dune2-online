@@ -8,11 +8,16 @@ import {
     GameLandTerrainGenerator,
     GameLandTerrainColorProvider,
     GameLandTilesProvider,
+    GameUnitsManager,
     GameMinimap,
     GameMode,
     GameScene,
     GameState,
 } from "@/engine/constants"
+
+import {
+    EntityManager,
+} from "@/engine/entity"
 
 import {
     Container,
@@ -151,7 +156,10 @@ async function initializeLand(
 async function initializeEntityManager(
     container: Container,
     game: any,
-) { console.log("Initializing entity manager") }
+) {
+    const um = container.get(EntityManager)
+    container.set(GameUnitsManager, um)
+}
 
 export function create(
     GameController: TConstructor<IGameController>,

@@ -33,9 +33,9 @@ class PaletteDecoder implements IGamePaletteDecoder {
     }
 }
 
-export const MiscImages: Token<Array<Engine.Image>> = Symbol("misc")
-export const TerrainImages: Token<Array<Engine.Image>> = Symbol("terrain")
-export const UnitsImages: Token<Array<Engine.Image>> = Symbol("units")
+export const MiscImages: Token<Array<Engine.Image>> = Symbol("resources:images:misc")
+export const TerrainImages: Token<Array<Engine.Image>> = Symbol("resources:images:terrain")
+export const UnitsImages: Token<Array<Engine.Image>> = Symbol("resources:images:units")
 
 @Service()
 class ImagesDecoder implements IGameImagesDecoder {

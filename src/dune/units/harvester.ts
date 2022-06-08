@@ -2,13 +2,15 @@ import * as Engine from "@/engine"
 
 import {
     Inject,
+    Service,
     type Token,
 } from "@/engine/injector"
+
+import { Direction } from "@/maths"
 
 import {
     UnitsImages,
 } from "@/dune/resources"
-import { Direction } from "@/maths"
 
 type IHarvesterData = Engine.IDestructibleData & Engine.IMovableData
 type IHarvesterEvents = Engine.IDestructibleEvents & Engine.IMovableEvents & Engine.IEntityEvents
@@ -40,6 +42,7 @@ class TileProvider implements Engine.IEntityTileProvider<IHarvesterData> {
     }
 }
 
+@Service()
 class Hooks implements Engine.IEntityLifecycleHooks<IHarvesterData, IHarvesterEvents> {
     public onDestroyed(): void {
         console.log("Harvester destroyed")

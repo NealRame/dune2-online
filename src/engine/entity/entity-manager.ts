@@ -13,7 +13,6 @@ import {
 import {
     Container,
     Service,
-    ServiceLifecycle,
     type Token,
 } from "@/engine/injector"
 
@@ -21,11 +20,18 @@ import {
     type TupleToIntersection,
 } from "@/utils"
 
+export interface IEntityManager {
+    create<
+        Data extends IEntityData,
+        Events extends IEntityEvents,
+        IMixins extends Array<unknown>,
+    >(kind: Token<[Data, Events, IMixins]>):  IEntity<Data, Events> & TupleToIntersection<IMixins>
+}
+
 @Service({
-    lifecycle: ServiceLifecycle.Singleton,
     factoryFunction: (container: Container) => new EntityManager(container),
 })
-export class EntityManager {
+export class EntityManager implements IEntityManager {
     private entities_: Array<IEntity> = []
 
     constructor(private constainer_: Container) {}
@@ -44,11 +50,14 @@ export class EntityManager {
             Entity as any,
         )
 
-        const hooks = this.constainer_.get(Hooks)
-        const tilesProvider = this.constainer_.get(TileProvider)
         const scene = this.constainer_.get(GameScene)
 
-        const entity = new Mixed(data, tilesProvider, hooks, scene)
+        const hooks = this.constainer_.get(Hooks)
+        const tilesProvider = this.constainer_.get(TileProvider)
+
+        const entity = new Mixed(data, hooks, tilesProvider, scene)
+
+        this.entities_.push(entity)
 
         return entity as unknown as IEntity<Data, Events> & TupleToIntersection<IMixins>
     }

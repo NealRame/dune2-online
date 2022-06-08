@@ -97,8 +97,16 @@ export class Entity<
         return this.position_.x
     }
 
+    set x(x: number) {
+        this.position_.x = x
+    }
+
     get y(): number {
         return this.position_.y
+    }
+
+    set y(y: number) {
+        this.position_.y = y
     }
 
     get emitter(): IEmitter<Events> {
@@ -123,9 +131,11 @@ export class Entity<
         IMixins extends Array<unknown>,
     >(
         id: Token<[Data, Events, IMixins]>,
-        metadata: IEntityMetadata<Data, Events, IMixins>
+        value: IEntityMetadata<Data, Events, IMixins>
     ): void {
-        Reflect.defineMetadata(window, id, metadata)
+        Reflect.defineProperty(window, id as symbol, {
+            value
+        })
     }
 
     static getMetadata<
