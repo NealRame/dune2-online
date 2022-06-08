@@ -1,7 +1,24 @@
-import { Rect, IVector2D, ISize2D } from "@/maths"
-import { createObservable, IObservable } from "@/utils"
+import {
+    type IScene,
+} from "./scene"
 
-import { clamp } from "lodash"
+import {
+    type IPaintDevice,
+} from "@/graphics"
+
+import {
+    Rect,
+    type IVector2D,
+    type ISize2D,
+} from "@/maths"
+
+import {
+    createObservable,
+    type IEmitter,
+    type IObservable,
+} from "@/utils"
+
+import { clamp, isNil } from "lodash"
 
 export interface IViewportEvent {
     changed: Rect
@@ -12,42 +29,88 @@ export interface IViewport {
     readonly rect: Rect
     position: IVector2D
     size: ISize2D
+    centerOn(position: IVector2D): IViewport
 }
 
-export function createViewport(sceneSize: ISize2D): IViewport {
-    const [emitter, events] = createObservable<IViewportEvent>()
-    const rect = new Rect({ x: 0, y: 0 }, sceneSize)
+type ResizeEventHandler = (size: ISize2D) => void
+type PositionEventHandler = (position: IVector2D) => void
 
-    const setPosition = ({ x, y }: IVector2D) => {
-        rect.x = clamp(x, 0, sceneSize.width - rect.width)
-        rect.y = clamp(y, 0, sceneSize.height - rect.height)
-        emitter.emit("changed", Rect.fromRect(rect))
+export class Viewport implements IViewport {
+    private emitter_: IEmitter<IViewportEvent>
+    private events_: IObservable<IViewportEvent>
+    private rect_: Rect
+    private screen_: IPaintDevice | null = null
+
+    private updateSize_: ResizeEventHandler
+    private updatePosition_: PositionEventHandler
+
+    constructor(
+        private scene_: IScene,
+    ) {
+        const [emitter, events] = createObservable<IViewportEvent>()
+
+        this.emitter_ = emitter
+        this.events_ = events
+        this.rect_ = Rect.empty()
+
+        this.updateSize_ = ({ width, height }) => {
+            const { gridSpacing, width: sceneW, height: sceneH } = this.scene_
+            this.rect_.width = clamp(width/gridSpacing, 0, sceneW)
+            this.rect_.height = clamp(height/gridSpacing, 0, sceneH)
+            this.emitter_.emit("changed", Rect.fromRect(this.rect_))
+        }
+
+        this.updatePosition_ = ({ x, y }) => {
+            this.rect_.x = clamp(x, 0, this.scene_.width - this.rect_.width)
+            this.rect_.y = clamp(y, 0, this.scene_.height - this.rect_.height)
+            this.emitter_.emit("changed", Rect.fromRect(this.rect_))
+        }
+
+        this.scene_.events
+            .on("scaledChanged", () => {
+                this.updateSize_(this.screen_?.size ?? { width: 0, height: 0 })
+            })
+            .on("sizeChanged", () => {
+                this.updateSize_(this.screen_?.size ?? { width: 0, height: 0 })
+            })
+            .on("screenChanged", (screen: IPaintDevice | null) => {
+                if (!isNil(this.screen_)) {
+                    this.screen_.events.off("resized", this.updateSize_)
+                }
+                if (!isNil(screen)) {
+                    this.screen_ = screen
+                    this.updateSize_(this.screen_.size)
+                    this.screen_.events.on("resized", this.updateSize_)
+                }
+            })
     }
 
-    const setSize = (size: ISize2D) => {
-        rect.width = clamp(size.width, 0, sceneSize.width)
-        rect.height = clamp(size.height, 0, sceneSize.height)
-        setPosition(rect.topLeft())
+    get events(): IObservable<IViewportEvent> {
+        return this.events_
     }
 
-    return {
-        get events(): IObservable<IViewportEvent> {
-            return events
-        },
-        get rect(): Rect {
-            return Rect.fromRect(rect)
-        },
-        get position(): IVector2D {
-            return rect.topLeft()
-        },
-        set position(pos: IVector2D) {
-            setPosition(pos)
-        },
-        get size(): ISize2D {
-            return rect.size
-        },
-        set size(size: ISize2D) {
-            setSize(size)
-        },
+    get rect(): Rect {
+        return this.rect_
+    }
+
+    get position(): IVector2D {
+        return this.rect_.topLeft()
+    }
+
+    set position(pos: IVector2D) {
+        this.updatePosition_(pos)
+    }
+
+    get size(): ISize2D {
+        return this.rect_.size
+    }
+
+    centerOn(position: IVector2D)
+        : IViewport {
+        this.position = {
+            x: clamp(position.x - this.rect_.width/2, 0, this.scene_.width - this.rect_.width),
+            y: clamp(position.y - this.rect_.height/2, 0, this.scene_.height - this.rect_.height),
+        }
+        return this
     }
 }

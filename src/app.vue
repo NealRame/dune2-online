@@ -1,59 +1,63 @@
-<template>
-    <modal :show="gameDataLoading">
-        <progress-bar
-            :current="gameDataProgress"
-            :label="gameDataProgressLabel"
-        />
-    </modal>
-    <router-view v-if="!gameDataLoading"></router-view>
-</template>
-
-<style lang="scss" scoped>
-ul {
-    padding: 0;
-    list-style-type: none;
-}
-</style>
-
 <script lang="ts">
 import "@/styles/global.scss"
 
-import Modal from "@/components/Modal.vue"
-import ProgressBar from "@/components/ProgressBar.vue"
-import * as Dune2 from "@/dune2"
+import { EngineKey } from "./constants"
 
-import { defineComponent, onMounted, ref } from "vue"
+import Modal from "@/dune/ui/Modal.vue"
+import ProgressBar from "@/dune/ui/ProgressBar.vue"
+
+import * as Engine from "@/engine"
+
+import { isNil } from "lodash"
+import { defineComponent, inject, onMounted, ref } from "vue"
 
 export default defineComponent({
+    name: "App",
     components: {
         Modal,
-        ProgressBar
+        ProgressBar,
     },
     setup() {
-        const gameDataLoading = ref(true)
-        const gameDataProgressLabel = ref("")
-        const gameDataProgress = ref(0)
+        const loadingRef = ref<boolean>(false)
+        const loadingLabelRef = ref<string>("")
+        const loadingValueRef = ref<number | null>(null)
 
-        onMounted(async () => await Dune2.Data.load({
-            begin() {
-                gameDataLoading.value = true
-            },
-            end() {
-                gameDataLoading.value = false
-            },
-            setLabel(label: string) {
-                gameDataProgressLabel.value = label
-            },
-            setValue(value: number) {
-                gameDataProgress.value = value
-            },
-        }))
+        onMounted(async () => {
+            const engine = inject(EngineKey)
+            if (!isNil(engine)) {
+                engine.events
+                    .on("stateChanged", state => {
+                        loadingRef.value = state === Engine.State.Initializing
+                    })
+                    .on("downloadingResourceBegin", ({ name }) => {
+                        loadingLabelRef.value = `Downloading ${name}...`
+                        loadingValueRef.value = null
+                    })
+                    .on("decodingResourceBegin", ({ name }) => {
+                        loadingLabelRef.value = `Decoding ${name}...`
+                        loadingValueRef.value = null
+                    })
+                    .on("downloadingResourceProgress", ({ current, total }) => {
+                        if (!(isNil(current) || isNil(total))) {
+                            loadingValueRef.value = current/total
+                        }
+                    })
+                await engine.initialize()
+            }
+        })
 
         return {
-            gameDataLoading,
-            gameDataProgressLabel,
-            gameDataProgress,
+            loading: loadingRef,
+            loadingLabel: loadingLabelRef,
+            loadingValue: loadingValueRef,
         }
     }
 })
 </script>
+
+<template>
+    <modal :show="loading">
+        <progress-bar :current="loadingValue" :label="loadingLabel"/>
+    </modal>
+    <router-view />
+</template>

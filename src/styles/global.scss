@@ -1,3 +1,6 @@
+@import "./variables";
+@import "./fonts";
+
 body {
   background-color: $bg-color;
   color: $fg-color;
@@ -15,4 +18,19 @@ body {
 a {
   color: $link-color;
   text-decoration: none;
+}
+
+#right-panel {
+  display: flex;
+
+  align-items: stretch;
+
+  flex-direction: column-reverse;
+
+  gap: .5rem;
+
+  position: fixed;
+  top: 16px;
+  bottom: 16px;
+  right: 16px;
 }

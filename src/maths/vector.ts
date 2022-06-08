@@ -41,7 +41,7 @@ export class Vector implements IVector2D {
         return exhaustiveCheck_
     }
 
-    static get Null(): Vector {
+    static get Zero(): Vector {
         return new Vector( 0,  0)
     }
 

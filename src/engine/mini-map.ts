@@ -1,13 +1,24 @@
-import { Engine } from "./engine"
-import { ITerrain, ITerrainData } from "./land"
+import {
+    GameLandTerrainColorProvider
+} from "@/engine/constants"
+
+import {
+    Inject,
+    Service,
+    ServiceLifecycle,
+} from "@/engine/injector"
+
+import {
+    type ILand,
+    type ILandTerrainColorProvider,
+    type ITerrainData,
+    type ITerrain,
+} from "@/engine/land"
 
 import { Color } from "@/graphics"
-import { createObservable, IObservable } from "@/utils"
+import { createObservable, IEmitter, IObservable } from "@/utils"
 
-import { constant, isNil } from "lodash"
-
-export type TerrainColorGetter<TerrainData extends ITerrainData>
-    = (t: ITerrain<TerrainData>) => Color.RGBA
+import { isNil } from "lodash"
 
 export interface IMiniMapEvent {
     changed: null
@@ -16,39 +27,75 @@ export interface IMiniMapEvent {
 export interface IMiniMap {
     readonly image: ImageBitmap|null
     readonly events: IObservable<IMiniMapEvent>
+    land: ILand | null
 }
 
-export class MiniMap<TerrainData extends ITerrainData> implements IMiniMap {
-    private bitmap_: ImageBitmap | null
-    private canvas_: OffscreenCanvas
-    private context_: OffscreenCanvasRenderingContext2D
+@Service({ lifecycle: ServiceLifecycle.Singleton })
+export class MiniMap implements IMiniMap {
     private events_: IObservable<IMiniMapEvent>
+    private emitter_: IEmitter<IMiniMapEvent>
 
-    terrainColor: TerrainColorGetter<TerrainData> = constant([0, 0, 0, 0])
+    private bitmap_: ImageBitmap | null
+    private canvas_: OffscreenCanvas | null
+    private land_: ILand | null
 
-    constructor(game: Engine<TerrainData>) {
-        const [emitter, events] = createObservable<IMiniMapEvent>()
+    private update_(terrain: ITerrain<ITerrainData>) {
+        if (isNil(this.canvas_)) return
 
-        const { width, height } = game.land.view.size
+        const context = this.canvas_.getContext("2d") as OffscreenCanvasRenderingContext2D
 
-        this.bitmap_ = null
-        this.canvas_ = new OffscreenCanvas(width, height)
-        this.context_ = this.canvas_.getContext("2d") as OffscreenCanvasRenderingContext2D
-        this.events_ = events
+        if (!isNil(this.bitmap_)) {
+            context.drawImage(this.bitmap_, 0, 0)
+        }
 
-        game.land.events.on("terrainChanged", terrain => {
-            if (!isNil(this.bitmap_)) {
-                this.context_.drawImage(this.bitmap_, 0, 0)
+        const { x, y } = terrain.position
+        const color = this.terrainColorProvider_.getTerrainColor(terrain)
+
+        context.fillStyle = Color.cssRGB(color)
+        context.fillRect(x, y, 1, 1)
+
+        this.bitmap_ = this.canvas_.transferToImageBitmap()
+        this.emitter_.emit("changed", null)
+    }
+
+    private reset_() {
+        if (isNil(this.land_)) return
+
+        const { width, height } = this.land_.size
+
+        if (width !== 0 && height !== 0) {
+            this.canvas_ = new OffscreenCanvas(width, height)
+
+            const context = this.canvas_.getContext("2d") as OffscreenCanvasRenderingContext2D
+            context.clearRect(0, 0, width, height)
+
+            for (const terrain of this.land_.terrains()) {
+                const { x, y } = terrain.position
+                const color = this.terrainColorProvider_.getTerrainColor(terrain)
+
+                context.fillStyle = Color.cssRGB(color)
+                context.fillRect(x, y, 1, 1)
             }
 
-            const { x, y } = terrain.position
-
-            this.context_.fillStyle = Color.cssRGB(this.terrainColor(terrain))
-            this.context_.fillRect(x, y, 1, 1)
             this.bitmap_ = this.canvas_.transferToImageBitmap()
+        } else {
+            this.bitmap_ = null
+        }
 
-            emitter.emit("changed", null)
-        })
+        this.emitter_.emit("changed", null)
+    }
+
+    constructor(
+        @Inject(GameLandTerrainColorProvider) private terrainColorProvider_: ILandTerrainColorProvider,
+    ) {
+        const [emitter, events] = createObservable<IMiniMapEvent>()
+
+        this.events_ = events
+        this.emitter_ = emitter
+
+        this.canvas_ = null
+        this.land_ = null
+        this.bitmap_ = null
     }
 
     get events()
@@ -59,5 +106,24 @@ export class MiniMap<TerrainData extends ITerrainData> implements IMiniMap {
     get image()
         : ImageBitmap | null {
         return this.bitmap_
+    }
+
+    get land(): ILand | null {
+        return this.land_
+    }
+
+    set land(land: ILand | null) {
+        if (!isNil(this.land_)) {
+            this.land_.events.off("reset", this.reset_)
+            this.land_.events.off("terrainChanged", this.update_)
+        }
+
+        this.land_ = land
+
+        if (!isNil(this.land_)) {
+            this.land_.events.on("terrainChanged", terrain => this.update_(terrain))
+            this.land_.events.on("reset", () => this.reset_())
+            this.reset_()
+        }
     }
 }

@@ -102,3 +102,24 @@ export function createObservable<T extends EventMap>()
         }
     }]
 }
+
+export interface IDOMEventManager {
+    start(): void
+    stop(): void
+}
+
+export function createEventManager<K extends keyof HTMLElementEventMap>(
+    element: HTMLElement | Window,
+    type: K,
+    listener: EventListener,
+    options?: boolean | AddEventListenerOptions | undefined
+): IDOMEventManager {
+    return {
+        start() {
+            element.addEventListener(type, listener, options)
+        },
+        stop() {
+            element.removeEventListener(type, listener, options)
+        }
+    }
+}

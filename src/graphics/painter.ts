@@ -17,20 +17,18 @@ export class PainterError extends Error {
 }
 
 export class Painter {
-    private canvas_: HTMLCanvasElement | OffscreenCanvas
     private context_: CanvasRenderingContext2D | OffscreenCanvasRenderingContext2D
 
     /**
      * @param paintDevice
      */
     constructor(
-        canvas: HTMLCanvasElement | OffscreenCanvas
+        private canvas_: HTMLCanvasElement | OffscreenCanvas
     ) {
-        this.canvas_ = canvas
-        if (canvas instanceof HTMLCanvasElement) {
-            this.context_ = canvas.getContext("2d") as CanvasRenderingContext2D
-        } else if (canvas instanceof OffscreenCanvas) {
-            this.context_ = canvas.getContext("2d") as OffscreenCanvasRenderingContext2D
+        if (this.canvas_ instanceof HTMLCanvasElement) {
+            this.context_ = this.canvas_.getContext("2d") as CanvasRenderingContext2D
+        } else if (this.canvas_ instanceof OffscreenCanvas) {
+            this.context_ = this.canvas_.getContext("2d") as OffscreenCanvasRenderingContext2D
         } else {
             throw new PainterError("Unsupported canvas")
         }
@@ -44,9 +42,17 @@ export class Painter {
         }
     }
 
-    get rect(): Rect {
-        return new Rect({ x: 0, y: 0 }, this.size)
-    }
+    // get rect(): Rect {
+    //     return new Rect({ x: 0, y: 0 }, this.size)
+    // }
+
+    // get width(): number {
+    //     return this.canvas_.width
+    // }
+
+    // get height(): number {
+    //     return this.canvas_.height
+    // }
 
     get pen(): Pen {
         return {
@@ -90,12 +96,18 @@ export class Painter {
 
     // Drawing routines
 
-    clear(brush: Brush): Painter {
-        const { width, height } = this.size
-        this.context_.save()
-        this.context_.fillStyle = brush
-        this.context_.fillRect(0, 0, width, height)
-        this.context_.restore()
+    clear(): Painter
+    clear(brush: Brush): Painter
+    clear(brush?: Brush): Painter {
+        const { width, height } = this.canvas_
+        if (isNil(brush)) {
+            this.context_.clearRect(0, 0, width, height)
+        } else {
+            this.context_.save()
+            this.context_.fillStyle = brush
+            this.context_.fillRect(0, 0, width, height)
+            this.context_.restore()
+        }
         return this
     }
 

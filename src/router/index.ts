@@ -1,8 +1,6 @@
-import Game from "@/components/Game.vue"
-import Home from "@/components/Home.vue"
-import Sprites from "@/components/Sprites.vue"
-import Images from "@/components/Images.vue"
-import Tiles from "@/components/Tiles.vue"
+import Game from "@/dune/ui/Game.vue"
+import Editor from "@/dune/ui/Editor.vue"
+import Home from "@/dune/ui/Home.vue"
 
 import { createRouter, createWebHistory, RouteRecordRaw } from "vue-router"
 
@@ -15,19 +13,9 @@ const routes: Array<RouteRecordRaw> = [{
     name: "Game",
     path: "/game",
 }, {
-    component: Sprites,
-    name: "Sprites",
-    path: "/sprites"
-}, {
-    component: Images,
-    name: "Images",
-    path: "/images/:set",
-    props: true,
-}, {
-    component: Tiles,
-    name: "Tiles",
-    path: "/tiles",
-    props: true,
+    component: Editor,
+    name: "Editor",
+    path: "/editor",
 }]
 
 const router = createRouter({

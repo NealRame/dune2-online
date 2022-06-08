@@ -1,88 +1,110 @@
-import { Terrain } from "./terrain"
+import { constant, isNil } from "lodash"
+
 import {
-    ILand,
-    ILandEvent,
-    ITerrainData,
-    ITerrain,
-    Neighborhood,
-    LandInitialData,
-    TileIndexGetter
+    GameLandTerrainGenerator,
+    GameLandTerrainColorProvider,
+    GameLandTilesProvider,
+    GameMode,
+    GameScene,
+} from "@/engine/constants"
+
+import {
+    Inject,
+    type Token,
+} from "@/engine/injector"
+
+import {
+    type IScene,
+    type ISceneItem
+} from "@/engine/scene"
+
+import {
+    Mode,
+    type IGameLandDescriptor,
+} from "@/engine/types"
+
+import {
+    Rect,
+    type ISize2D,
+    type IVector2D,
+} from "@/maths"
+
+import {
+    createObservable,
+    type IEmitter,
+    type IObservable
+} from "@/utils"
+
+import {
+    LandConfigurationError,
+    LandDataSizeError,
+} from "./errors"
+
+import {
+    Terrain
+} from "./terrain"
+
+import {
+    type ILand,
+    type ILandConfig,
+    type ILandEvent,
+    type ILandTerrainGenerator,
+    type ILandTerrainTilesProvider,
+    type ITerrainData,
+    type ITerrain,
+    type Neighborhood,
 } from "./types"
+
 import {
     createPositionToIndexConverter,
     createIndexToPositionConverter,
-    PositionToIndexConverter,
     IndexToPositionConverter,
+    PositionToIndexConverter,
 } from "./utils"
-import { LandView } from "./view"
 
-import { Entity } from "@/engine/entity"
-import { Image, IScene, ISceneItem } from "@/engine/scene"
+import { LandChunkView } from "./view/chunk-view"
+import { LandEditorView } from "./view/editor-view"
 
-import { ISize2D, IVector2D, Rect } from "@/maths"
-
-import { constant, isNil, times } from "lodash"
-import { createObservable, IEmitter, IObservable } from "@/utils"
-
-export class LandDataError extends Error {
-    constructor(m: string) {
-        super(m)
-        Object.setPrototypeOf(this, LandDataError.prototype)
-    }
-}
-
-export class Land<TerrainData extends ITerrainData> extends Entity implements ILand<TerrainData> {
+export class Land<
+    TerrainDataType extends ITerrainData = ITerrainData,
+    LandConfigType extends ILandConfig = ILandConfig,
+> implements ILand<TerrainDataType, LandConfigType> {
     private size_: ISize2D
     private indexToPosition_: IndexToPositionConverter
     private positionToIndex_: PositionToIndexConverter
 
-    private events_: IObservable<ILandEvent<TerrainData>>
-    private emitter_: IEmitter<ILandEvent<TerrainData>>
+    private events_: IObservable<ILandEvent<TerrainDataType>>
+    private emitter_: IEmitter<ILandEvent<TerrainDataType>>
 
-    private terrains_: Array<Terrain<TerrainData>> = []
-    private view_: LandView<TerrainData>
-
-    chunkSize = { width: 16, height: 16 }
-    fogImage: TileIndexGetter<TerrainData> = constant(-1)
-    terrainImage: TileIndexGetter<TerrainData> = constant(-1)
-    tiles: Array<Image> = []
+    private terrains_: Array<Terrain<TerrainDataType>> = []
+    private view_: ISceneItem
 
     constructor(
-        scene: IScene,
-        landData: LandInitialData<TerrainData>,
+        @Inject(GameLandTerrainGenerator) private terrainGenerator_: ILandTerrainGenerator<TerrainDataType>,
+        @Inject(GameLandTilesProvider) private tilesProvider_: ILandTerrainTilesProvider<TerrainDataType>,
+        @Inject(GameMode) gameMode: Mode,
+        @Inject(GameScene) scene: IScene,
     ) {
-        super()
+        const [emitter, events] = createObservable<ILandEvent<TerrainDataType>>()
 
-        this.size_ = scene.size
-        this.indexToPosition_ = createIndexToPositionConverter(this.size_)
-        this.positionToIndex_ = createPositionToIndexConverter(this.size_)
-
-        const [emitter, events] = createObservable<ILandEvent<TerrainData>>()
-
+        this.indexToPosition_ = constant({ x: 0, y: 0 })
+        this.positionToIndex_ = constant(-1)
+        this.size_ = { width: 0, height: 0 }
         this.emitter_ = emitter
         this.events_ = events
 
-        this.terrains_ = times(this.size_.width*this.size_.height, index => {
-            const position = this.indexToPosition_(index)
-            const data = (typeof landData === "function")
-                ? landData(position)
-                : landData[index]
-
-            if (isNil(data)) {
-                throw new LandDataError("Not enougth data to cover land area!")
-            }
-            return new Terrain(position, data, this)
-        })
-        this.view_ = new LandView(this, scene)
+        this.view_ = gameMode === Mode.Editor
+            ? new LandEditorView(this, this.tilesProvider_, scene)
+            : new LandChunkView(this, this.tilesProvider_, scene)
     }
 
     get events()
-        : IObservable<ILandEvent<TerrainData>> {
+        : IObservable<ILandEvent<TerrainDataType>> {
         return this.events_
     }
 
     get emitter()
-        : IEmitter<ILandEvent<TerrainData>> {
+        : IEmitter<ILandEvent<TerrainDataType>> {
         return this.emitter_
     }
 
@@ -90,12 +112,40 @@ export class Land<TerrainData extends ITerrainData> extends Entity implements IL
         return this.size_
     }
 
+    get width(): number {
+        return this.size_.width
+    }
+
+    get height(): number {
+        return this.size_.height
+    }
+
     get view(): ISceneItem {
         return this.view_
     }
 
+    load(size: ISize2D, terrains: TerrainDataType[]): this {
+        const terrainsLength = terrains.length
+        const landArea = size.width*size.height
+        if (terrainsLength === landArea) {
+            this.indexToPosition_ = createIndexToPositionConverter(size)
+            this.positionToIndex_ = createPositionToIndexConverter(size)
+            this.size_ = size
+            this.terrains_ = terrains.map((data, index) => {
+                return new Terrain(this.indexToPosition_(index), data, this)
+            })
+            this.emitter_.emit("reset", this.size_)
+            return this
+        }
+        throw new LandDataSizeError(terrainsLength, landArea)
+    }
+
+    generate(config: LandConfigType): this {
+        return this.load(config.size, this.terrainGenerator_.generate(config))
+    }
+
     neighborhood({ x, y }: IVector2D)
-        : Neighborhood<TerrainData> {
+        : Neighborhood<TerrainDataType> {
         return [
             this.terrain({ x, y: y - 1 }),
             this.terrain({ x: x + 1, y }),
@@ -107,31 +157,66 @@ export class Land<TerrainData extends ITerrainData> extends Entity implements IL
     reveal(position: IVector2D, size?: ISize2D): this {
         size = size ?? { width: 1, height: 1 }
         for (const terrain of this.terrains(new Rect(position, size))) {
-            terrain.set({ revealed: true } as Partial<TerrainData>)
+            terrain.set({ revealed: true } as Partial<TerrainDataType>)
         }
         return this
     }
 
     terrain(position: IVector2D)
-        : ITerrain<TerrainData>|null {
+        : ITerrain<TerrainDataType>|null {
         return this.terrains_[this.positionToIndex_(position)] ?? null
     }
 
     * terrains(zone?: Rect)
-        : Generator<ITerrain<TerrainData>, void, undefined> {
+        : Generator<ITerrain<TerrainDataType>, void, undefined> {
         if (!isNil(zone)) {
             const rect = Rect.intersection(this.view.rect, zone)
             if (!isNil(rect)) {
                 for (const { x, y } of rect.partition()) {
-                    yield this.terrain({ x, y }) as ITerrain<TerrainData>
+                    yield this.terrain({ x, y }) as ITerrain<TerrainDataType>
                 }
             }
         } else {
             yield * this.terrains_
         }
     }
+}
 
-    update(): void {
-        this.view_.update()
+export function define<
+    TerrainDataType extends ITerrainData = ITerrainData
+>(metadata: IGameLandDescriptor<TerrainDataType>): void {
+    Reflect.defineProperty(window, GameLandTerrainColorProvider, {
+        value: metadata.ColorsProvider,
+    })
+    Reflect.defineProperty(window, GameLandTerrainGenerator, {
+        value: metadata.Generator,
+    })
+    Reflect.defineProperty(window, GameLandTilesProvider, {
+        value: metadata.TilesProvider
+    })
+}
+
+export function getMetadata<
+    TerrainDataType extends ITerrainData = ITerrainData
+>(): IGameLandDescriptor<TerrainDataType> {
+    const Generator = Reflect.get(window, GameLandTerrainGenerator)
+    if (isNil(Generator)) {
+        throw new LandConfigurationError("Land configuration miss Generator property")
     }
+
+    const ColorsProvider = Reflect.get(window, GameLandTerrainColorProvider)
+    if (isNil(ColorsProvider)) {
+        throw new LandConfigurationError("Land configuration miss ColorsProvider property")
+    }
+
+    const TilesProvider = Reflect.get(window, GameLandTilesProvider)
+    if (isNil(TilesProvider)) {
+        throw new LandConfigurationError("Land configuration miss TilesProvider property")
+    }
+
+    return {
+        Generator,
+        ColorsProvider,
+        TilesProvider,
+    } as IGameLandDescriptor<TerrainDataType>
 }
